@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: personality-360-mvp
+    runtime: docker
+    plan: free
+    region: oregon
+    envVars:
+      - key: APP_NAME
+        value: "Personality 360"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        value: "base64:1wWf5KHtdnNCU3beG42ECrqpZJHGTjZbPPWpYWyDkvg="
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
