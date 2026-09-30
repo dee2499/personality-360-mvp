@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assessment;
 use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentScoreService;
@@ -52,9 +53,65 @@ class PeopleController extends Controller
 
         $surveys = Survey::all();
 
-        // Calculate combined score strictly for this subject
+        // Get all surveys associated with this person (as participant or in assessments)
+        $userSurveys = Survey::query()
+            ->where(function ($query) use ($person) {
+                $query->whereHas('participants', fn ($q) => $q->where('users.id', $person->id))
+                    ->orWhereHas('assessments', fn ($q) => $q->where('assessor_id', $person->id)->orWhere('subject_id', $person->id));
+            })
+            ->with(['questions'])
+            ->get()
+            ->map(function (Survey $survey) use ($person) {
+                $givenAssessments = Assessment::where('survey_id', $survey->id)
+                    ->where('assessor_id', $person->id)
+                    ->get();
+                $givenTotal = $givenAssessments->count();
+                $givenCompleted = $givenAssessments->where('status', 'completed')->count();
+                $givenPending = $givenTotal - $givenCompleted;
+
+                $receivedAssessments = Assessment::where('survey_id', $survey->id)
+                    ->where('subject_id', $person->id)
+                    ->get();
+                $receivedTotal = $receivedAssessments->count();
+                $receivedCompleted = $receivedAssessments->where('status', 'completed')->count();
+                $receivedPending = $receivedTotal - $receivedCompleted;
+
+                $surveyMetrics = $this->scoreService->calculateSubjectCombinedScore($person, $survey);
+
+                $isCompleted = ($givenTotal > 0 ? $givenPending === 0 : true)
+                    && ($receivedTotal > 0 ? $receivedPending === 0 : true)
+                    && ($givenTotal > 0 || $receivedTotal > 0);
+
+                $isPending = ($givenPending > 0 || $receivedPending > 0);
+
+                return [
+                    'survey' => $survey,
+                    'is_completed' => $isCompleted,
+                    'is_pending' => $isPending,
+                    'given_total' => $givenTotal,
+                    'given_completed' => $givenCompleted,
+                    'given_pending' => $givenPending,
+                    'received_total' => $receivedTotal,
+                    'received_completed' => $receivedCompleted,
+                    'received_pending' => $receivedPending,
+                    'metrics' => $surveyMetrics,
+                ];
+            });
+
+        $pendingSurveys = $userSurveys->filter(fn ($s) => $s['is_pending']);
+        $completedSurveys = $userSurveys->filter(fn ($s) => $s['is_completed']);
+
+        // Calculate combined score (for selected survey, or overall across all surveys)
         $metrics = $this->scoreService->calculateSubjectCombinedScore($person, $selectedSurvey);
 
-        return view('admin.people.show', compact('person', 'metrics', 'surveys', 'selectedSurvey'));
+        return view('admin.people.show', compact(
+            'person',
+            'metrics',
+            'surveys',
+            'selectedSurvey',
+            'userSurveys',
+            'pendingSurveys',
+            'completedSurveys'
+        ));
     }
 }

@@ -162,4 +162,64 @@ class AssessmentScoreTest extends TestCase
         $this->assertEquals(66.06, $metrics['percentage']); // 218 / 330 * 100
         $this->assertEquals('Lemon', $metrics['category']);
     }
+
+    public function test_people_profile_and_participant_portal_list_pending_surveys(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $participant = User::factory()->create(['name' => 'Dipak', 'role' => 'participant']);
+
+        // Survey 1 (Completed)
+        $survey1 = Survey::create([
+            'title' => 'Survey Alpha 2026',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+        $survey1->participants()->attach($participant->id);
+        $q1 = Question::create(['survey_id' => $survey1->id, 'question_text' => 'Q1', 'sort_order' => 1]);
+        $a1 = Assessment::create([
+            'survey_id' => $survey1->id,
+            'assessor_id' => $participant->id,
+            'subject_id' => $participant->id,
+            'status' => 'completed',
+            'total_score' => 10,
+            'max_score' => 10,
+            'percentage' => 100.0,
+            'category' => 'Cucumber',
+        ]);
+        AssessmentAnswer::create(['assessment_id' => $a1->id, 'question_id' => $q1->id, 'score' => 10]);
+
+        // Survey 2 (Pending)
+        $survey2 = Survey::create([
+            'title' => 'Survey Beta 2026',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+        $survey2->participants()->attach($participant->id);
+        $q2 = Question::create(['survey_id' => $survey2->id, 'question_text' => 'Q2', 'sort_order' => 1]);
+        $a2 = Assessment::create([
+            'survey_id' => $survey2->id,
+            'assessor_id' => $participant->id,
+            'subject_id' => $participant->id,
+            'status' => 'pending',
+            'total_score' => 0,
+            'max_score' => 10,
+            'percentage' => 0.0,
+        ]);
+
+        // 1. Admin User Details (/admin/people/{participant})
+        $responseAdmin = $this->actingAs($admin)->get(route('admin.people.show', $participant));
+        $responseAdmin->assertOk();
+        $responseAdmin->assertSee('Assigned Surveys');
+        $responseAdmin->assertSee('Survey Alpha 2026');
+        $responseAdmin->assertSee('Survey Beta 2026');
+        $responseAdmin->assertSee('Pending Survey');
+        $responseAdmin->assertSee('Completed');
+
+        // 2. Participant Portal (/my-assessments)
+        $responseParticipant = $this->actingAs($participant)->get(route('participant.assessments.index'));
+        $responseParticipant->assertOk();
+        $responseParticipant->assertSee('Survey Alpha 2026');
+        $responseParticipant->assertSee('Survey Beta 2026');
+        $responseParticipant->assertSee('Pending Survey');
+    }
 }

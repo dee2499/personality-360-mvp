@@ -43,10 +43,29 @@ class AssessmentController extends Controller
         $selfAssessment = $assessments->first(fn ($a) => $a->isSelfAssessment());
         $peerAssessments = $assessments->filter(fn ($a) => ! $a->isSelfAssessment());
 
+        $surveyGroups = $assessments->groupBy('survey_id')->map(function ($items) {
+            $survey = $items->first()->survey;
+            $self = $items->first(fn ($a) => $a->isSelfAssessment());
+            $peers = $items->filter(fn ($a) => ! $a->isSelfAssessment());
+            $isCompleted = $items->every(fn ($a) => $a->isCompleted());
+            $completed = $items->where('status', 'completed')->count();
+            $total = $items->count();
+
+            return [
+                'survey' => $survey,
+                'selfAssessment' => $self,
+                'peerAssessments' => $peers,
+                'isCompleted' => $isCompleted,
+                'completedCount' => $completed,
+                'totalCount' => $total,
+            ];
+        })->values();
+
         return view('participant.assessments.index', compact(
             'assessments',
             'selfAssessment',
             'peerAssessments',
+            'surveyGroups',
             'totalAssigned',
             'completedCount',
             'pendingCount',
