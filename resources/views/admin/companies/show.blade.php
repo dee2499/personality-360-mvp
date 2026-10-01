@@ -154,7 +154,7 @@
                                                 <div class="flex items-center justify-end gap-2">
                                                     @if($employee->isInvited())
                                                         <button type="button" 
-                                                                @click="copyLink('{{ route('invitation.accept', ['token' => $employee->invitation_token]) }}')"
+                                                                @click="copyLink('{{ route('invitation.show', ['token' => $employee->invitation_token]) }}')"
                                                                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
                                                             <i data-lucide="copy" class="w-3 h-3"></i>
                                                             <span>Link</span>

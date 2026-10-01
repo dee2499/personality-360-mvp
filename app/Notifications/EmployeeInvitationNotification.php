@@ -34,7 +34,7 @@ class EmployeeInvitationNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $company = $this->companyName ?? $notifiable->company?->name ?? 'your organization';
-        $activationUrl = route('invitation.accept', ['token' => $this->token]);
+        $activationUrl = route('invitation.show', ['token' => $this->token]);
 
         return (new MailMessage)
             ->subject("You've been invited to {$company} on Personality 360")

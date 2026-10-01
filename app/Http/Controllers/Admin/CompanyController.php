@@ -9,6 +9,7 @@ use App\Notifications\EmployeeInvitationNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -126,11 +127,11 @@ class CompanyController extends Controller
 
         try {
             $user->notify(new EmployeeInvitationNotification($token, $company->name));
-        } catch (\Throwable) {
-            // Mail failure should not block account creation in local or offline environments
+        } catch (\Throwable $e) {
+            Log::error('Failed sending invitation email to '.$user->email.': '.$e->getMessage());
         }
 
-        $activationUrl = route('invitation.accept', ['token' => $token]);
+        $activationUrl = route('invitation.show', ['token' => $token]);
 
         return redirect()->route('admin.companies.show', $company)
             ->with('success', "Employee '{$user->name}' added to {$company->name}! Invitation email generated.")
