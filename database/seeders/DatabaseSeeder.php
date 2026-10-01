@@ -40,6 +40,9 @@ class DatabaseSeeder extends Seeder
         // Remove companies
         Company::truncate();
 
+        // Seed Score Categories (Apple, Orange, Tomato, Lemon, Cucumber)
+        $this->call(ScoreCategorySeeder::class);
+
         Schema::enableForeignKeyConstraints();
 
         // 2. Ensure Admin user exists with password "password"

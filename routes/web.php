@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PeopleController as AdminPeopleController;
@@ -96,4 +97,9 @@ Route::prefix('admin')
         // Assessments
         Route::get('/assessments', [AdminAssessmentController::class, 'index'])->name('assessments.index');
         Route::get('/assessments/{assessment}', [AdminAssessmentController::class, 'show'])->name('assessments.show');
+
+        // Score Categories CRUD
+        Route::post('categories/reset-defaults', [AdminCategoryController::class, 'resetDefaults'])->name('categories.reset-defaults');
+        Route::post('categories/recalculate', [AdminCategoryController::class, 'recalculate'])->name('categories.recalculate');
+        Route::resource('categories', AdminCategoryController::class)->except(['show']);
     });
