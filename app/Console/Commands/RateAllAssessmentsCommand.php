@@ -80,6 +80,7 @@ class RateAllAssessmentsCommand extends Command
             'Tina Fey' => ['self' => 8.2, 'peer' => 8.6],
             'Victor Stone' => ['self' => 8.4, 'peer' => 8.2],
             'Wendy Rhoades' => ['self' => 8.9, 'peer' => 9.1],
+            'System Admin' => ['self' => 8.8, 'peer' => 8.7],
         ];
 
         $assessments = Assessment::where('survey_id', $survey->id)->get();

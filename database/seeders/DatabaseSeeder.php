@@ -10,6 +10,7 @@ use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentGenerationService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -64,6 +65,8 @@ class DatabaseSeeder extends Seeder
             'contact_email' => 'hr@acme.com',
             'description' => 'Leading innovation & organizational culture benchmark.',
         ]);
+
+        $admin->update(['company_id' => $company->id]);
 
         // 4. Create 20 Employees for this company with password "password"
         $employeesData = [
@@ -136,10 +139,14 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 7. Attach all 20 employees to the survey
-        $survey->participants()->attach($employees->pluck('id'));
+        // 7. Attach all 21 users (Admin + 20 employees) to the survey
+        $allUsers = $employees->concat([$admin]);
+        $survey->participants()->attach($allUsers->pluck('id'));
 
-        // 8. Generate all 360 assessment pairings (20 x 20 = 400 assessments)
+        // 8. Generate all 360 assessment pairings (21 x 21 = 441 assessments)
         app(AssessmentGenerationService::class)->generateForSurvey($survey);
+
+        // 9. Rate all assessments for all users with realistic ratings and completed status
+        Artisan::call('assessment:rate-all', ['--survey' => $survey->id]);
     }
 }
