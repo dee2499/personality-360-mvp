@@ -159,5 +159,8 @@
             </span>
         </div>
     </footer>
+
+    <!-- Universal Action Confirmation & Alert Modal -->
+    <x-confirm-modal />
 </body>
 </html>

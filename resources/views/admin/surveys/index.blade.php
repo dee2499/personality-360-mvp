@@ -102,7 +102,7 @@
                                             <form method="POST" action="{{ route('admin.surveys.destroy', $survey) }}" 
                                                   data-confirm="true"
                                                   data-confirm-title="Delete Survey"
-                                                  data-confirm-message="Are you sure you want to delete survey '{{ addslashes($survey->title) }}'? All questions and generated assessments will be permanently removed."
+                                                  data-confirm-message="Are you sure you want to delete this survey ({{ e($survey->title) }})? All questions and generated assessments will be permanently removed."
                                                   data-confirm-btn="Delete Survey"
                                                   data-confirm-type="danger"
                                                   class="inline">
