@@ -78,6 +78,7 @@ class AssessmentScoreService
     public function calculateSubjectCombinedScore(User $subject, ?Survey $survey = null): array
     {
         $query = Assessment::query()
+            ->has('survey')
             ->with(['assessor', 'survey', 'answers.question'])
             ->where('subject_id', $subject->id);
 
@@ -187,6 +188,7 @@ class AssessmentScoreService
     public function calculateSelfAndPeerScores(User $subject, ?Survey $survey = null): array
     {
         $query = Assessment::query()
+            ->has('survey')
             ->with(['assessor', 'survey', 'answers.question'])
             ->where('subject_id', $subject->id);
 

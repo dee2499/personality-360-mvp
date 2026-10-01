@@ -27,7 +27,7 @@ class SubmitAssessmentRequest extends FormRequest
     {
         /** @var Assessment $assessment */
         $assessment = $this->route('assessment');
-        $questionIds = $assessment->survey->questions()->pluck('id')->toArray();
+        $questionIds = $assessment->survey?->questions()->pluck('id')->toArray() ?? [];
 
         $rules = [
             'answers' => ['required', 'array'],

@@ -50,7 +50,8 @@ class AssessmentController extends Controller
         }
 
         // 3. Load all given assessments
-        $assessments = Assessment::with(['subject', 'survey'])
+        $assessments = Assessment::has('survey')
+            ->with(['subject', 'survey'])
             ->where('assessor_id', $user->id)
             ->get();
 

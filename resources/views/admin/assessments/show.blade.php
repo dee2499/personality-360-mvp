@@ -2,11 +2,19 @@
     <div class="max-w-4xl mx-auto space-y-6">
         <!-- Back Navigation -->
         <div>
-            <a href="{{ route('admin.people.show', $assessment->subject) }}" 
-               class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                <span>Back to {{ $assessment->subject->name }}'s Profile</span>
-            </a>
+            @if($assessment->subject)
+                <a href="{{ route('admin.people.show', $assessment->subject) }}" 
+                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back to {{ $assessment->subject->name }}'s Profile</span>
+                </a>
+            @else
+                <a href="{{ route('admin.assessments.index') }}" 
+                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back to Assessments</span>
+                </a>
+            @endif
         </div>
 
         <!-- Assessment Header Card -->
@@ -18,12 +26,12 @@
                         {{ $assessment->isSelfAssessment() ? 'Self Assessment' : 'Peer Assessment' }}
                     </span>
                     <h1 class="text-2xl font-black text-slate-900 mt-2 flex items-center gap-2">
-                        <span>{{ $assessment->assessor->name }}</span>
+                        <span>{{ $assessment->assessor?->name ?? 'Unknown' }}</span>
                         <span class="text-slate-300 font-normal">→</span>
-                        <span class="text-indigo-600">{{ $assessment->subject->name }}</span>
+                        <span class="text-indigo-600">{{ $assessment->subject?->name ?? 'Unknown' }}</span>
                     </h1>
                     <p class="text-xs text-slate-500 mt-1">
-                        Survey: <span class="font-semibold text-slate-700">{{ $assessment->survey->title }}</span>
+                        Survey: <span class="font-semibold text-slate-700">{{ $assessment->survey?->title ?? 'General Survey' }}</span>
                         @if($assessment->completed_at)
                             • Submitted on {{ $assessment->completed_at->format('F d, Y \a\t H:i') }}
                         @endif
@@ -55,7 +63,7 @@
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Score</span>
                     <div class="mt-1 flex items-baseline gap-1">
                         <span class="text-3xl font-black text-slate-900">{{ $assessment->total_score ?? '—' }}</span>
-                        <span class="text-xs text-slate-500 font-medium">/ {{ $assessment->max_score ?? ($assessment->survey->questions->count() * 10) }}</span>
+                        <span class="text-xs text-slate-500 font-medium">/ {{ $assessment->max_score ?? (($assessment->survey?->questions?->count() ?? 0) * 10) }}</span>
                     </div>
                 </div>
 
@@ -148,7 +156,7 @@
             <div class="p-6 sm:px-8 bg-slate-50 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs font-semibold text-slate-700">
                 <div class="flex items-center gap-2">
                     <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                    <span>Total Score: {{ $assessment->total_score ?? 0 }} / {{ $assessment->max_score ?? ($assessment->survey->questions->count() * 10) }}</span>
+                    <span>Total Score: {{ $assessment->total_score ?? 0 }} / {{ $assessment->max_score ?? (($assessment->survey?->questions?->count() ?? 0) * 10) }}</span>
                 </div>
                 <div class="flex items-center gap-4">
                     <span>Percentage: <strong class="text-slate-900">{{ number_format($assessment->percentage ?? 0, 2) }}%</strong></span>

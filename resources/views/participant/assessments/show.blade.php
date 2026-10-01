@@ -1,8 +1,8 @@
 <x-layouts.app>
     @php
-        $questions = $assessment->survey->questions;
+        $questions = $assessment->survey?->questions ?? collect();
         $totalQuestions = $questions->count();
-        $subjectName = $assessment->isSelfAssessment() ? 'Yourself' : $assessment->subject->name;
+        $subjectName = $assessment->isSelfAssessment() ? 'Yourself' : ($assessment->subject?->name ?? 'Colleague');
     @endphp
 
     <div class="max-w-3xl mx-auto space-y-6" x-data="{
@@ -84,7 +84,7 @@
                     <h1 class="text-2xl font-black text-slate-900 mt-2">
                         Assessing: <span class="text-indigo-600">{{ $subjectName }}</span>
                     </h1>
-                    <p class="text-xs text-slate-400 mt-0.5">Survey: {{ $assessment->survey->title }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Survey: {{ $assessment->survey?->title ?? 'General Survey' }}</p>
                 </div>
 
                 <!-- Progress Pill -->

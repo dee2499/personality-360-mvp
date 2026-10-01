@@ -20,7 +20,8 @@ class AssessmentController extends Controller
         $status = $request->query('status');
         $surveyId = $request->query('survey_id');
 
-        $query = Assessment::with(['assessor', 'subject', 'survey'])
+        $query = Assessment::has('survey')
+            ->with(['assessor', 'subject', 'survey'])
             ->latest('updated_at');
 
         if ($status && in_array($status, ['pending', 'in_progress', 'completed'])) {
@@ -39,6 +40,10 @@ class AssessmentController extends Controller
 
     public function show(Assessment $assessment): View
     {
+        if (! $assessment->survey) {
+            abort(404, 'The survey for this assessment no longer exists.');
+        }
+
         $assessment->load([
             'assessor',
             'subject',
@@ -48,7 +53,8 @@ class AssessmentController extends Controller
 
         $answersByQuestionId = $assessment->answers->keyBy('question_id');
 
-        $questionsWithAnswers = $assessment->survey->questions->map(function ($question) use ($answersByQuestionId) {
+        $questions = $assessment->survey?->questions ?? collect();
+        $questionsWithAnswers = $questions->map(function ($question) use ($answersByQuestionId) {
             $answer = $answersByQuestionId->get($question->id);
 
             return [
