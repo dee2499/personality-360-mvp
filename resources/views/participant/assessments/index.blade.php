@@ -42,37 +42,111 @@
                 </p>
             </div>
         @else
-            <!-- Survey Selector on Top -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-2.5">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                            Select Survey to View Matrix & Meters:
-                        </span>
-                    </div>
-                    <span class="text-[11px] text-slate-400">
-                        Click any survey name below to inspect its matrix
-                    </span>
-                </div>
-
-                <!-- Clickable Tabs for All Available Surveys -->
-                <div class="flex flex-wrap items-center gap-2.5">
-                    @foreach($surveyGroups as $group)
-                        @php
-                            $s = $group['survey'];
-                            $isSelected = $selectedSurvey && $selectedSurvey->id === $s->id;
-                            $sCompleted = $group['isCompleted'];
-                        @endphp
-                        <a href="{{ route('participant.assessments.index', ['survey_id' => $s->id]) }}"
-                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition {{ $isSelected ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 ring-2 ring-indigo-400/30' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
-                            <i data-lucide="{{ $isSelected ? 'check-circle-2' : 'file-text' }}" class="w-4 h-4 {{ $isSelected ? 'text-white' : 'text-slate-400' }}"></i>
-                            <span>{{ $s->title }}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-extrabold {{ $isSelected ? 'bg-indigo-800/80 text-white' : ($sCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800') }}">
-                                {{ $sCompleted ? 'Submitted' : 'Pending Survey' }}
+            <!-- Modern UI Survey Select Box -->
+            <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs"
+                 x-data="{
+                     open: false,
+                     selectedId: '{{ $selectedSurvey?->id }}'
+                 }"
+                 @click.outside="open = false"
+                 @keydown.escape.window="open = false">
+                
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <!-- Left: Label & Description -->
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-indigo-50 text-indigo-600">
+                                <i data-lucide="layers" class="w-4 h-4"></i>
                             </span>
-                        </a>
-                    @endforeach
+                            <label for="survey-select" class="text-sm font-black text-slate-900 tracking-tight">
+                                Select Survey to View Matrix
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-500 pl-9">
+                            Choose from your assigned 360 surveys to switch evaluation meters and matrix details.
+                        </p>
+                    </div>
+
+                    <!-- Right: Modern Select Box UI -->
+                    <div class="relative min-w-[280px] sm:min-w-[340px]">
+                        <!-- Custom Select Trigger Button -->
+                        <button type="button"
+                                @click="open = !open"
+                                class="w-full flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-200 text-left transition shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 cursor-pointer">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <span class="w-2.5 h-2.5 rounded-full {{ $selectedGroup && $selectedGroup['isCompleted'] ? 'bg-emerald-500' : 'bg-amber-500' }} shrink-0"></span>
+                                <div class="truncate">
+                                    <span class="text-xs font-bold text-slate-900 block truncate">
+                                        {{ $selectedSurvey ? $selectedSurvey->title : 'Select a survey...' }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-medium">
+                                        {{ $selectedGroup && $selectedGroup['isCompleted'] ? 'Submitted' : 'Pending Survey' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <i data-lucide="chevron-down" 
+                               class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"
+                               :class="{ 'rotate-180': open }"></i>
+                        </button>
+
+                        <!-- Floating Dropdown Menu -->
+                        <div x-show="open"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                             class="absolute right-0 left-0 mt-2 z-40 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden py-1.5 divide-y divide-slate-100">
+                            
+                            @foreach($surveyGroups as $group)
+                                @php
+                                    $s = $group['survey'];
+                                    $isSelected = $selectedSurvey && $selectedSurvey->id === $s->id;
+                                    $sCompleted = $group['isCompleted'];
+                                    $url = route('participant.assessments.index', ['survey_id' => $s->id]);
+                                @endphp
+                                <a href="{{ $url }}"
+                                   class="flex items-center justify-between gap-3 px-4 py-3 hover:bg-indigo-50/50 transition cursor-pointer {{ $isSelected ? 'bg-indigo-50/70' : '' }}">
+                                    <div class="flex items-center gap-3 truncate">
+                                        <div class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 {{ $isSelected ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                            <i data-lucide="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <div class="truncate">
+                                            <span class="text-xs font-bold text-slate-900 block truncate {{ $isSelected ? 'text-indigo-950 font-black' : '' }}">
+                                                {{ $s->title }}
+                                            </span>
+                                            <span class="text-[10px] text-slate-400">
+                                                {{ $s->company?->name ?? 'Company Survey' }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full shrink-0 {{ $sCompleted ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                        {{ $sCompleted ? 'Submitted' : 'Pending Survey' }}
+                                    </span>
+                                </a>
+                            @endforeach
+                        </div>
+
+                        <!-- Native Select for accessibility & testing fallback -->
+                        <select id="survey-select" 
+                                class="sr-only"
+                                onchange="if (this.value) window.location.href = this.value">
+                            @foreach($surveyGroups as $group)
+                                @php
+                                    $s = $group['survey'];
+                                    $isSelected = $selectedSurvey && $selectedSurvey->id === $s->id;
+                                    $sCompleted = $group['isCompleted'];
+                                    $url = route('participant.assessments.index', ['survey_id' => $s->id]);
+                                @endphp
+                                <option value="{{ $url }}" {{ $isSelected ? 'selected' : '' }}>
+                                    {{ $s->title }} ({{ $sCompleted ? 'Submitted' : 'Pending Survey' }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
 
