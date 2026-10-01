@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Assessment;
+use App\Models\AssessmentAnswer;
 use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
@@ -273,5 +274,111 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $response->assertSee('Peer-Assessed Rating');
         $response->assertSee('80.00');
         $response->assertSee('Executive Leadership 360');
+    }
+
+    public function test_user_dashboard_displays_dual_meters_and_switches_between_two_surveys(): void
+    {
+        $company = Company::factory()->create(['name' => 'Stark Global']);
+        $admin = User::factory()->create(['role' => 'admin', 'company_id' => $company->id]);
+        $tony = User::factory()->create(['name' => 'Tony Stark', 'role' => 'participant', 'company_id' => $company->id]);
+        $rhodey = User::factory()->create(['name' => 'James Rhodes', 'role' => 'participant', 'company_id' => $company->id]);
+
+        // Survey 1
+        $survey1 = Survey::create([
+            'company_id' => $company->id,
+            'title' => 'Leadership & Strategy 360',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+        $survey1->participants()->attach([$tony->id, $rhodey->id]);
+        $q1 = Question::create([
+            'survey_id' => $survey1->id,
+            'question_text' => 'Demonstrates technical visionary leadership',
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $tonySelf1 = Assessment::create([
+            'survey_id' => $survey1->id,
+            'assessor_id' => $tony->id,
+            'subject_id' => $tony->id,
+            'status' => 'completed',
+            'total_score' => 95,
+            'max_score' => 110,
+            'percentage' => 86.36,
+            'category' => 'Cucumber',
+        ]);
+        AssessmentAnswer::create(['assessment_id' => $tonySelf1->id, 'question_id' => $q1->id, 'score' => 10]);
+
+        $rhodeyPeer1 = Assessment::create([
+            'survey_id' => $survey1->id,
+            'assessor_id' => $rhodey->id,
+            'subject_id' => $tony->id,
+            'status' => 'completed',
+            'total_score' => 90,
+            'max_score' => 110,
+            'percentage' => 81.82,
+            'category' => 'Cucumber',
+        ]);
+        AssessmentAnswer::create(['assessment_id' => $rhodeyPeer1->id, 'question_id' => $q1->id, 'score' => 9]);
+
+        // Survey 2
+        $survey2 = Survey::create([
+            'company_id' => $company->id,
+            'title' => 'Innovation & Team Culture 360',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+        $survey2->participants()->attach([$tony->id, $rhodey->id]);
+        $q2 = Question::create([
+            'survey_id' => $survey2->id,
+            'question_text' => 'Fosters a collaborative environment of trust',
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $tonySelf2 = Assessment::create([
+            'survey_id' => $survey2->id,
+            'assessor_id' => $tony->id,
+            'subject_id' => $tony->id,
+            'status' => 'completed',
+            'total_score' => 80,
+            'max_score' => 110,
+            'percentage' => 72.73,
+            'category' => 'Lemon',
+        ]);
+        AssessmentAnswer::create(['assessment_id' => $tonySelf2->id, 'question_id' => $q2->id, 'score' => 8]);
+
+        $rhodeyPeer2 = Assessment::create([
+            'survey_id' => $survey2->id,
+            'assessor_id' => $rhodey->id,
+            'subject_id' => $tony->id,
+            'status' => 'completed',
+            'total_score' => 85,
+            'max_score' => 110,
+            'percentage' => 77.27,
+            'category' => 'Lemon',
+        ]);
+        AssessmentAnswer::create(['assessment_id' => $rhodeyPeer2->id, 'question_id' => $q2->id, 'score' => 9]);
+
+        // 1. Visit Tony's dashboard (default view displays Survey 1)
+        $response1 = $this->actingAs($tony)->get(route('participant.assessments.index'));
+        $response1->assertOk();
+        $response1->assertSee('Select Survey to View Matrix');
+        $response1->assertSee('Leadership & Strategy 360');
+        $response1->assertSee('Innovation & Team Culture 360');
+        $response1->assertSee('Meter 1: Self Evaluation');
+        $response1->assertSee('Meter 2: Peer Feedback');
+        $response1->assertSee('86.36');
+        $response1->assertSee('81.82');
+        $response1->assertSee('Demonstrates technical visionary leadership');
+
+        // 2. Select Survey 2 by name on top via query string
+        $response2 = $this->actingAs($tony)->get(route('participant.assessments.index', ['survey_id' => $survey2->id]));
+        $response2->assertOk();
+        $response2->assertSee('Innovation & Team Culture 360');
+        $response2->assertSee('72.73');
+        $response2->assertSee('77.27');
+        $response2->assertSee('Fosters a collaborative environment of trust');
     }
 }

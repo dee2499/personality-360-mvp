@@ -148,5 +148,42 @@ class DatabaseSeeder extends Seeder
 
         // 9. Rate all assessments for all users with realistic ratings and completed status
         Artisan::call('assessment:rate-all', ['--survey' => $survey->id]);
+
+        // 10. Create Survey 2: Culture, Innovation & Cross-Team Collaboration
+        $survey2 = Survey::create([
+            'company_id' => $company->id,
+            'title' => 'Culture, Innovation & Communication 360 Survey',
+            'description' => 'Cross-functional evaluation focusing on innovation, empathy, agility, and team culture benchmark.',
+            'status' => 'published',
+            'published_at' => now(),
+            'created_by' => $admin->id,
+        ]);
+
+        $questions2 = [
+            'How effectively does this person foster creative problem-solving?',
+            'How actively does this person contribute to a culture of trust and psychological safety?',
+            'How well does this person adapt to innovative technology and modern workflows?',
+            'How clearly does this person share ideas and strategic direction?',
+            'How proactively does this person support and mentor team colleagues?',
+            'How constructively does this person receive and act on critical feedback?',
+            'How consistently does this person maintain positivity and focus under deadlines?',
+            'How well does this person collaborate across different company departments?',
+            'How effectively does this person identify new improvement opportunities?',
+            'How reliably does this person maintain ethical standards and accountability?',
+            'How strongly does this person drive inclusive team discussions and diversity of thought?',
+        ];
+
+        foreach ($questions2 as $index => $text) {
+            Question::create([
+                'survey_id' => $survey2->id,
+                'question_text' => $text,
+                'sort_order' => $index + 1,
+                'is_active' => true,
+            ]);
+        }
+
+        $survey2->participants()->attach($allUsers->pluck('id'));
+        app(AssessmentGenerationService::class)->generateForSurvey($survey2);
+        Artisan::call('assessment:rate-all', ['--survey' => $survey2->id]);
     }
 }

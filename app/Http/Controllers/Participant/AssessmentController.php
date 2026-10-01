@@ -79,6 +79,9 @@ class AssessmentController extends Controller
             $completed = $surveyAssessments->where('status', 'completed')->count();
             $total = $surveyAssessments->count();
 
+            // Dual Meters (Self vs Peer) for this survey
+            $dualMeters = $this->scoreService->calculateSelfAndPeerScores($user, $survey);
+
             // Subjects list (self first, then colleagues)
             $cohortMembers = $survey->participants()
                 ->get()
@@ -93,14 +96,87 @@ class AssessmentController extends Controller
                 'isCompleted' => $isCompleted,
                 'completedCount' => $completed,
                 'totalCount' => $total,
+                'self' => $dualMeters['self'],
+                'peer' => $dualMeters['peer'],
+                'comparison' => $dualMeters['comparison'],
             ];
         });
+
+        // 4. Handle survey selection from the top
+        $selectedSurveyId = $request->query('survey_id');
+        $selectedGroup = $selectedSurveyId
+            ? $surveyGroups->first(fn ($g) => $g['survey']->id == $selectedSurveyId)
+            : $surveyGroups->first();
+
+        $selectedSurvey = $selectedGroup ? $selectedGroup['survey'] : null;
+
+        // 5. Detailed matrix breakdown for selected survey
+        $questionsBreakdown = [];
+        $givenRatingsBreakdown = [];
+
+        if ($selectedSurvey) {
+            $questions = $selectedSurvey->questions()->where('is_active', true)->orderBy('sort_order')->get();
+            $selfAssessmentRecord = Assessment::where('survey_id', $selectedSurvey->id)
+                ->where('assessor_id', $user->id)
+                ->where('subject_id', $user->id)
+                ->first();
+
+            $peerAssessmentIds = Assessment::where('survey_id', $selectedSurvey->id)
+                ->where('assessor_id', '!=', $user->id)
+                ->where('subject_id', $user->id)
+                ->where('status', 'completed')
+                ->pluck('id');
+
+            foreach ($questions as $q) {
+                $selfScore = $selfAssessmentRecord
+                    ? AssessmentAnswer::where('assessment_id', $selfAssessmentRecord->id)->where('question_id', $q->id)->value('score')
+                    : null;
+
+                $peerAnswers = AssessmentAnswer::whereIn('assessment_id', $peerAssessmentIds)
+                    ->where('question_id', $q->id)
+                    ->pluck('score');
+
+                $peerAvg = $peerAnswers->isNotEmpty() ? round($peerAnswers->avg(), 1) : null;
+                $gap = ($selfScore !== null && $peerAvg !== null) ? round($selfScore - $peerAvg, 1) : null;
+
+                $questionsBreakdown[] = [
+                    'question' => $q,
+                    'self_score' => $selfScore,
+                    'peer_avg' => $peerAvg,
+                    'peer_count' => $peerAnswers->count(),
+                    'gap' => $gap,
+                ];
+            }
+
+            // Given ratings for each cohort member
+            $cohort = $selectedGroup['cohortMembers'];
+            foreach ($cohort as $member) {
+                $assessment = Assessment::where('survey_id', $selectedSurvey->id)
+                    ->where('assessor_id', $user->id)
+                    ->where('subject_id', $member->id)
+                    ->first();
+
+                $givenRatingsBreakdown[] = [
+                    'member' => $member,
+                    'is_self' => ($member->id === $user->id),
+                    'assessment' => $assessment,
+                    'is_completed' => $assessment?->isCompleted() ?? false,
+                    'total_score' => $assessment?->total_score ?? 0,
+                    'percentage' => $assessment?->percentage ?? 0.0,
+                    'category' => $assessment?->category ?? 'Pending',
+                ];
+            }
+        }
 
         return view('participant.assessments.index', compact(
             'assessments',
             'selfAssessment',
             'peerAssessments',
             'surveyGroups',
+            'selectedGroup',
+            'selectedSurvey',
+            'questionsBreakdown',
+            'givenRatingsBreakdown',
             'totalAssigned',
             'completedCount',
             'pendingCount',

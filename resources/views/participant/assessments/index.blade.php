@@ -1,169 +1,454 @@
 <x-layouts.app>
-    <div class="max-w-4xl mx-auto space-y-8">
-        <!-- Dashboard Header & Completion Progress -->
+    <div class="max-w-5xl mx-auto space-y-8">
+        <!-- Dashboard Header & Overall Completion Progress -->
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
                     Participant Portal
                 </span>
-                <h1 class="text-2xl font-black text-slate-900 tracking-tight mt-2">My 360 Feedback Surveys</h1>
-                <p class="text-xs text-slate-500 mt-1 max-w-lg">
-                    Each survey guides you through 11 questions. On each question, you will rate yourself first, followed by all colleagues in your cohort.
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-2">
+                    My 360° Assessment Dashboard
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
+                    View your self-assessment meter, peer-assessment meter, and inspect full competency matrices across your submitted 360 surveys.
                 </p>
             </div>
 
             <!-- Progress Meter -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col min-w-[240px]">
+            <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-100 flex flex-col min-w-[240px]">
                 <div class="flex items-center justify-between text-xs mb-1.5">
-                    <span class="font-bold text-slate-700">Completion Status</span>
+                    <span class="font-bold text-slate-700">All Surveys Completion</span>
                     <span class="font-extrabold text-indigo-600">{{ $completedCount }} / {{ $totalAssigned }} ({{ $completionRate }}%)</span>
                 </div>
                 <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
                     <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-700" 
                          style="width: {{ $completionRate }}%"></div>
                 </div>
-                <span class="text-[10px] text-slate-400 mt-2 text-right">
-                    {{ $totalAssigned - $completedCount }} evaluation(s) remaining
-                </span>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 mt-2">
+                    <span>{{ $surveyGroups->count() }} Survey(s) Assigned</span>
+                    <span>{{ $totalAssigned - $completedCount }} evaluation(s) remaining</span>
+                </div>
             </div>
         </div>
 
         @if($surveyGroups->isEmpty())
-            <div class="bg-white p-12 rounded-3xl border border-slate-200 text-center">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+            <div class="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-2">
                     <i data-lucide="calendar" class="w-6 h-6"></i>
                 </div>
                 <h3 class="text-base font-bold text-slate-900">No active surveys assigned</h3>
-                <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                <p class="text-xs text-slate-500 max-w-sm mx-auto">
                     When an administrator assigns you to a company survey cohort, it will appear here.
                 </p>
             </div>
         @else
-            <!-- Surveys List -->
-            <div class="space-y-6">
-                @foreach($surveyGroups as $group)
-                    @php
-                        $survey = $group['survey'];
-                        $isCompleted = $group['isCompleted'];
-                        $cohort = $group['cohortMembers'];
-                    @endphp
+            <!-- Survey Selector on Top -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                            Select Survey to View Matrix & Meters:
+                        </span>
+                    </div>
+                    <span class="text-[11px] text-slate-400">
+                        Click any survey name below to inspect its matrix
+                    </span>
+                </div>
 
-                    <div class="bg-white rounded-3xl border {{ $isCompleted ? 'border-emerald-200 bg-emerald-50/10' : 'border-slate-200' }} p-6 sm:p-8 shadow-xs space-y-6">
-                        <!-- Survey Header -->
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b border-slate-100">
-                            <div class="space-y-2">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    @if($survey->company)
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                            <i data-lucide="building-2" class="w-3 h-3 text-indigo-500"></i>
-                                            {{ $survey->company->name }}
+                <!-- Clickable Tabs for All Available Surveys -->
+                <div class="flex flex-wrap items-center gap-2.5">
+                    @foreach($surveyGroups as $group)
+                        @php
+                            $s = $group['survey'];
+                            $isSelected = $selectedSurvey && $selectedSurvey->id === $s->id;
+                            $sCompleted = $group['isCompleted'];
+                        @endphp
+                        <a href="{{ route('participant.assessments.index', ['survey_id' => $s->id]) }}"
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition {{ $isSelected ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 ring-2 ring-indigo-400/30' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                            <i data-lucide="{{ $isSelected ? 'check-circle-2' : 'file-text' }}" class="w-4 h-4 {{ $isSelected ? 'text-white' : 'text-slate-400' }}"></i>
+                            <span>{{ $s->title }}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-extrabold {{ $isSelected ? 'bg-indigo-800/80 text-white' : ($sCompleted ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800') }}">
+                                {{ $sCompleted ? 'Submitted' : 'Pending Survey' }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            @if($selectedGroup)
+                @php
+                    $survey = $selectedGroup['survey'];
+                    $isCompleted = $selectedGroup['isCompleted'];
+                    $self = $selectedGroup['self'];
+                    $peer = $selectedGroup['peer'];
+                    $comparison = $selectedGroup['comparison'];
+                    $cohort = $selectedGroup['cohortMembers'];
+                @endphp
+
+                <!-- Active Survey Master Card -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-8">
+                    <!-- Survey Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b border-slate-100">
+                        <div class="space-y-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                                @if($survey->company)
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                        <i data-lucide="building-2" class="w-3 h-3 text-indigo-500"></i>
+                                        {{ $survey->company->name }}
+                                    </span>
+                                @endif
+
+                                @if($isCompleted)
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                        Completed & Submitted
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-600"></i>
+                                        Pending Survey
+                                    </span>
+                                @endif
+
+                                <span class="text-xs text-slate-400 font-medium">
+                                    {{ $survey->questions->count() }} Questions • Scale 1 to 10
+                                </span>
+                            </div>
+
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                                {{ $survey->title }}
+                            </h2>
+
+                            @if($survey->description)
+                                <p class="text-xs text-slate-500 max-w-2xl leading-relaxed">
+                                    {{ $survey->description }}
+                                </p>
+                            @endif
+                        </div>
+
+                        <!-- CTA Actions -->
+                        <div class="shrink-0 flex flex-wrap items-center gap-2">
+                            <a href="{{ route('participant.surveys.take', $survey) }}" 
+                               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-100 transition">
+                                <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
+                                <span>{{ $isCompleted ? 'Review in 11-Question Wizard' : 'Take 11-Question Survey' }}</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+
+                            <a href="{{ route('profile.show') }}" 
+                               class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                                <i data-lucide="user" class="w-4 h-4 text-slate-500"></i>
+                                <span>Profile Analysis</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- TWO METERS SECTION (Self-Assessment Meter vs Peer-Assessment Meter) -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
+                                    Dual-Meter Benchmark
+                                </span>
+                                <h3 class="text-lg font-black text-slate-900 mt-1">
+                                    Self-Assessment Meter vs. Peer-Assessment Meter
+                                </h3>
+                            </div>
+                            <span class="text-xs text-slate-400">Scale: 0% to 100%</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                            <!-- Meter 1: Self Assessed Meter -->
+                            <div class="bg-gradient-to-b from-indigo-50/40 to-white rounded-3xl border border-indigo-100 p-6 flex flex-col justify-between items-center text-center shadow-xs">
+                                <div class="w-full text-left flex items-start justify-between gap-2 mb-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-md">
+                                            Meter 1: Self Evaluation
                                         </span>
-                                    @endif
+                                        <h4 class="text-base font-black text-slate-900 mt-1.5">
+                                            Personal Assessment
+                                        </h4>
+                                        <p class="text-xs text-slate-400">
+                                            How you rated your own competencies in this survey
+                                        </p>
+                                    </div>
 
-                                    @if($isCompleted)
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
-                                            Completed & Submitted
+                                    @if($self['is_completed'])
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                            <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i>
+                                            Rated
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                                            <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-600"></i>
-                                            Pending Survey
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
+                                            Pending
                                         </span>
                                     @endif
+                                </div>
 
-                                    <span class="text-xs text-slate-400 font-medium">
-                                        {{ $survey->questions->count() }} Questions • Scale 1 to 10
+                                <!-- Visual Gauge Needle -->
+                                <div class="w-full my-auto py-2">
+                                    <x-score-meter 
+                                        :percentage="$self['percentage']" 
+                                        :category="$self['category']" 
+                                        :only-gauge="true"
+                                    />
+                                </div>
+
+                                <!-- Score Numbers Box -->
+                                <div class="w-full pt-4 border-t border-indigo-100/70 space-y-3">
+                                    <div class="flex items-baseline justify-center gap-1">
+                                        <span class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                                            {{ number_format($self['percentage'], 2) }}
+                                        </span>
+                                        <span class="text-xl font-bold text-slate-400">%</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs {{ $self['category_badge'] }}">
+                                            <span class="text-sm">{{ $self['category_emoji'] }}</span>
+                                            <span>{{ $self['category'] }}</span>
+                                        </span>
+
+                                        <span class="text-xs font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                            {{ $self['score'] }} / {{ $self['max_score'] }} pts
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Meter 2: Peer Assessed Meter -->
+                            <div class="bg-gradient-to-b from-teal-50/40 to-white rounded-3xl border border-teal-100 p-6 flex flex-col justify-between items-center text-center shadow-xs">
+                                <div class="w-full text-left flex items-start justify-between gap-2 mb-2">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-100/80 px-2.5 py-0.5 rounded-md">
+                                            Meter 2: Peer Feedback
+                                        </span>
+                                        <h4 class="text-base font-black text-slate-900 mt-1.5">
+                                            Peer-Assessed Rating
+                                        </h4>
+                                        <p class="text-xs text-slate-400">
+                                            Average score evaluated by {{ $peer['completed_count'] }} colleagues
+                                        </p>
+                                    </div>
+
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 shrink-0">
+                                        {{ $peer['completed_count'] }} of {{ $peer['total_count'] }} Peers
                                     </span>
                                 </div>
 
-                                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                                    {{ $survey->title }}
-                                </h2>
-
-                                @if($survey->description)
-                                    <p class="text-xs text-slate-500 max-w-2xl leading-relaxed">
-                                        {{ $survey->description }}
-                                    </p>
-                                @endif
-                            </div>
-
-                            <!-- Survey Action CTA -->
-                            <div class="shrink-0 flex sm:flex-col sm:items-end justify-between items-center gap-2">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <a href="{{ route('profile.show') }}" 
-                                       class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition border border-indigo-200">
-                                        <i data-lucide="gauge" class="w-4 h-4 text-indigo-600"></i>
-                                        <span>View 360 Meters in Profile</span>
-                                    </a>
-                                    <a href="{{ route('participant.surveys.take', $survey) }}" 
-                                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white {{ $isCompleted ? 'bg-slate-800 hover:bg-slate-900' : 'bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200' }} transition">
-                                        <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
-                                        <span>{{ $isCompleted ? 'Review 11-Question Survey' : 'Open 11-Question Survey' }}</span>
-                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                    </a>
+                                <!-- Visual Gauge Needle -->
+                                <div class="w-full my-auto py-2">
+                                    <x-score-meter 
+                                        :percentage="$peer['percentage']" 
+                                        :category="$peer['category']" 
+                                        :only-gauge="true"
+                                    />
                                 </div>
 
-                                <span class="text-[11px] font-bold {{ $isCompleted ? 'text-emerald-700' : 'text-slate-400' }}">
-                                    {{ $group['completedCount'] }} of {{ $group['totalCount'] }} ratings submitted
-                                </span>
+                                <!-- Score Numbers Box -->
+                                <div class="w-full pt-4 border-t border-teal-100/70 space-y-3">
+                                    <div class="flex items-baseline justify-center gap-1">
+                                        <span class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                                            {{ number_format($peer['percentage'], 2) }}
+                                        </span>
+                                        <span class="text-xl font-bold text-slate-400">%</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs {{ $peer['category_badge'] }}">
+                                            <span class="text-sm">{{ $peer['category_emoji'] }}</span>
+                                            <span>{{ $peer['category'] }}</span>
+                                        </span>
+
+                                        <span class="text-xs font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                            {{ $peer['average_score'] }} / 110 avg pts
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Cohort Team Members Preview -->
-                        <div class="space-y-3">
+                        <!-- 360° Alignment / Perception Gap Banner -->
+                        <div class="p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 {{ $comparison['alignment_badge'] }}">
+                            <div class="flex items-start sm:items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-white/80 shadow-xs flex items-center justify-center shrink-0">
+                                    <i data-lucide="scale" class="w-5 h-5 text-slate-700"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-extrabold text-sm text-slate-900">
+                                            Perception Analysis: {{ $comparison['alignment_label'] }}
+                                        </span>
+                                        @if($comparison['has_both'])
+                                            <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-white/90 text-slate-700 shadow-2xs">
+                                                Gap: {{ $comparison['gap'] > 0 ? '+' : '' }}{{ number_format($comparison['gap'], 2) }}%
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs mt-0.5 text-slate-700 leading-relaxed">
+                                        {{ $comparison['insight'] }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="shrink-0 flex items-center gap-4 text-xs font-mono bg-white/80 px-3.5 py-2 rounded-xl border border-black/5">
+                                <div class="text-center">
+                                    <span class="text-[10px] text-slate-400 uppercase font-sans block">Self</span>
+                                    <span class="font-bold text-slate-900">{{ number_format($self['percentage'], 1) }}%</span>
+                                </div>
+                                <span class="text-slate-300 font-sans">vs</span>
+                                <div class="text-center">
+                                    <span class="text-[10px] text-slate-400 uppercase font-sans block">Peers</span>
+                                    <span class="font-bold text-slate-900">{{ number_format($peer['percentage'], 1) }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ALL DETAIL OF THE SURVEY SUBMITTED: Competency Dimension Matrix -->
+                    @if(!empty($questionsBreakdown))
+                        <div class="space-y-4 pt-4 border-t border-slate-100">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
+                                        Detailed Matrix
+                                    </span>
+                                    <h3 class="text-lg font-black text-slate-900 mt-1">
+                                        All Question Matrix Details Submitted
+                                    </h3>
+                                    <p class="text-xs text-slate-500">
+                                        Breakdown of each competency question comparing your self-rating (1–10) vs peer average rating (1–10).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                                        <tr>
+                                            <th class="py-3 px-4 w-12 text-center">#</th>
+                                            <th class="py-3 px-4">Behavioral Competency Question</th>
+                                            <th class="py-3 px-4 text-center w-28">Your Self Rating</th>
+                                            <th class="py-3 px-4 text-center w-28">Peers Avg Rating</th>
+                                            <th class="py-3 px-4 w-40 text-center">Comparison Bar</th>
+                                            <th class="py-3 px-4 text-center w-24">Alignment Gap</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        @foreach($questionsBreakdown as $item)
+                                            <tr class="hover:bg-slate-50/60 transition">
+                                                <td class="py-3.5 px-4 font-mono font-bold text-center text-slate-400">
+                                                    Q{{ $item['question']->sort_order }}
+                                                </td>
+                                                <td class="py-3.5 px-4 font-medium text-slate-900">
+                                                    {{ $item['question']->question_text }}
+                                                </td>
+                                                <td class="py-3.5 px-4 text-center">
+                                                    @if($item['self_score'] !== null)
+                                                        <span class="inline-flex items-center justify-center font-black text-xs px-2.5 py-1 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                            {{ $item['self_score'] }} <span class="text-[10px] text-slate-400 font-normal">/ 10</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="text-slate-400 italic text-[11px]">—</span>
+                                                    @endif
+                                                </td>
+                                                <td class="py-3.5 px-4 text-center">
+                                                    @if($item['peer_avg'] !== null)
+                                                        <span class="inline-flex items-center justify-center font-black text-xs px-2.5 py-1 rounded-xl bg-teal-50 text-teal-700 border border-teal-200">
+                                                            {{ number_format($item['peer_avg'], 1) }} <span class="text-[10px] text-slate-400 font-normal">/ 10</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="text-slate-400 italic text-[11px]">—</span>
+                                                    @endif
+                                                </td>
+                                                <td class="py-3.5 px-4">
+                                                    <div class="space-y-1">
+                                                        <!-- Self bar (indigo) -->
+                                                        <div class="flex items-center gap-1.5 text-[9px] text-slate-400 font-mono">
+                                                            <span class="w-7">Self:</span>
+                                                            <div class="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                                <div class="bg-indigo-600 h-1.5 rounded-full" 
+                                                                     style="width: {{ ($item['self_score'] ?? 0) * 10 }}%"></div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Peer bar (teal) -->
+                                                        <div class="flex items-center gap-1.5 text-[9px] text-slate-400 font-mono">
+                                                            <span class="w-7">Peer:</span>
+                                                            <div class="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                                <div class="bg-teal-500 h-1.5 rounded-full" 
+                                                                     style="width: {{ ($item['peer_avg'] ?? 0) * 10 }}%"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3.5 px-4 text-center font-mono font-bold text-xs">
+                                                    @if($item['gap'] !== null)
+                                                        <span class="{{ $item['gap'] > 0.5 ? 'text-amber-600' : ($item['gap'] < -0.5 ? 'text-blue-600' : 'text-emerald-600') }}">
+                                                            {{ $item['gap'] > 0 ? '+' : '' }}{{ number_format($item['gap'], 1) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-slate-300">—</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- COHORT RATINGS MATRIX (Ratings Submitted for Team Members in this Survey) -->
+                    @if(!empty($givenRatingsBreakdown))
+                        <div class="space-y-3 pt-4 border-t border-slate-100">
                             <div class="flex items-center justify-between text-xs">
                                 <span class="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
-                                    Cohort Team Members ({{ $cohort->count() }} people to rate across 11 questions):
+                                    Cohort Evaluations Submitted for this Survey ({{ count($givenRatingsBreakdown) }} people):
                                 </span>
-                                <span class="text-slate-400 text-[11px]">You (Self) is rated first on each question</span>
+                                <span class="text-slate-400 text-[11px]">
+                                    Row 1 is You (Self), followed by all colleagues
+                                </span>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                @foreach($cohort as $member)
-                                    @php
-                                        $isSelf = $member->id === auth()->id();
-                                    @endphp
-                                    <div class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 {{ $isSelf ? 'bg-indigo-50/60 border-indigo-200 shadow-xs' : 'bg-slate-50/60 border-slate-100' }}">
+                                @foreach($givenRatingsBreakdown as $row)
+                                    <div class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 {{ $row['is_self'] ? 'bg-indigo-50/60 border-indigo-200 shadow-xs' : 'bg-slate-50/60 border-slate-200' }}">
                                         <div class="flex items-center gap-2.5 truncate">
-                                            <div class="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 {{ $isSelf ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700' }}">
-                                                {{ substr($member->name, 0, 1) }}
+                                            <div class="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 {{ $row['is_self'] ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700' }}">
+                                                {{ substr($row['member']->name, 0, 1) }}
                                             </div>
                                             <div class="truncate">
                                                 <div class="flex items-center gap-1.5">
                                                     <span class="text-xs font-bold text-slate-900 truncate">
-                                                        {{ $isSelf ? 'You (' . $member->name . ')' : $member->name }}
+                                                        {{ $row['is_self'] ? 'You (' . $row['member']->name . ')' : $row['member']->name }}
                                                     </span>
                                                 </div>
-                                                <span class="text-[10px] text-slate-400 truncate block">{{ $member->email }}</span>
+                                                <span class="text-[10px] text-slate-400 truncate block">{{ $row['member']->email }}</span>
                                             </div>
                                         </div>
 
-                                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 {{ $isSelf ? 'bg-indigo-600 text-white' : 'bg-slate-200/70 text-slate-600' }}">
-                                            {{ $isSelf ? '1st (Self)' : 'Peer' }}
-                                        </span>
+                                        <div class="shrink-0 text-right">
+                                            @if($row['is_completed'])
+                                                <span class="text-[11px] font-extrabold text-slate-900 block font-mono">
+                                                    {{ $row['total_score'] }} / 110
+                                                </span>
+                                                <span class="text-[9px] font-bold text-emerald-600 block">
+                                                    {{ number_format($row['percentage'], 1) }}%
+                                                </span>
+                                            @else
+                                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $row['is_self'] ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600' }}">
+                                                    {{ $row['is_self'] ? '1st (Self)' : 'Pending' }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
-
-                        <!-- Instructions / How It Works Strip -->
-                        <div class="p-4 rounded-2xl bg-indigo-50/40 border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-indigo-950">
-                            <div class="flex items-center gap-2">
-                                <i data-lucide="info" class="w-4 h-4 text-indigo-600 shrink-0"></i>
-                                <span>
-                                    <strong>How it works:</strong> Click "Open 11-Question Survey" to see Question 1. Rate yourself and all team members on a 1–10 scale, then advance to Question 2 through 11.
-                                </span>
-                            </div>
-
-                            <a href="{{ route('participant.surveys.take', $survey) }}" 
-                               class="font-bold text-indigo-600 hover:text-indigo-800 underline shrink-0">
-                                Launch Wizard &rarr;
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endif
+                </div>
+            @endif
         @endif
     </div>
 </x-layouts.app>
