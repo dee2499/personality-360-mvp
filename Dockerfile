@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     sqlite3 \
     libsqlite3-dev \
-    && docker-php-ext-install pdo pdo_sqlite mbstring bcmath opcache \
+    && docker-php-ext-install pdo pdo_sqlite pdo_mysql mbstring bcmath opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache rewrite module
