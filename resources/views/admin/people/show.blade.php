@@ -248,11 +248,7 @@
                         @endphp
                         <div class="bg-white rounded-3xl border p-6 transition flex flex-col justify-between gap-5 {{ $isSelected ? 'border-indigo-600 ring-2 ring-indigo-500/20 shadow-md' : 'border-slate-200 hover:border-slate-300 shadow-xs' }}">
                             <div>
-                                <div class="flex items-center justify-between gap-2 mb-2">
-                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                                        Survey #{{ $surveyItem->id }}
-                                    </span>
-
+                                <div class="flex items-center justify-end gap-2 mb-2">
                                     @if($sData['is_completed'])
                                         <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                             <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
@@ -351,11 +347,10 @@
         <!-- Centerpiece: 3-Section Combined Result -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             
-            <!-- Section 1: The Visual Meter Gauge -->
+            <!-- 360° Visual Meter Gauge -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between items-center text-center">
                 <div class="w-full text-left">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Section 1</span>
-                    <h2 class="text-base font-black text-slate-900 mt-0.5">360° Visual Gauge</h2>
+                    <h2 class="text-base font-black text-slate-900">360° Visual Gauge</h2>
                 </div>
 
                 <div class="w-full my-auto py-2">
@@ -371,13 +366,10 @@
                 </div>
             </div>
 
-            <!-- Section 2: Percentage Number & Score -->
+            <!-- Percentage Number & Score -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between">
                 <div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
-                        Section 2
-                    </span>
-                    <h2 class="text-base font-black text-slate-900 mt-1.5">Score & Percentage</h2>
+                    <h2 class="text-base font-black text-slate-900">Score & Percentage</h2>
                     <p class="text-xs text-slate-400 mt-0.5">Overall evaluation rating for {{ $person->name }}</p>
                 </div>
 
@@ -415,11 +407,10 @@
                 </div>
             </div>
 
-            <!-- Section 3: Rest (Formula Breakdown & Scale Reference) -->
+            <!-- Synthesis Breakdown & Formula -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between space-y-4">
                 <div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Section 3</span>
-                    <h2 class="text-base font-black text-slate-900 mt-0.5">Synthesis Breakdown</h2>
+                    <h2 class="text-base font-black text-slate-900">Synthesis Breakdown</h2>
                 </div>
 
                 <!-- Formula Breakdown Box -->

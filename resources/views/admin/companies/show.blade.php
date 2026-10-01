@@ -209,10 +209,7 @@
                     @forelse($company->surveys as $survey)
                         <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col justify-between gap-3 hover:border-indigo-300 transition">
                             <div>
-                                <div class="flex items-center justify-between gap-2 mb-1.5">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                        Survey #{{ $survey->id }}
-                                    </span>
+                                <div class="flex items-center justify-end gap-2 mb-1.5">
                                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full capitalize
                                         {{ $survey->isPublished() ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600' }}">
                                         {{ $survey->status }}
