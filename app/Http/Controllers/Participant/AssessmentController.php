@@ -29,6 +29,27 @@ class AssessmentController extends Controller
     {
         $user = $request->user();
 
+        // 1. Identify all surveys assigned to the user or belonging to their company
+        $surveys = Survey::query()
+            ->where(function ($q) use ($user) {
+                $q->whereHas('participants', fn ($sq) => $sq->where('users.id', $user->id))
+                    ->orWhereHas('assessments', fn ($sq) => $sq->where('assessor_id', $user->id));
+                if ($user->company_id) {
+                    $q->orWhere('company_id', $user->company_id);
+                }
+            })
+            ->with(['questions', 'participants', 'company'])
+            ->get();
+
+        // 2. Auto-enroll user into their company surveys and sync assessments
+        foreach ($surveys as $s) {
+            if (! $s->participants()->where('users.id', $user->id)->exists()) {
+                $s->participants()->syncWithoutDetaching([$user->id]);
+            }
+            app(AssessmentGenerationService::class)->generateForSurvey($s);
+        }
+
+        // 3. Load all given assessments
         $assessments = Assessment::with(['subject', 'survey'])
             ->where('assessor_id', $user->id)
             ->get();
@@ -45,23 +66,35 @@ class AssessmentController extends Controller
         $selfAssessment = $assessments->first(fn ($a) => $a->isSelfAssessment());
         $peerAssessments = $assessments->filter(fn ($a) => ! $a->isSelfAssessment());
 
-        $surveyGroups = $assessments->groupBy('survey_id')->map(function ($items) {
-            $survey = $items->first()->survey;
-            $self = $items->first(fn ($a) => $a->isSelfAssessment());
-            $peers = $items->filter(fn ($a) => ! $a->isSelfAssessment());
-            $isCompleted = $items->every(fn ($a) => $a->isCompleted());
-            $completed = $items->where('status', 'completed')->count();
-            $total = $items->count();
+        // Group surveys for the dashboard view
+        $surveyGroups = $surveys->map(function ($survey) use ($user) {
+            $surveyAssessments = Assessment::where('survey_id', $survey->id)
+                ->where('assessor_id', $user->id)
+                ->with('subject')
+                ->get();
+
+            $self = $surveyAssessments->first(fn ($a) => $a->isSelfAssessment());
+            $peers = $surveyAssessments->filter(fn ($a) => ! $a->isSelfAssessment());
+            $isCompleted = $surveyAssessments->isNotEmpty() && $surveyAssessments->every(fn ($a) => $a->isCompleted());
+            $completed = $surveyAssessments->where('status', 'completed')->count();
+            $total = $surveyAssessments->count();
+
+            // Subjects list (self first, then colleagues)
+            $cohortMembers = $survey->participants()
+                ->get()
+                ->sortBy(fn ($s) => $s->id === $user->id ? 0 : 1)
+                ->values();
 
             return [
                 'survey' => $survey,
                 'selfAssessment' => $self,
                 'peerAssessments' => $peers,
+                'cohortMembers' => $cohortMembers,
                 'isCompleted' => $isCompleted,
                 'completedCount' => $completed,
                 'totalCount' => $total,
             ];
-        })->values();
+        });
 
         return view('participant.assessments.index', compact(
             'assessments',
@@ -77,43 +110,15 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Show the assessment taking interface (or completed view).
+     * Show the assessment taking interface (redirects directly to 11-question cohort wizard).
      */
-    public function show(Request $request, Assessment $assessment): View
+    public function show(Request $request, Assessment $assessment): RedirectResponse
     {
-        // Enforce authorization: user can only view their own given assessments
         if ($assessment->assessor_id !== $request->user()->id && ! $request->user()->isAdmin()) {
             abort(403, 'You are not authorized to view this assessment.');
         }
 
-        // If pending, mark as in_progress
-        if ($assessment->isPending()) {
-            $assessment->update([
-                'status' => 'in_progress',
-                'started_at' => now(),
-            ]);
-        }
-
-        $assessment->load([
-            'subject',
-            'survey.questions' => fn ($q) => $q->orderBy('sort_order'),
-            'answers',
-        ]);
-
-        $answers = $assessment->answers->pluck('score', 'question_id')->toArray();
-
-        $isReadOnly = $assessment->isCompleted();
-
-        $categoryEmoji = $assessment->category ? $this->categoryService->getEmoji($assessment->category) : null;
-        $categoryBadge = $assessment->category ? $this->categoryService->getBadgeClass($assessment->category) : null;
-
-        return view('participant.assessments.show', compact(
-            'assessment',
-            'answers',
-            'isReadOnly',
-            'categoryEmoji',
-            'categoryBadge'
-        ));
+        return redirect()->route('participant.surveys.take', $assessment->survey_id);
     }
 
     /**
@@ -164,7 +169,11 @@ class AssessmentController extends Controller
     {
         $user = $request->user();
 
-        // Check if user is participant or has assessments in this survey
+        // 1. If survey belongs to user's company, auto-enroll user if not yet attached
+        if ($survey->company_id && $user->company_id === $survey->company_id && ! $survey->participants()->where('users.id', $user->id)->exists()) {
+            $survey->participants()->syncWithoutDetaching([$user->id]);
+        }
+
         $isParticipant = $survey->participants()->where('users.id', $user->id)->exists();
         $hasAssessments = Assessment::where('survey_id', $survey->id)->where('assessor_id', $user->id)->exists();
 
@@ -172,29 +181,26 @@ class AssessmentController extends Controller
             abort(403, 'You are not assigned to this survey cohort.');
         }
 
-        // Ensure assessments are generated for this survey
+        // 2. Always ensure assessments are synchronized for all participants
+        app(AssessmentGenerationService::class)->generateForSurvey($survey);
+
         $assessments = Assessment::with(['subject', 'answers'])
             ->where('survey_id', $survey->id)
             ->where('assessor_id', $user->id)
             ->get();
 
-        if ($assessments->isEmpty() && $isParticipant) {
-            app(AssessmentGenerationService::class)->generateForSurvey($survey);
-            $assessments = Assessment::with(['subject', 'answers'])
-                ->where('survey_id', $survey->id)
-                ->where('assessor_id', $user->id)
-                ->get();
-        }
-
-        // Questions sorted
+        // 3. Questions sorted
         $questions = $survey->questions()->where('is_active', true)->orderBy('sort_order')->get();
 
-        // Subjects list: Put current user (Self) first, followed by other colleagues
-        $subjects = $assessments->map(fn ($a) => $a->subject)
-            ->filter()
-            ->unique('id')
+        // 4. Subjects list: Current user (Self) STRICTLY FIRST (Index 0), followed by other colleagues
+        $subjects = $survey->participants()
+            ->get()
             ->sortBy(fn ($s) => $s->id === $user->id ? 0 : 1)
             ->values();
+
+        if ($subjects->isEmpty()) {
+            $subjects = $assessments->map(fn ($a) => $a->subject)->filter()->unique('id')->sortBy(fn ($s) => $s->id === $user->id ? 0 : 1)->values();
+        }
 
         // Existing scores map: [subject_id => [question_id => score]]
         $existingScores = [];

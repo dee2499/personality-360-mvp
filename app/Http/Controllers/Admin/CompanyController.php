@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\User;
 use App\Notifications\EmployeeInvitationNotification;
+use App\Services\AssessmentGenerationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -124,6 +125,12 @@ class CompanyController extends Controller
             'invitation_token' => $token,
             'invitation_sent_at' => now(),
         ]);
+
+        // Auto-enroll employee into existing surveys belonging to this company
+        foreach ($company->surveys as $survey) {
+            $survey->participants()->syncWithoutDetaching([$user->id]);
+            app(AssessmentGenerationService::class)->generateForSurvey($survey);
+        }
 
         $emailSent = false;
         $emailError = null;

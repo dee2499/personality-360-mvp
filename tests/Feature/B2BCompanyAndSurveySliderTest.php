@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Assessment;
 use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
@@ -130,11 +131,25 @@ class B2BCompanyAndSurveySliderTest extends TestCase
             ]));
         }
 
+        // 0. Visiting individual assessment show redirects to unified slider
+        $dipakSelfAssessment = Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $dipak->id,
+            'subject_id' => $dipak->id,
+            'status' => 'pending',
+            'total_score' => 0,
+            'max_score' => 110,
+            'percentage' => 0.0,
+        ]);
+        $responseRedirect = $this->actingAs($dipak)->get(route('participant.assessments.show', $dipakSelfAssessment));
+        $responseRedirect->assertRedirect(route('participant.surveys.take', $survey));
+
         // 1. Dipak opens the survey slider view
         $responseView = $this->actingAs($dipak)->get(route('participant.surveys.take', $survey));
         $responseView->assertOk();
         $responseView->assertSee('Leadership Cohort 360');
         $responseView->assertSee('Question 1: Evaluates competency dimension 1');
+        $responseView->assertSee('Self Evaluation');
         $responseView->assertSee('Dipak');
         $responseView->assertSee('Ankit');
         $responseView->assertSee('Srini');

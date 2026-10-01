@@ -49,11 +49,14 @@ class SurveyController extends Controller
 
     public function store(StoreSurveyRequest $request): RedirectResponse
     {
+        $companyId = $request->input('company_id');
+
         $survey = Survey::create([
-            'company_id' => $request->input('company_id'),
+            'company_id' => $companyId,
             'title' => $request->string('title'),
             'description' => $request->string('description'),
-            'status' => 'draft',
+            'status' => 'published',
+            'published_at' => now(),
             'created_by' => $request->user()->id,
         ]);
 
@@ -70,8 +73,17 @@ class SurveyController extends Controller
             }
         }
 
+        // If survey belongs to a company, automatically enroll all company employees into the cohort
+        if ($companyId) {
+            $employeeIds = User::where('company_id', $companyId)->pluck('id');
+            if ($employeeIds->isNotEmpty()) {
+                $survey->participants()->sync($employeeIds);
+                app(AssessmentGenerationService::class)->generateForSurvey($survey);
+            }
+        }
+
         return redirect()->route('admin.surveys.show', $survey)
-            ->with('success', "Survey '{$survey->title}' created successfully.");
+            ->with('success', "Survey '{$survey->title}' created and published successfully.");
     }
 
     public function show(Survey $survey): View

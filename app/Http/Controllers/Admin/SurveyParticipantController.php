@@ -39,14 +39,10 @@ class SurveyParticipantController extends Controller
             $survey->participants()->syncWithoutDetaching($validated['user_ids']);
         }
 
-        // If the survey is published, automatically generate assessments for the group
-        if ($survey->isPublished()) {
-            $generated = $generationService->generateForSurvey($survey);
+        // Always generate/synchronize assessments for the entire group
+        $generated = $generationService->generateForSurvey($survey);
 
-            return back()->with('success', "Participants updated. Generated {$generated} new assessment(s).");
-        }
-
-        return back()->with('success', 'Survey participants updated successfully.');
+        return back()->with('success', "Participants enrolled. Updated {$generated} assessment pairings in cohort.");
     }
 
     public function destroy(Survey $survey, User $participant): RedirectResponse
