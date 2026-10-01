@@ -353,6 +353,173 @@
 
         </div>
 
+        <!-- 360° Dual Meters: Self-Assessed Meter vs Peer-Assessed Meter -->
+        @php
+            $selfM = $metrics['self_metrics'] ?? null;
+            $peerM = $metrics['peer_metrics'] ?? null;
+            $compM = $metrics['comparison'] ?? null;
+        @endphp
+
+        @if($selfM && $peerM)
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
+                                <i data-lucide="gauge" class="w-4 h-4 text-indigo-600"></i>
+                                360° Dual-Meter Comparison
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 tracking-tight mt-1.5">
+                            Self-Assessed Meter vs. Peer-Assessed Meter
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Compare {{ $person->name }}'s internal perception against feedback provided by colleagues.
+                        </p>
+                    </div>
+
+                    @if($compM && $compM['has_both'])
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-bold {{ $compM['alignment_badge'] }}">
+                            <i data-lucide="scale" class="w-4 h-4"></i>
+                            <span>{{ $compM['alignment_label'] }} ({{ $compM['gap'] > 0 ? '+' : '' }}{{ number_format($compM['gap'], 2) }}%)</span>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Two Meters Side-by-Side -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                    <!-- Meter 1: Self Assessed Meter -->
+                    <div class="bg-gradient-to-b from-indigo-50/40 to-white rounded-3xl border border-indigo-100 p-6 flex flex-col justify-between items-center text-center shadow-xs">
+                        <div class="w-full text-left flex items-start justify-between gap-2 mb-2">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-md">
+                                    Meter 1: Self Evaluation
+                                </span>
+                                <h4 class="text-base sm:text-lg font-black text-slate-900 mt-1.5">
+                                    Personal Self-Assessment
+                                </h4>
+                                <p class="text-xs text-slate-400">
+                                    {{ $person->name }}'s rating of own competencies
+                                </p>
+                            </div>
+
+                            @if($selfM['is_completed'])
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                                    <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i>
+                                    Rated
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
+                                    Pending
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Gauge Needle -->
+                        <div class="w-full my-auto py-3">
+                            <x-score-meter 
+                                :percentage="$selfM['percentage']" 
+                                :category="$selfM['category']" 
+                                :only-gauge="true"
+                            />
+                        </div>
+
+                        <!-- Scores Box -->
+                        <div class="w-full pt-4 border-t border-indigo-100/70 space-y-3">
+                            <div class="flex items-baseline justify-center gap-1">
+                                <span class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                                    {{ number_format($selfM['percentage'], 2) }}
+                                </span>
+                                <span class="text-xl font-bold text-slate-400">%</span>
+                            </div>
+
+                            <div class="flex items-center justify-center gap-2 flex-wrap">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs {{ $selfM['category_badge'] }}">
+                                    <span class="text-sm">{{ $selfM['category_emoji'] }}</span>
+                                    <span>{{ $selfM['category'] }}</span>
+                                </span>
+
+                                <span class="text-xs font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                    {{ $selfM['score'] }} / {{ $selfM['max_score'] }} pts
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meter 2: Peer Assessed Meter -->
+                    <div class="bg-gradient-to-b from-teal-50/40 to-white rounded-3xl border border-teal-100 p-6 flex flex-col justify-between items-center text-center shadow-xs">
+                        <div class="w-full text-left flex items-start justify-between gap-2 mb-2">
+                            <div>
+                                <span class="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-100/80 px-2.5 py-0.5 rounded-md">
+                                    Meter 2: Peer Feedback
+                                </span>
+                                <h4 class="text-base sm:text-lg font-black text-slate-900 mt-1.5">
+                                    Peer-Assessed Rating
+                                </h4>
+                                <p class="text-xs text-slate-400">
+                                    Evaluated by {{ $peerM['completed_count'] }} colleagues
+                                </p>
+                            </div>
+
+                            <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 shrink-0">
+                                {{ $peerM['completed_count'] }} of {{ $peerM['total_count'] }} Peers
+                            </span>
+                        </div>
+
+                        <!-- Gauge Needle -->
+                        <div class="w-full my-auto py-3">
+                            <x-score-meter 
+                                :percentage="$peerM['percentage']" 
+                                :category="$peerM['category']" 
+                                :only-gauge="true"
+                            />
+                        </div>
+
+                        <!-- Scores Box -->
+                        <div class="w-full pt-4 border-t border-teal-100/70 space-y-3">
+                            <div class="flex items-baseline justify-center gap-1">
+                                <span class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                                    {{ number_format($peerM['percentage'], 2) }}
+                                </span>
+                                <span class="text-xl font-bold text-slate-400">%</span>
+                            </div>
+
+                            <div class="flex items-center justify-center gap-2 flex-wrap">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs {{ $peerM['category_badge'] }}">
+                                    <span class="text-sm">{{ $peerM['category_emoji'] }}</span>
+                                    <span>{{ $peerM['category'] }}</span>
+                                </span>
+
+                                <span class="text-xs font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                    {{ $peerM['average_score'] }} / 110 avg pts
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if($compM && $compM['has_both'])
+                    <!-- Perception Gap Insight -->
+                    <div class="p-4 rounded-2xl border flex items-center justify-between gap-4 {{ $compM['alignment_badge'] }}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-white/80 shadow-xs flex items-center justify-center shrink-0">
+                                <i data-lucide="info" class="w-4 h-4 text-slate-700"></i>
+                            </div>
+                            <p class="text-xs text-slate-800 leading-relaxed">
+                                {{ $compM['insight'] }}
+                            </p>
+                        </div>
+
+                        <div class="shrink-0 flex items-center gap-3 text-xs font-mono bg-white/80 px-3 py-1.5 rounded-xl border border-black/5">
+                            <span class="text-slate-500">Self: <strong>{{ number_format($selfM['percentage'], 1) }}%</strong></span>
+                            <span class="text-slate-300">|</span>
+                            <span class="text-slate-500">Peers: <strong>{{ number_format($peerM['percentage'], 1) }}%</strong></span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <!-- Section 17: Individual Assessment Cards -->
         <div class="space-y-4">
             <div class="flex items-center justify-between">

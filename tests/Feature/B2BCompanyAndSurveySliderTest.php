@@ -222,4 +222,56 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $response->assertSessionHas('success');
         $this->assertDatabaseMissing('users', ['id' => $person->id]);
     }
+
+    public function test_user_profile_displays_two_meters_self_and_peer(): void
+    {
+        $company = Company::factory()->create(['name' => 'Acme Labs']);
+        $admin = User::factory()->create(['role' => 'admin', 'company_id' => $company->id]);
+        $alice = User::factory()->create(['name' => 'Alice', 'role' => 'participant', 'company_id' => $company->id]);
+        $bob = User::factory()->create(['name' => 'Bob', 'role' => 'participant', 'company_id' => $company->id]);
+
+        $survey = Survey::create([
+            'company_id' => $company->id,
+            'title' => 'Executive Leadership 360',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+        $survey->participants()->attach([$alice->id, $bob->id]);
+
+        // Alice self assessment
+        Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $alice->id,
+            'subject_id' => $alice->id,
+            'status' => 'completed',
+            'total_score' => 95,
+            'max_score' => 110,
+            'percentage' => 86.36,
+            'category' => 'Cucumber',
+        ]);
+
+        // Bob peer assessment of Alice
+        Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $bob->id,
+            'subject_id' => $alice->id,
+            'status' => 'completed',
+            'total_score' => 88,
+            'max_score' => 110,
+            'percentage' => 80.0,
+            'category' => 'Lemon',
+        ]);
+
+        // Visit Alice's profile
+        $response = $this->actingAs($alice)->get(route('profile.show'));
+        $response->assertOk();
+        $response->assertSee('360° Survey Meters (Self vs Peers)');
+        $response->assertSee('Meter 1: Self Evaluation');
+        $response->assertSee('Personal Assessment');
+        $response->assertSee('86.36');
+        $response->assertSee('Meter 2: Peer Evaluations');
+        $response->assertSee('Peer-Assessed Rating');
+        $response->assertSee('80.00');
+        $response->assertSee('Executive Leadership 360');
+    }
 }

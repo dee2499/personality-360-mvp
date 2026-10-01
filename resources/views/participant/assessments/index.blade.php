@@ -90,12 +90,19 @@
 
                             <!-- Survey Action CTA -->
                             <div class="shrink-0 flex sm:flex-col sm:items-end justify-between items-center gap-2">
-                                <a href="{{ route('participant.surveys.take', $survey) }}" 
-                                   class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-black text-white {{ $isCompleted ? 'bg-slate-800 hover:bg-slate-900' : 'bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200' }} transition">
-                                    <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
-                                    <span>{{ $isCompleted ? 'Review 11-Question Survey' : 'Open 11-Question Survey' }}</span>
-                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                </a>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <a href="{{ route('profile.show') }}" 
+                                       class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition border border-indigo-200">
+                                        <i data-lucide="gauge" class="w-4 h-4 text-indigo-600"></i>
+                                        <span>View 360 Meters in Profile</span>
+                                    </a>
+                                    <a href="{{ route('participant.surveys.take', $survey) }}" 
+                                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white {{ $isCompleted ? 'bg-slate-800 hover:bg-slate-900' : 'bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200' }} transition">
+                                        <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
+                                        <span>{{ $isCompleted ? 'Review 11-Question Survey' : 'Open 11-Question Survey' }}</span>
+                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                    </a>
+                                </div>
 
                                 <span class="text-[11px] font-bold {{ $isCompleted ? 'text-emerald-700' : 'text-slate-400' }}">
                                     {{ $group['completedCount'] }} of {{ $group['totalCount'] }} ratings submitted
