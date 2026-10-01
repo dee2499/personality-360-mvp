@@ -83,19 +83,110 @@
                     @endif
                 </div>
 
-                <!-- Quick Filter Toggle -->
-                <div class="flex items-center gap-1.5 text-xs bg-slate-100 p-1 rounded-xl">
-                    <span class="text-slate-400 font-semibold px-2">Show:</span>
-                    <a href="{{ route('admin.people.show', $person) }}" 
-                       class="px-3 py-1.5 rounded-lg font-bold transition {{ $selectedSurvey === null ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
-                        All Surveys
-                    </a>
-                    @foreach($userSurveys as $sData)
-                        <a href="{{ route('admin.people.show', [$person, 'survey_id' => $sData['survey']->id]) }}" 
-                           class="px-3 py-1.5 rounded-lg font-bold transition {{ $selectedSurvey && $selectedSurvey->id === $sData['survey']->id ? 'bg-white text-indigo-700 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
-                            {{ Str::limit($sData['survey']->title, 18) }}
+                <!-- Modern UI Survey Selection Box -->
+                <div class="relative min-w-[260px] sm:min-w-[320px]"
+                     x-data="{ open: false }"
+                     @click.outside="open = false"
+                     @keydown.escape.window="open = false">
+                    
+                    <!-- Select Trigger Button -->
+                    <button type="button"
+                            @click="open = !open"
+                            class="w-full flex items-center justify-between gap-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 text-left transition shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 cursor-pointer">
+                        <div class="flex items-center gap-2.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0 {{ $selectedSurvey ? ($userSurveys->firstWhere('survey.id', $selectedSurvey->id)['is_completed'] ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-indigo-600' }}"></span>
+                            <div class="truncate">
+                                <span class="text-xs font-bold text-slate-900 block truncate">
+                                    {{ $selectedSurvey ? $selectedSurvey->title : 'All Surveys Combined' }}
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-medium">
+                                    {{ $selectedSurvey ? ($userSurveys->firstWhere('survey.id', $selectedSurvey->id)['is_completed'] ? 'Completed' : 'Pending Survey') : $userSurveys->count() . ' Surveys Active' }}
+                                </span>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-down" 
+                           class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"
+                           :class="{ 'rotate-180': open }"></i>
+                    </button>
+
+                    <!-- Floating Dropdown Menu -->
+                    <div x-show="open"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                         class="absolute right-0 left-0 mt-2 z-40 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden py-1.5 divide-y divide-slate-100">
+                        
+                        <!-- Option 1: All Surveys Combined -->
+                        <a href="{{ route('admin.people.show', $person) }}"
+                           class="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-indigo-50/50 transition cursor-pointer {{ $selectedSurvey === null ? 'bg-indigo-50/70' : '' }}">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <div class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 {{ $selectedSurvey === null ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                    <i data-lucide="check" class="w-3 h-3"></i>
+                                </div>
+                                <div class="truncate">
+                                    <span class="text-xs font-bold text-slate-900 block truncate {{ $selectedSurvey === null ? 'text-indigo-950 font-black' : '' }}">
+                                        All Surveys Combined
+                                    </span>
+                                    <span class="text-[10px] text-slate-400">
+                                        Aggregated synthesis across {{ $userSurveys->count() }} surveys
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 shrink-0">
+                                All
+                            </span>
                         </a>
-                    @endforeach
+
+                        <!-- Individual Surveys -->
+                        @foreach($userSurveys as $sData)
+                            @php
+                                $sItem = $sData['survey'];
+                                $isSelected = $selectedSurvey && $selectedSurvey->id === $sItem->id;
+                                $sCompleted = $sData['is_completed'];
+                                $url = route('admin.people.show', [$person, 'survey_id' => $sItem->id]);
+                            @endphp
+                            <a href="{{ $url }}"
+                               class="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-indigo-50/50 transition cursor-pointer {{ $isSelected ? 'bg-indigo-50/70' : '' }}">
+                                <div class="flex items-center gap-2.5 truncate">
+                                    <div class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 {{ $isSelected ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                        <i data-lucide="check" class="w-3 h-3"></i>
+                                    </div>
+                                    <div class="truncate">
+                                        <span class="text-xs font-bold text-slate-900 block truncate {{ $isSelected ? 'text-indigo-950 font-black' : '' }}">
+                                            {{ $sItem->title }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">
+                                            {{ $sItem->company?->name ?? 'Company Survey' }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0 {{ $sCompleted ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200' }}">
+                                    {{ $sCompleted ? 'Completed' : 'Pending Survey' }}
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <!-- Native select for accessibility & automation -->
+                    <select class="sr-only" onchange="if (this.value) window.location.href = this.value">
+                        <option value="{{ route('admin.people.show', $person) }}" {{ $selectedSurvey === null ? 'selected' : '' }}>
+                            All Surveys Combined
+                        </option>
+                        @foreach($userSurveys as $sData)
+                            @php
+                                $sItem = $sData['survey'];
+                                $isSelected = $selectedSurvey && $selectedSurvey->id === $sItem->id;
+                            @endphp
+                            <option value="{{ route('admin.people.show', [$person, 'survey_id' => $sItem->id]) }}" {{ $isSelected ? 'selected' : '' }}>
+                                {{ $sItem->title }} ({{ $sData['is_completed'] ? 'Completed' : 'Pending Survey' }})
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
