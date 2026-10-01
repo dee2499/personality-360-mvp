@@ -201,7 +201,7 @@
                                         @endif
                                     </td>
                                     <td class="py-3.5 px-6 text-slate-600 truncate max-w-[160px]">
-                                        {{ $assessment->survey->title }}
+                                        {{ $assessment->survey?->title ?? 'General Survey' }}
                                     </td>
                                     <td class="py-3.5 px-6 font-bold text-slate-800">
                                         @if($assessment->isCompleted())

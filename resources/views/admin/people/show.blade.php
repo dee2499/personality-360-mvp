@@ -705,7 +705,7 @@
                                 </h4>
 
                                 <div class="text-[11px] text-slate-400 mt-0.5 truncate">
-                                    Survey: {{ $assessment->survey->title }}
+                                    Survey: {{ $assessment->survey?->title ?? 'General Survey' }}
                                 </div>
                             </div>
 

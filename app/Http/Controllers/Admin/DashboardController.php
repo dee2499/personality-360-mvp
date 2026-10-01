@@ -16,16 +16,17 @@ class DashboardController extends Controller
         $activeSurveys = Survey::where('status', 'published')->count();
         $totalParticipants = User::where('role', 'participant')->count();
 
-        $completedAssessments = Assessment::where('status', 'completed')->count();
-        $pendingAssessments = Assessment::where('status', 'pending')->count();
-        $inProgressAssessments = Assessment::where('status', 'in_progress')->count();
-        $totalAssessments = Assessment::count();
+        $completedAssessments = Assessment::has('survey')->where('status', 'completed')->count();
+        $pendingAssessments = Assessment::has('survey')->where('status', 'pending')->count();
+        $inProgressAssessments = Assessment::has('survey')->where('status', 'in_progress')->count();
+        $totalAssessments = Assessment::has('survey')->count();
 
         $overallCompletionRate = $totalAssessments > 0
             ? round(($completedAssessments / $totalAssessments) * 100, 1)
             : 0;
 
-        $recentAssessments = Assessment::with(['assessor', 'subject', 'survey'])
+        $recentAssessments = Assessment::has('survey')
+            ->with(['assessor', 'subject', 'survey'])
             ->latest('updated_at')
             ->take(10)
             ->get();

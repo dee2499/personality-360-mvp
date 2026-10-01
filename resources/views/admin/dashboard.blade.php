@@ -153,7 +153,7 @@
                                         </div>
                                     </td>
                                     <td class="py-3.5 px-6 text-slate-600 max-w-[160px] truncate">
-                                        {{ $assessment->survey->title }}
+                                        {{ $assessment->survey?->title ?? 'General Survey' }}
                                     </td>
                                     <td class="py-3.5 px-6 font-bold text-slate-800">
                                         @if($assessment->isCompleted())

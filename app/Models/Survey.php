@@ -29,6 +29,13 @@ class Survey extends Model
         'published_at',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Survey $survey) {
+            $survey->assessments()->delete();
+        });
+    }
+
     /**
      * Get the attributes that should be cast.
      *
