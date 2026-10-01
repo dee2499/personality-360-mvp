@@ -99,10 +99,16 @@
                                                class="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit Survey">
                                                 <i data-lucide="edit-3" class="w-4 h-4"></i>
                                             </a>
-                                            <form method="POST" action="{{ route('admin.surveys.destroy', $survey) }}" onsubmit="return confirm('Are you sure you want to delete this survey?');" class="inline">
+                                            <form method="POST" action="{{ route('admin.surveys.destroy', $survey) }}" 
+                                                  data-confirm="true"
+                                                  data-confirm-title="Delete Survey"
+                                                  data-confirm-message="Are you sure you want to delete survey '{{ addslashes($survey->title) }}'? All questions and generated assessments will be permanently removed."
+                                                  data-confirm-btn="Delete Survey"
+                                                  data-confirm-type="danger"
+                                                  class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="Delete Survey">
+                                                <button type="submit" class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer" title="Delete Survey">
                                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                 </button>
                                             </form>

@@ -44,7 +44,13 @@
                     </a>
 
                     @if($survey->isDraft())
-                        <form method="POST" action="{{ route('admin.surveys.publish', $survey) }}" class="inline">
+                        <form method="POST" action="{{ route('admin.surveys.publish', $survey) }}" 
+                              data-confirm="true"
+                              data-confirm-title="Publish Survey & Generate Assessments"
+                              data-confirm-message="Publishing this survey will activate it and generate all 360-degree assessment pairings for all participants. Proceed?"
+                              data-confirm-btn="Publish & Generate"
+                              data-confirm-type="primary"
+                              class="inline">
                             @csrf
                             <button type="submit" 
                                     class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-100 transition cursor-pointer">
@@ -53,7 +59,13 @@
                             </button>
                         </form>
                     @else
-                        <form method="POST" action="{{ route('admin.surveys.unpublish', $survey) }}" class="inline">
+                        <form method="POST" action="{{ route('admin.surveys.unpublish', $survey) }}" 
+                              data-confirm="true"
+                              data-confirm-title="Set Survey to Draft"
+                              data-confirm-message="Setting this survey to draft will pause participant evaluations. Proceed?"
+                              data-confirm-btn="Set to Draft"
+                              data-confirm-type="warning"
+                              class="inline">
                             @csrf
                             <button type="submit" 
                                     class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition cursor-pointer">
@@ -216,10 +228,15 @@
                                         </td>
                                         <td class="py-3.5 px-6 text-right">
                                             <form method="POST" action="{{ route('admin.surveys.participants.destroy', [$survey, $participant]) }}"
-                                                  onsubmit="return confirm('Remove participant {{ $participant->name }} from this survey?');" class="inline">
+                                                  data-confirm="true"
+                                                  data-confirm-title="Remove Participant"
+                                                  data-confirm-message="Are you sure you want to remove participant {{ $participant->name }} from this survey? Their evaluation pairings will be permanently deleted."
+                                                  data-confirm-btn="Remove Participant"
+                                                  data-confirm-type="danger"
+                                                  class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-xs text-rose-600 hover:text-rose-800 font-medium">
+                                                <button type="submit" class="text-xs text-rose-600 hover:text-rose-800 font-medium cursor-pointer">
                                                     Remove
                                                 </button>
                                             </form>
@@ -260,10 +277,14 @@
                         </div>
 
                         <form method="POST" action="{{ route('admin.surveys.questions.destroy', [$survey, $question]) }}"
-                              onsubmit="return confirm('Delete this question?');">
+                              data-confirm="true"
+                              data-confirm-title="Delete Question"
+                              data-confirm-message="Are you sure you want to delete this question? Any submitted ratings for this question will be removed."
+                              data-confirm-btn="Delete Question"
+                              data-confirm-type="danger">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition" title="Delete question">
+                            <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition cursor-pointer" title="Delete question">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </form>

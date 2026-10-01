@@ -168,12 +168,16 @@
 
                                                     @if($employee->id !== auth()->id())
                                                         <form method="POST" action="{{ route('admin.companies.employees.destroy', [$company, $employee]) }}" 
-                                                              onsubmit="return confirm('Are you sure you want to delete employee {{ $employee->name }}? This will permanently remove their assessments and participation.')" 
+                                                              data-confirm="true"
+                                                              data-confirm-title="Delete Employee"
+                                                              data-confirm-message="Are you sure you want to delete employee {{ $employee->name }}? This will permanently remove their assessments and participation."
+                                                              data-confirm-btn="Delete Employee"
+                                                              data-confirm-type="danger"
                                                               class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" 
-                                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-semibold text-xs text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition"
+                                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-semibold text-xs text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer"
                                                                     title="Delete Employee">
                                                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                                                 <span>Delete</span>

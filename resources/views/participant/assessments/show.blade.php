@@ -50,7 +50,16 @@
 
         openSubmitModal() {
             if (!this.canSubmit()) {
-                alert('Please answer all ' + this.totalSteps + ' questions before submitting.');
+                if (window.alertAction) {
+                    window.alertAction({
+                        title: 'Incomplete Assessment',
+                        message: 'Please answer all ' + this.totalSteps + ' questions before submitting. You have answered ' + this.answeredCount() + ' so far.',
+                        confirmText: 'Continue Assessment',
+                        type: 'warning'
+                    });
+                } else {
+                    alert('Please answer all ' + this.totalSteps + ' questions before submitting.');
+                }
                 return;
             }
             this.confirmModal = true;

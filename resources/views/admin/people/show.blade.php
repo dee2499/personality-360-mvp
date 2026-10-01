@@ -52,11 +52,15 @@
                     @if($person->id !== auth()->id())
                         <div class="border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-4">
                             <form method="POST" action="{{ route('admin.people.destroy', $person) }}" 
-                                  onsubmit="return confirm('Are you sure you want to delete employee {{ $person->name }}? All related assessments and data will be permanently removed.')">
+                                  data-confirm="true"
+                                  data-confirm-title="Delete Employee"
+                                  data-confirm-message="Are you sure you want to delete employee {{ $person->name }}? All related assessments and data will be permanently removed."
+                                  data-confirm-btn="Delete Employee"
+                                  data-confirm-type="danger">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 
-                                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition">
+                                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer">
                                     <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
                                     <span>Delete Employee</span>
                                 </button>

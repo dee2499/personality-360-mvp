@@ -64,7 +64,14 @@
                 </div>
 
                 <div class="pt-4 flex items-center justify-between border-t border-slate-100">
-                    <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" onsubmit="return confirm('Are you sure you want to delete this company?');">
+                    <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" 
+                          data-confirm="true"
+                          data-confirm-title="Delete Company"
+                          data-confirm-message="Are you sure you want to delete this company? All associated employees, surveys, and assessments will be permanently removed."
+                          data-confirm-btn="Delete Company"
+                          data-confirm-type="danger">
+                        @csrf
+                        @method('DELETE')
                         <!-- separate delete action -->
                     </form>
                     <a href="{{ route('admin.companies.show', $company) }}" 

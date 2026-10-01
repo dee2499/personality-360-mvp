@@ -176,8 +176,13 @@
             </div>
         </div>
 
-        <!-- Hidden Form Container for Final Submission -->
-        <form id="matrix-form" method="POST" action="{{ route('participant.surveys.submit-matrix', $survey) }}">
+        <!-- Form Container for Final Submission -->
+        <form id="matrix-form" method="POST" action="{{ route('participant.surveys.submit-matrix', $survey) }}"
+              data-confirm="true"
+              data-confirm-title="Submit All 360 Evaluations?"
+              data-confirm-message="You are about to submit evaluations for all {{ $totalSubjects }} team members across all {{ $totalQuestions }} competency questions. Once submitted, your ratings become final and will be factored into their 360-degree synthesis scores."
+              data-confirm-btn="Yes, Submit Evaluations"
+              data-confirm-type="success">
             @csrf
 
             <!-- Hidden Matrix Inputs dynamically reflected from Alpine scores -->
