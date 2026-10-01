@@ -101,11 +101,27 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-6 text-right">
-                                        <a href="{{ route('admin.people.show', $person) }}" 
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition">
-                                            <span>View Profile</span>
-                                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                                        </a>
+                                        <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('admin.people.show', $person) }}" 
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition">
+                                                <span>View Profile</span>
+                                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                            </a>
+
+                                            @if($person->id !== auth()->id())
+                                                <form method="POST" action="{{ route('admin.people.destroy', $person) }}" 
+                                                      onsubmit="return confirm('Are you sure you want to delete {{ $person->name }}? This will permanently remove their assessments and participation.')" 
+                                                      class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-semibold text-xs text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition"
+                                                            title="Delete Person">
+                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

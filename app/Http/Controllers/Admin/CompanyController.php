@@ -138,4 +138,24 @@ class CompanyController extends Controller
             ->with('invitation_link', $activationUrl)
             ->with('invited_employee', $user->name);
     }
+
+    /**
+     * Remove / delete an employee from a company and the system.
+     */
+    public function destroyEmployee(Request $request, Company $company, User $employee): RedirectResponse
+    {
+        if ($employee->id === $request->user()->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        if ($employee->company_id !== $company->id) {
+            abort(404);
+        }
+
+        $name = $employee->name;
+        $employee->delete();
+
+        return redirect()->route('admin.companies.show', $company)
+            ->with('success', "Employee '{$name}' has been deleted successfully.");
+    }
 }

@@ -72,6 +72,7 @@ Route::prefix('admin')
         // Companies Management (B2B)
         Route::resource('companies', AdminCompanyController::class);
         Route::post('companies/{company}/invite', [AdminCompanyController::class, 'inviteEmployee'])->name('companies.invite');
+        Route::delete('companies/{company}/employees/{employee}', [AdminCompanyController::class, 'destroyEmployee'])->name('companies.employees.destroy');
 
         // Surveys
         Route::resource('surveys', AdminSurveyController::class);
@@ -90,6 +91,7 @@ Route::prefix('admin')
         // People & 360 Profiles
         Route::get('/people', [AdminPeopleController::class, 'index'])->name('people.index');
         Route::get('/people/{person}', [AdminPeopleController::class, 'show'])->name('people.show');
+        Route::delete('/people/{person}', [AdminPeopleController::class, 'destroy'])->name('people.destroy');
 
         // Assessments
         Route::get('/assessments', [AdminAssessmentController::class, 'index'])->name('assessments.index');

@@ -7,6 +7,7 @@ use App\Models\Assessment;
 use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentScoreService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -113,5 +114,27 @@ class PeopleController extends Controller
             'pendingSurveys',
             'completedSurveys'
         ));
+    }
+
+    /**
+     * Delete an employee/participant and all related evaluation records.
+     */
+    public function destroy(Request $request, User $person): RedirectResponse
+    {
+        if ($person->id === $request->user()->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        $name = $person->name;
+        $company = $person->company;
+        $person->delete();
+
+        if ($company) {
+            return redirect()->route('admin.companies.show', $company)
+                ->with('success', "Employee '{$name}' has been deleted successfully.");
+        }
+
+        return redirect()->route('admin.people.index')
+            ->with('success', "Person '{$name}' has been deleted successfully.");
     }
 }

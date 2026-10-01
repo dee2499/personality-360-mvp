@@ -166,4 +166,45 @@ class B2BCompanyAndSurveySliderTest extends TestCase
             $this->assertEquals('Lemon', $assessment->category);
         }
     }
+
+    public function test_admin_can_delete_employee_from_company(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $company = Company::factory()->create(['name' => 'Cyberdyne Systems']);
+        $employee = User::factory()->create([
+            'name' => 'Miles Dyson',
+            'company_id' => $company->id,
+            'role' => 'participant',
+        ]);
+
+        $response = $this->actingAs($admin)->delete(route('admin.companies.employees.destroy', [$company, $employee]));
+
+        $response->assertRedirect(route('admin.companies.show', $company));
+        $response->assertSessionHas('success');
+        $this->assertSoftDeleted('users', ['id' => $employee->id]);
+    }
+
+    public function test_admin_cannot_delete_own_account(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $company = Company::factory()->create();
+        $admin->update(['company_id' => $company->id]);
+
+        $response = $this->actingAs($admin)->delete(route('admin.companies.employees.destroy', [$company, $admin]));
+
+        $response->assertSessionHas('error', 'You cannot delete your own account.');
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
+    }
+
+    public function test_admin_can_delete_person_from_people_directory(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $person = User::factory()->create(['role' => 'participant']);
+
+        $response = $this->actingAs($admin)->delete(route('admin.people.destroy', $person));
+
+        $response->assertRedirect(route('admin.people.index'));
+        $response->assertSessionHas('success');
+        $this->assertSoftDeleted('users', ['id' => $person->id]);
+    }
 }
