@@ -181,7 +181,7 @@ class B2BCompanyAndSurveySliderTest extends TestCase
 
         $response->assertRedirect(route('admin.companies.show', $company));
         $response->assertSessionHas('success');
-        $this->assertSoftDeleted('users', ['id' => $employee->id]);
+        $this->assertDatabaseMissing('users', ['id' => $employee->id]);
     }
 
     public function test_admin_cannot_delete_own_account(): void
@@ -205,6 +205,6 @@ class B2BCompanyAndSurveySliderTest extends TestCase
 
         $response->assertRedirect(route('admin.people.index'));
         $response->assertSessionHas('success');
-        $this->assertSoftDeleted('users', ['id' => $person->id]);
+        $this->assertDatabaseMissing('users', ['id' => $person->id]);
     }
 }
