@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Participant\SubmitAssessmentRequest;
 use App\Models\Assessment;
 use App\Models\AssessmentAnswer;
+use App\Models\Survey;
 use App\Services\AssessmentCategoryService;
+use App\Services\AssessmentGenerationService;
 use App\Services\AssessmentScoreService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -153,5 +155,118 @@ class AssessmentController extends Controller
 
         return redirect()->route('participant.assessments.index')
             ->with('success', "Great job! Successfully submitted {$subjectName}.");
+    }
+
+    /**
+     * Show the question-first multi-subject assessment slider wizard.
+     */
+    public function takeSurvey(Request $request, Survey $survey): View|RedirectResponse
+    {
+        $user = $request->user();
+
+        // Check if user is participant or has assessments in this survey
+        $isParticipant = $survey->participants()->where('users.id', $user->id)->exists();
+        $hasAssessments = Assessment::where('survey_id', $survey->id)->where('assessor_id', $user->id)->exists();
+
+        if (! $isParticipant && ! $hasAssessments && ! $user->isAdmin()) {
+            abort(403, 'You are not assigned to this survey cohort.');
+        }
+
+        // Ensure assessments are generated for this survey
+        $assessments = Assessment::with(['subject', 'answers'])
+            ->where('survey_id', $survey->id)
+            ->where('assessor_id', $user->id)
+            ->get();
+
+        if ($assessments->isEmpty() && $isParticipant) {
+            app(AssessmentGenerationService::class)->generateForSurvey($survey);
+            $assessments = Assessment::with(['subject', 'answers'])
+                ->where('survey_id', $survey->id)
+                ->where('assessor_id', $user->id)
+                ->get();
+        }
+
+        // Questions sorted
+        $questions = $survey->questions()->where('is_active', true)->orderBy('sort_order')->get();
+
+        // Subjects list: Put current user (Self) first, followed by other colleagues
+        $subjects = $assessments->map(fn ($a) => $a->subject)
+            ->filter()
+            ->unique('id')
+            ->sortBy(fn ($s) => $s->id === $user->id ? 0 : 1)
+            ->values();
+
+        // Existing scores map: [subject_id => [question_id => score]]
+        $existingScores = [];
+        foreach ($assessments as $assessment) {
+            foreach ($assessment->answers as $ans) {
+                $existingScores[$assessment->subject_id][$ans->question_id] = $ans->score;
+            }
+        }
+
+        $isAllCompleted = $assessments->isNotEmpty() && $assessments->every(fn ($a) => $a->isCompleted());
+
+        return view('participant.surveys.take', compact(
+            'survey',
+            'questions',
+            'subjects',
+            'existingScores',
+            'isAllCompleted',
+            'user'
+        ));
+    }
+
+    /**
+     * Submit all answers across all questions for the entire cohort.
+     */
+    public function submitSurveyMatrix(Request $request, Survey $survey): RedirectResponse
+    {
+        $user = $request->user();
+
+        $answersData = $request->input('answers', []); // [subject_id => [question_id => score]]
+
+        if (empty($answersData)) {
+            return back()->with('error', 'Please provide ratings before submitting.');
+        }
+
+        DB::transaction(function () use ($survey, $user, $answersData) {
+            foreach ($answersData as $subjectId => $questionScores) {
+                $assessment = Assessment::firstOrCreate(
+                    [
+                        'survey_id' => $survey->id,
+                        'assessor_id' => $user->id,
+                        'subject_id' => $subjectId,
+                    ],
+                    [
+                        'status' => 'in_progress',
+                        'started_at' => now(),
+                    ]
+                );
+
+                foreach ($questionScores as $questionId => $score) {
+                    if ($score !== null && $score !== '') {
+                        AssessmentAnswer::updateOrCreate(
+                            [
+                                'assessment_id' => $assessment->id,
+                                'question_id' => $questionId,
+                            ],
+                            [
+                                'score' => (int) $score,
+                            ]
+                        );
+                    }
+                }
+
+                $assessment->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+
+                $this->scoreService->calculateAssessmentScore($assessment);
+            }
+        });
+
+        return redirect()->route('participant.assessments.index')
+            ->with('success', "Great job! All evaluations for '{$survey->title}' have been successfully submitted.");
     }
 }

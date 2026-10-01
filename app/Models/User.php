@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,10 +22,14 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'name',
         'email',
         'password',
         'role',
+        'invitation_token',
+        'invitation_sent_at',
+        'invitation_accepted_at',
     ];
 
     /**
@@ -35,6 +40,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'invitation_token',
     ];
 
     /**
@@ -47,7 +53,19 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'invitation_sent_at' => 'datetime',
+            'invitation_accepted_at' => 'datetime',
         ];
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function isInvited(): bool
+    {
+        return ! empty($this->invitation_token) && empty($this->invitation_accepted_at);
     }
 
     public function isAdmin(): bool

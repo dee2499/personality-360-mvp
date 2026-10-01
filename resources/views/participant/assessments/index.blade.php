@@ -67,11 +67,18 @@
                                 </h2>
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl">
-                                <span>Progress:</span>
-                                <span class="{{ $group['isCompleted'] ? 'text-emerald-700 font-black' : 'text-amber-700 font-black' }}">
-                                    {{ $group['completedCount'] }} of {{ $group['totalCount'] }} Submitted
-                                </span>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl">
+                                    <span>Progress:</span>
+                                    <span class="{{ $group['isCompleted'] ? 'text-emerald-700 font-black' : 'text-amber-700 font-black' }}">
+                                        {{ $group['completedCount'] }} of {{ $group['totalCount'] }} Submitted
+                                    </span>
+                                </div>
+                                <a href="{{ route('participant.surveys.take', $group['survey']) }}" 
+                                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition">
+                                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                    <span>{{ $group['isCompleted'] ? 'Review 11-Question Slider' : 'Open 11-Question Survey' }}</span>
+                                </a>
                             </div>
                         </div>
 

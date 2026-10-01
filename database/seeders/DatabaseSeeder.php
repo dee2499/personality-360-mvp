@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Assessment;
 use App\Models\AssessmentAnswer;
+use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
@@ -22,6 +23,16 @@ class DatabaseSeeder extends Seeder
         $generationService = app(AssessmentGenerationService::class);
         $scoreService = app(AssessmentScoreService::class);
 
+        // 0. Create Enterprise Company
+        $company = Company::firstOrCreate(
+            ['slug' => 'acme-technologies'],
+            [
+                'name' => 'Acme Technologies',
+                'contact_email' => 'contact@acme.com',
+                'description' => 'Global innovation enterprise with distributed engineering and leadership cohorts.',
+            ]
+        );
+
         // 1. Create Admin User
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
@@ -29,6 +40,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Admin',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
+                'company_id' => $company->id,
             ]
         );
 
@@ -39,8 +51,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Dipak',
                 'password' => Hash::make('password'),
                 'role' => 'participant',
+                'company_id' => $company->id,
             ]
         );
+        $dipak->update(['company_id' => $company->id]);
 
         $vishy = User::firstOrCreate(
             ['email' => 'vishy@example.com'],
@@ -48,8 +62,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Vishy',
                 'password' => Hash::make('password'),
                 'role' => 'participant',
+                'company_id' => $company->id,
             ]
         );
+        $vishy->update(['company_id' => $company->id]);
 
         $srini = User::firstOrCreate(
             ['email' => 'srini@example.com'],
@@ -57,8 +73,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Srini',
                 'password' => Hash::make('password'),
                 'role' => 'participant',
+                'company_id' => $company->id,
             ]
         );
+        $srini->update(['company_id' => $company->id]);
 
         $participants = collect([$dipak, $vishy, $srini]);
 
@@ -66,12 +84,14 @@ class DatabaseSeeder extends Seeder
         $survey = Survey::firstOrCreate(
             ['title' => 'Personality Assessment 2026'],
             [
+                'company_id' => $company->id,
                 'description' => 'Comprehensive 360-degree personality and self-assessment survey. Rate each person on 11 behavioral competencies on a scale of 1 to 10.',
                 'status' => 'published',
                 'created_by' => $admin->id,
                 'published_at' => now(),
             ]
         );
+        $survey->update(['company_id' => $company->id]);
 
         // 4. Create 11 Standard Questions (Section 42 of spec)
         $questionTexts = [

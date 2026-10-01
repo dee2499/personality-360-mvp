@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
+use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PeopleController as AdminPeopleController;
 use App\Http\Controllers\Admin\SurveyController as AdminSurveyController;
 use App\Http\Controllers\Admin\SurveyParticipantController as AdminSurveyParticipantController;
 use App\Http\Controllers\Admin\SurveyQuestionController as AdminSurveyQuestionController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\Participant\AssessmentController as ParticipantAssessmentController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -26,20 +29,35 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'create'])->name('login');
     Route::post('/login', [AuthController::class, 'store']);
+
+    // Employee Account Invitation & Activation
+    Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('invitation.show');
+    Route::post('/invitation/{token}', [InvitationController::class, 'accept'])->name('invitation.accept');
 });
 
 Route::post('/logout', [AuthController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-// Participant Routes
+// Authenticated Routes (Profile & Participant)
 Route::middleware('auth')->group(function () {
+    // User Profile & Password Update
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // Participant 360 Surveys & Assessments
     Route::get('/my-assessments', [ParticipantAssessmentController::class, 'index'])
         ->name('participant.assessments.index');
 
+    // New 11-Question Slider Wizard for Entire Cohort
+    Route::get('/my-surveys/{survey}', [ParticipantAssessmentController::class, 'takeSurvey'])
+        ->name('participant.surveys.take');
+    Route::post('/my-surveys/{survey}/submit', [ParticipantAssessmentController::class, 'submitSurveyMatrix'])
+        ->name('participant.surveys.submit-matrix');
+
+    // Individual Assessment View & Direct Submit
     Route::get('/my-assessments/{assessment}', [ParticipantAssessmentController::class, 'show'])
         ->name('participant.assessments.show');
-
     Route::post('/my-assessments/{assessment}/submit', [ParticipantAssessmentController::class, 'submit'])
         ->name('participant.assessments.submit');
 });
@@ -50,6 +68,10 @@ Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Companies Management (B2B)
+        Route::resource('companies', AdminCompanyController::class);
+        Route::post('companies/{company}/invite', [AdminCompanyController::class, 'inviteEmployee'])->name('companies.invite');
 
         // Surveys
         Route::resource('surveys', AdminSurveyController::class);

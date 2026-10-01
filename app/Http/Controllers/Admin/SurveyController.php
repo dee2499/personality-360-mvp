@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreSurveyRequest;
+use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
@@ -17,15 +18,18 @@ class SurveyController extends Controller
     public function index(): View
     {
         $surveys = Survey::withCount(['questions', 'participants', 'assessments'])
-            ->with(['creator'])
+            ->with(['creator', 'company'])
             ->latest()
             ->paginate(10);
 
         return view('admin.surveys.index', compact('surveys'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
+        $companies = Company::orderBy('name')->get();
+        $selectedCompanyId = $request->query('company_id');
+
         $defaultQuestions = [
             'How effectively does this person communicate with others?',
             'How well does this person work in a team?',
@@ -40,12 +44,13 @@ class SurveyController extends Controller
             'How reliable is this person when working toward goals?',
         ];
 
-        return view('admin.surveys.create', compact('defaultQuestions'));
+        return view('admin.surveys.create', compact('defaultQuestions', 'companies', 'selectedCompanyId'));
     }
 
     public function store(StoreSurveyRequest $request): RedirectResponse
     {
         $survey = Survey::create([
+            'company_id' => $request->input('company_id'),
             'title' => $request->string('title'),
             'description' => $request->string('description'),
             'status' => 'draft',

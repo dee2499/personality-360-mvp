@@ -1,0 +1,140 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Company;
+use App\Models\User;
+use App\Notifications\EmployeeInvitationNotification;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
+class CompanyController extends Controller
+{
+    /**
+     * Display a listing of all companies.
+     */
+    public function index(): View
+    {
+        $companies = Company::withCount(['users', 'surveys'])
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.companies.index', compact('companies'));
+    }
+
+    /**
+     * Show the form for creating a new company.
+     */
+    public function create(): View
+    {
+        return view('admin.companies.create');
+    }
+
+    /**
+     * Store a newly created company in storage.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $company = Company::create($validated);
+
+        return redirect()->route('admin.companies.show', $company)
+            ->with('success', "Company '{$company->name}' created successfully! You can now add employees.");
+    }
+
+    /**
+     * Display the specified company with its employees and surveys.
+     */
+    public function show(Company $company): View
+    {
+        $company->load([
+            'users' => fn ($q) => $q->orderBy('name'),
+            'surveys' => fn ($q) => $q->withCount(['participants', 'assessments'])->orderByDesc('created_at'),
+        ]);
+
+        return view('admin.companies.show', compact('company'));
+    }
+
+    /**
+     * Show the form for editing the specified company.
+     */
+    public function edit(Company $company): View
+    {
+        return view('admin.companies.edit', compact('company'));
+    }
+
+    /**
+     * Update the specified company in storage.
+     */
+    public function update(Request $request, Company $company): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $company->update($validated);
+
+        return redirect()->route('admin.companies.show', $company)
+            ->with('success', 'Company details updated successfully.');
+    }
+
+    /**
+     * Remove the specified company from storage.
+     */
+    public function destroy(Company $company): RedirectResponse
+    {
+        $companyName = $company->name;
+        $company->delete();
+
+        return redirect()->route('admin.companies.index')
+            ->with('success', "Company '{$companyName}' deleted successfully.");
+    }
+
+    /**
+     * Invite an employee to join the company.
+     */
+    public function inviteEmployee(Request $request, Company $company): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'role' => ['nullable', 'in:participant,admin'],
+        ]);
+
+        $token = Str::random(40);
+
+        $user = User::create([
+            'company_id' => $company->id,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'] ?? 'participant',
+            'password' => Hash::make(Str::random(32)),
+            'invitation_token' => $token,
+            'invitation_sent_at' => now(),
+        ]);
+
+        try {
+            $user->notify(new EmployeeInvitationNotification($token, $company->name));
+        } catch (\Throwable) {
+            // Mail failure should not block account creation in local or offline environments
+        }
+
+        $activationUrl = route('invitation.accept', ['token' => $token]);
+
+        return redirect()->route('admin.companies.show', $company)
+            ->with('success', "Employee '{$user->name}' added to {$company->name}! Invitation email generated.")
+            ->with('invitation_link', $activationUrl)
+            ->with('invited_employee', $user->name);
+    }
+}

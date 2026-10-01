@@ -35,6 +35,10 @@
                                class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                 Dashboard
                             </a>
+                            <a href="{{ route('admin.companies.index') }}" 
+                               class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                Companies
+                            </a>
                             <a href="{{ route('admin.surveys.index') }}" 
                                class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                 Surveys
@@ -51,7 +55,7 @@
                     @elseif(auth()->check())
                         <nav class="hidden md:flex items-center space-x-1 pl-4 border-l border-slate-200">
                             <a href="{{ route('participant.assessments.index') }}" 
-                               class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('participant.assessments.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                               class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                 My Assessments
                             </a>
                         </nav>
@@ -60,20 +64,27 @@
 
                 <!-- User Profile & Logout -->
                 <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs border border-slate-200">
+                    <a href="{{ route('profile.show') }}" 
+                       class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition {{ request()->routeIs('profile.*') ? 'bg-indigo-50 ring-1 ring-indigo-200' : '' }}"
+                       title="View Profile & Security">
+                        <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-100">
                             {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
-                        <div class="hidden sm:flex flex-col text-right">
-                            <span class="text-xs font-semibold text-slate-800 leading-tight">{{ auth()->user()->name }}</span>
-                            <span class="text-[10px] text-slate-400 capitalize font-medium">{{ auth()->user()->role }}</span>
+                        <div class="hidden sm:flex flex-col text-left">
+                            <span class="text-xs font-semibold text-slate-800 leading-tight flex items-center gap-1">
+                                {{ auth()->user()->name }}
+                                <i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>
+                            </span>
+                            <span class="text-[10px] text-slate-400 capitalize font-medium">
+                                {{ auth()->user()->company?->name ?? ucfirst(auth()->user()->role) }}
+                            </span>
                         </div>
-                    </div>
+                    </a>
 
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit" 
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition cursor-pointer"
                                 title="Sign out">
                             <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                             <span class="hidden sm:inline">Logout</span>

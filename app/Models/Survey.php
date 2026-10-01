@@ -21,6 +21,7 @@ class Survey extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'title',
         'description',
         'status',
@@ -38,6 +39,11 @@ class Survey extends Model
         return [
             'published_at' => 'datetime',
         ];
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function creator(): BelongsTo

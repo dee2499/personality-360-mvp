@@ -18,6 +18,7 @@ class StoreSurveyRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'company_id' => ['nullable', 'exists:companies,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'questions' => ['nullable', 'array'],

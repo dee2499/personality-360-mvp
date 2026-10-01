@@ -29,6 +29,22 @@
                 <h2 class="text-base font-bold text-slate-900">1. Survey Details</h2>
 
                 <div>
+                    <label for="company_id" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        Client Company / Organization (B2B)
+                    </label>
+                    <select name="company_id" id="company_id" 
+                            class="mt-1.5 block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                        <option value="">— Standalone / General Survey —</option>
+                        @foreach($companies as $comp)
+                            <option value="{{ $comp->id }}" {{ old('company_id', $selectedCompanyId) == $comp->id ? 'selected' : '' }}>
+                                {{ $comp->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1 text-[11px] text-slate-400">Optionally scope this survey cohort to an enterprise client company</p>
+                </div>
+
+                <div>
                     <label for="title" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                         Survey Title <span class="text-rose-500">*</span>
                     </label>
