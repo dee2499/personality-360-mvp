@@ -270,7 +270,7 @@ class RouteHealthAndNullSafetyTest extends TestCase
             'company_id' => $this->company->id,
         ]);
 
-        Question::create([
+        $q = Question::create([
             'survey_id' => $survey->id,
             'question_text' => 'Question to delete?',
             'sort_order' => 1,
@@ -280,8 +280,20 @@ class RouteHealthAndNullSafetyTest extends TestCase
         $survey->participants()->attach([$this->participant1->id, $this->participant2->id]);
         app(AssessmentGenerationService::class)->generateForSurvey($survey);
 
+        $assessments = Assessment::where('survey_id', $survey->id)->get();
+        $this->assertNotEmpty($assessments);
+
+        // Add answers to the assessments
+        foreach ($assessments as $a) {
+            AssessmentAnswer::create([
+                'assessment_id' => $a->id,
+                'question_id' => $q->id,
+                'score' => 9,
+            ]);
+        }
+
         $this->assertDatabaseHas('surveys', ['id' => $survey->id]);
-        $this->assertGreaterThan(0, Assessment::where('survey_id', $survey->id)->count());
+        $this->assertGreaterThan(0, AssessmentAnswer::where('question_id', $q->id)->count());
 
         // Call the delete route as Admin
         $delResponse = $this->actingAs($this->admin)->delete(route('admin.surveys.destroy', $survey));
@@ -292,6 +304,10 @@ class RouteHealthAndNullSafetyTest extends TestCase
 
         // Assessments for this survey should have been cascaded/cleaned up
         $this->assertEquals(0, Assessment::where('survey_id', $survey->id)->count());
+
+        // Answers for this survey must also be completely deleted
+        $this->assertEquals(0, AssessmentAnswer::where('question_id', $q->id)->count());
+        $this->assertEquals(0, AssessmentAnswer::whereIn('assessment_id', $assessments->pluck('id'))->count());
 
         // Admin dashboard must still be 200 OK
         $dashResponse = $this->actingAs($this->admin)->get(route('admin.dashboard'));

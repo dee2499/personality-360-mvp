@@ -47,6 +47,13 @@ class Assessment extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Assessment $assessment) {
+            $assessment->answers()->delete();
+        });
+    }
+
     public function survey(): BelongsTo
     {
         return $this->belongsTo(Survey::class);

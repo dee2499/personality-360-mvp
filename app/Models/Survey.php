@@ -32,7 +32,22 @@ class Survey extends Model
     protected static function booted(): void
     {
         static::deleting(function (Survey $survey) {
+            // Delete all answers belonging to this survey's assessments
+            $assessmentIds = $survey->assessments()->pluck('id');
+            if ($assessmentIds->isNotEmpty()) {
+                AssessmentAnswer::whereIn('assessment_id', $assessmentIds)->delete();
+            }
+
+            // Also delete answers linked to this survey's questions
+            $questionIds = $survey->questions()->pluck('id');
+            if ($questionIds->isNotEmpty()) {
+                AssessmentAnswer::whereIn('question_id', $questionIds)->delete();
+            }
+
+            // Delete assessments, detach participants, and delete questions
             $survey->assessments()->delete();
+            $survey->participants()->detach();
+            $survey->questions()->delete();
         });
     }
 
