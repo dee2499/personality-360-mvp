@@ -1,6 +1,6 @@
 <x-layouts.app>
     <div class="space-y-8" x-data="{
-        showInviteModal: false,
+        showInviteModal: {{ $errors->any() ? 'true' : 'false' }},
         copied: false,
         copyLink(link) {
             navigator.clipboard.writeText(link);
@@ -267,6 +267,20 @@
                 <form method="POST" action="{{ route('admin.companies.invite', $company) }}" class="space-y-4">
                     @csrf
 
+                    @if($errors->any())
+                        <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-1">
+                            <span class="font-bold flex items-center gap-1.5 text-rose-900">
+                                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>
+                                Could not invite employee:
+                            </span>
+                            <ul class="list-disc list-inside space-y-0.5 text-[11px] text-rose-700 pl-1">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div>
                         <label for="invite_name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Employee Full Name <span class="text-rose-500">*</span>
@@ -276,9 +290,13 @@
                                    name="name" 
                                    type="text" 
                                    required 
+                                   value="{{ old('name') }}"
                                    placeholder="e.g. John Doe"
-                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
+                                   class="block w-full rounded-xl border {{ $errors->has('name') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }} px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
                         </div>
+                        @error('name')
+                            <p class="mt-1 text-xs text-rose-600 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -290,9 +308,13 @@
                                    name="email" 
                                    type="email" 
                                    required 
+                                   value="{{ old('email') }}"
                                    placeholder="e.g. jdoe@company.com"
-                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
+                                   class="block w-full rounded-xl border {{ $errors->has('email') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }} px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
                         </div>
+                        @error('email')
+                            <p class="mt-1 text-xs text-rose-600 font-semibold">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -302,8 +324,8 @@
                         <div class="mt-1">
                             <select id="invite_role" name="role" 
                                     class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
-                                <option value="participant">Participant (Employee)</option>
-                                <option value="admin">Company Administrator</option>
+                                <option value="participant" {{ old('role') === 'participant' ? 'selected' : '' }}>Participant (Employee)</option>
+                                <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Company Administrator</option>
                             </select>
                         </div>
                     </div>

@@ -125,18 +125,28 @@ class CompanyController extends Controller
             'invitation_sent_at' => now(),
         ]);
 
+        $emailSent = false;
+        $emailError = null;
+
         try {
             $user->notify(new EmployeeInvitationNotification($token, $company->name));
+            $emailSent = true;
         } catch (\Throwable $e) {
+            $emailError = $e->getMessage();
             Log::error('Failed sending invitation email to '.$user->email.': '.$e->getMessage());
         }
 
         $activationUrl = route('invitation.show', ['token' => $token]);
 
-        return redirect()->route('admin.companies.show', $company)
-            ->with('success', "Employee '{$user->name}' added to {$company->name}! Invitation email generated.")
+        $redirect = redirect()->route('admin.companies.show', $company)
             ->with('invitation_link', $activationUrl)
             ->with('invited_employee', $user->name);
+
+        if ($emailSent) {
+            return $redirect->with('success', "Employee '{$user->name}' added to {$company->name}! Invitation email sent to {$user->email}.");
+        }
+
+        return $redirect->with('warning', "Employee '{$user->name}' added, but email delivery failed: {$emailError}. You can use the activation link below to activate their account.");
     }
 
     /**

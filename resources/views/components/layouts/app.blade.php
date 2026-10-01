@@ -95,12 +95,33 @@
         </div>
     </header>
 
-    <!-- Flash Messages -->
+    <!-- Flash Messages & Global Errors -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        @if($errors->any())
+            <div class="mb-4 p-4 text-sm text-rose-800 rounded-2xl bg-rose-50 border border-rose-200 shadow-xs" role="alert">
+                <div class="flex items-center gap-2 font-bold mb-2 text-rose-900">
+                    <i data-lucide="alert-octagon" class="w-5 h-5 text-rose-600 shrink-0"></i>
+                    <span>Please review and fix the following issues:</span>
+                </div>
+                <ul class="list-disc list-inside space-y-1 text-xs text-rose-700 font-medium">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if(session('success'))
             <div class="mb-4 flex items-center gap-3 p-4 text-sm text-emerald-800 rounded-xl bg-emerald-50 border border-emerald-200 shadow-xs" role="alert">
                 <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600 shrink-0"></i>
                 <div class="font-medium">{{ session('success') }}</div>
+            </div>
+        @endif
+
+        @if(session('warning'))
+            <div class="mb-4 flex items-center gap-3 p-4 text-sm text-amber-800 rounded-xl bg-amber-50 border border-amber-200 shadow-xs" role="alert">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0"></i>
+                <div class="font-medium">{{ session('warning') }}</div>
             </div>
         @endif
 
