@@ -25,6 +25,9 @@ if [ "$USER_COUNT" = "0" ]; then
     php artisan db:seed --force
 fi
 
+# Ensure default score categories are seeded
+php artisan db:seed --class=ScoreCategorySeeder --force
+
 # Optimization caches
 php artisan config:cache
 php artisan route:cache
