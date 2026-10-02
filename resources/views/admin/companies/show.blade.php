@@ -16,16 +16,16 @@
                 <span>Back to Companies</span>
             </a>
 
-            <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-2xl bg-indigo-600 text-white font-black text-2xl flex items-center justify-center shadow-md shadow-indigo-100">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-600 text-white font-black text-2xl flex items-center justify-center shadow-md shadow-indigo-100 shrink-0">
                         {{ substr($company->name, 0, 1) }}
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
                             <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $company->name }}</h1>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
-                                Organization
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                Organization Profile
                             </span>
                         </div>
                         <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
@@ -36,24 +36,45 @@
                                 </span>
                                 <span>•</span>
                             @endif
-                            <span>{{ $company->users->count() }} Employees</span>
+                            <span class="font-medium text-slate-700">{{ $company->users->count() }} Employees</span>
                             <span>•</span>
-                            <span>{{ $company->surveys->count() }} Surveys</span>
+                            <span class="font-medium text-slate-700">{{ $company->surveys->count() }} Surveys</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.companies.edit', $company) }}" 
-                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
-                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                        <span>Edit Company</span>
-                    </a>
-                    <button type="button" @click="showInviteModal = true"
-                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i>
-                        <span>Add / Invite Employee</span>
-                    </button>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <!-- Overall Company Evaluation Progress Pill -->
+                    <div class="flex flex-col sm:items-end gap-1.5 bg-slate-50 sm:bg-transparent p-4 sm:p-0 rounded-xl">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluation Benchmark</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl font-extrabold text-slate-900">
+                                {{ number_format($metrics['average_percentage'], 1) }}%
+                                <span class="text-slate-400 text-sm font-normal">({{ $metrics['completed_assessments'] }}/{{ $metrics['total_assessments'] }})</span>
+                            </span>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-md {{ $metrics['completion_rate'] >= 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-indigo-100 text-indigo-800' }}">
+                                {{ $metrics['completion_rate'] }}% Done
+                            </span>
+                        </div>
+                        <div class="w-48 bg-slate-200 rounded-full h-2 overflow-hidden mt-1">
+                            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500" 
+                                 style="width: {{ $metrics['completion_rate'] }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-4 flex items-center gap-2">
+                        <a href="{{ route('admin.companies.edit', $company) }}" 
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                            <span>Edit Company</span>
+                        </a>
+                        <button type="button" @click="showInviteModal = true"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xs shadow-indigo-100 transition cursor-pointer">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            <span>Add Employee</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -80,6 +101,319 @@
                 </div>
             </div>
         @endif
+
+        @if($selectedSurvey)
+            <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between text-xs text-indigo-900">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="filter" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Viewing 360 benchmark score & evaluations for survey: <strong>{{ $selectedSurvey->title }}</strong></span>
+                </div>
+                <a href="{{ route('admin.companies.show', $company) }}" class="font-bold text-indigo-600 hover:text-indigo-800 underline">
+                    Reset to All Surveys Combined
+                </a>
+            </div>
+        @endif
+
+        <!-- Company 360° Benchmark Bar & Survey Filter -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+                        <i data-lucide="gauge" class="w-4 h-4"></i>
+                    </span>
+                    <h2 class="text-lg font-black text-slate-900 tracking-tight">Company 360° Benchmark</h2>
+                </div>
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                    {{ $surveys->count() }} Surveys
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $metrics['category_badge'] }}">
+                    <span>{{ $metrics['category_emoji'] }}</span>
+                    <span>{{ $metrics['category'] }}</span>
+                </span>
+            </div>
+
+            <!-- Modern UI Survey Selection Box -->
+            @if($surveys->isNotEmpty())
+                <div class="relative w-full sm:w-80 shrink-0"
+                     x-data="{
+                         open: false,
+                         searchQuery: '',
+                         selectedSurveyTitle: '{{ $selectedSurvey ? $selectedSurvey->title : 'All Surveys (Company-wide)' }}',
+                         surveyTitles: @js(array_merge(['All Surveys (Company-wide)'], $surveys->pluck('title')->values()->all())),
+                         matches(name) {
+                             if (!this.searchQuery.trim()) return true;
+                             return name.toLowerCase().includes(this.searchQuery.toLowerCase().trim());
+                         }
+                     }"
+                     @click.outside="open = false"
+                     @keydown.escape.window="open = false">
+                    
+                    <!-- Select Trigger Button -->
+                    <button type="button"
+                            @click="open = !open; if (open) $nextTick(() => $refs.searchInput?.focus())"
+                            class="w-full flex items-center justify-between gap-3 px-4 py-2.5 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 text-left transition shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 cursor-pointer">
+                        <div class="flex items-center gap-2.5 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0 {{ $selectedSurvey ? 'bg-indigo-600' : 'bg-emerald-500' }}"></span>
+                            <div class="truncate">
+                                <span class="text-xs font-bold text-slate-900 block truncate" x-text="selectedSurveyTitle"></span>
+                                <span class="text-[10px] text-slate-400 font-medium">
+                                    {{ $selectedSurvey ? 'Individual Survey Benchmark' : 'All ' . $surveys->count() . ' Surveys Combined' }}
+                                </span>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-down" 
+                           class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"
+                           :class="{ 'rotate-180': open }"></i>
+                    </button>
+
+                    <!-- Floating Dropdown Menu -->
+                    <div x-show="open"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                         class="absolute right-0 left-0 mt-2 z-40 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden py-1">
+                        
+                        <!-- Search by Name Input -->
+                        <div class="p-2 border-b border-slate-100 bg-slate-50/70">
+                            <div class="relative">
+                                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text"
+                                       x-ref="searchInput"
+                                       x-model="searchQuery"
+                                       placeholder="Search surveys by name..."
+                                       @keydown.escape.stop="if (searchQuery) { searchQuery = '' } else { open = false }"
+                                       class="w-full text-xs pl-8 pr-7 py-2 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:outline-hidden focus:ring-1 focus:ring-indigo-600 transition placeholder-slate-400 font-medium">
+                                <button type="button"
+                                        x-show="searchQuery.length > 0"
+                                        x-cloak
+                                        @click="searchQuery = ''; $refs.searchInput?.focus()"
+                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Options List -->
+                        <div class="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                            <!-- Option 1: All Surveys Combined -->
+                            <a href="{{ route('admin.companies.show', $company) }}"
+                               x-show="matches('All Surveys (Company-wide)')"
+                               class="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-indigo-50/50 transition cursor-pointer {{ $selectedSurvey === null ? 'bg-indigo-50/70' : '' }}">
+                                <div class="flex items-center gap-2.5 truncate">
+                                    <div class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 {{ $selectedSurvey === null ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                        <i data-lucide="check" class="w-3 h-3"></i>
+                                    </div>
+                                    <div class="truncate">
+                                        <span class="text-xs font-bold text-slate-900 block truncate {{ $selectedSurvey === null ? 'text-indigo-950 font-black' : '' }}">
+                                            All Surveys (Company-wide)
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">
+                                            Company-wide synthesis across all surveys
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 shrink-0">
+                                    All
+                                </span>
+                            </a>
+
+                            <!-- Individual Surveys -->
+                            @foreach($surveys as $sItem)
+                                @php
+                                    $isSelected = $selectedSurvey && $selectedSurvey->id === $sItem->id;
+                                @endphp
+                                <a href="{{ route('admin.companies.show', ['company' => $company, 'survey_id' => $sItem->id]) }}"
+                                   x-show="matches('{{ addslashes($sItem->title) }}')"
+                                   class="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-indigo-50/50 transition cursor-pointer {{ $isSelected ? 'bg-indigo-50/70' : '' }}">
+                                    <div class="flex items-center gap-2.5 truncate">
+                                        <div class="w-5 h-5 rounded-lg flex items-center justify-center shrink-0 {{ $isSelected ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                            <i data-lucide="check" class="w-3 h-3"></i>
+                                        </div>
+                                        <div class="truncate">
+                                            <span class="text-xs font-bold text-slate-800 block truncate {{ $isSelected ? 'text-indigo-950 font-black' : '' }}">
+                                                {{ $sItem->title }}
+                                            </span>
+                                            <span class="text-[10px] text-slate-400">
+                                                {{ $sItem->assessments_count }} evaluations • {{ $sItem->completionPercentage() }}% complete
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full capitalize shrink-0 {{ $sItem->isPublished() ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600' }}">
+                                        {{ $sItem->status }}
+                                    </span>
+                                </a>
+                            @endforeach
+
+                            <!-- Empty State when search matches nothing -->
+                            <div x-show="!surveyTitles.some(t => matches(t))"
+                                 x-cloak
+                                 class="py-6 px-4 text-center">
+                                <p class="text-xs text-slate-500 font-medium">No surveys found matching "<span x-text="searchQuery" class="font-bold text-slate-700"></span>"</p>
+                                <button type="button" @click="searchQuery = ''; $refs.searchInput?.focus()" class="mt-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800">Clear search</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Native select for accessibility & automation -->
+                    <select class="sr-only" onchange="if (this.value) window.location.href = this.value">
+                        <option value="{{ route('admin.companies.show', $company) }}" {{ $selectedSurvey === null ? 'selected' : '' }}>
+                            All Surveys (Company-wide)
+                        </option>
+                        @foreach($surveys as $sItem)
+                            @php
+                                $isSelected = $selectedSurvey && $selectedSurvey->id === $sItem->id;
+                            @endphp
+                            <option value="{{ route('admin.companies.show', ['company' => $company, 'survey_id' => $sItem->id]) }}" {{ $isSelected ? 'selected' : '' }}>
+                                {{ $sItem->title }} ({{ $sItem->completionPercentage() }}% complete)
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+        </div>
+
+        <!-- Centerpiece: 3-Column Benchmark Result -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            
+            <!-- Col 1: 360° Visual Gauge Meter -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between items-center text-center">
+                <div class="w-full text-left">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100">
+                        Overall 360° Evaluation Score
+                    </span>
+                    <h3 class="text-base font-black text-slate-900 mt-1.5">Company Visual Gauge</h3>
+                    <p class="text-xs text-slate-400">Weighted average across all evaluations</p>
+                </div>
+
+                <div class="w-full my-auto py-2">
+                    <x-score-meter 
+                        :percentage="$metrics['average_percentage']" 
+                        :category="$metrics['category']" 
+                        :only-gauge="true"
+                    />
+                </div>
+
+                <div class="w-full pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-400 font-medium">Evaluations:</span>
+                    <span class="font-bold text-slate-800">
+                        {{ $metrics['completed_assessments'] }} / {{ $metrics['total_assessments'] }} Completed
+                    </span>
+                </div>
+            </div>
+
+            <!-- Col 2: Company Performance Breakdown -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-500">Benchmark Tier</span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border {{ $metrics['category_badge'] }}">
+                            <span>{{ $metrics['category_emoji'] }}</span>
+                            <span>{{ $metrics['category'] }}</span>
+                        </span>
+                    </div>
+
+                    <div class="py-4 space-y-4">
+                        <div>
+                            <span class="text-xs text-slate-400 font-medium block">Average Company Percentage</span>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span class="text-3xl sm:text-4xl font-black text-slate-900">{{ number_format($metrics['average_percentage'], 2) }}%</span>
+                                <span class="text-xs font-bold text-slate-400">overall score</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs font-bold text-slate-600">
+                                <span>Completion Progress</span>
+                                <span class="text-indigo-600">{{ $metrics['completion_rate'] }}%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-600 rounded-full transition-all duration-500"
+                                     style="width: {{ $metrics['completion_rate'] }}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-400">
+                                <span>{{ $metrics['completed_assessments'] }} Completed</span>
+                                <span>{{ $metrics['pending_assessments'] }} Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-500 font-medium">Total Accumulated Points:</span>
+                    <span class="font-extrabold text-slate-900">
+                        {{ number_format($metrics['total_score']) }} <span class="text-slate-400 font-normal">/ {{ number_format($metrics['max_score']) }} pts</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Col 3: Self vs Peer Perception Benchmark -->
+            <div class="bg-gradient-to-b from-indigo-50/30 to-white rounded-3xl border border-indigo-100 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <div class="flex items-center justify-between pb-3 border-b border-indigo-100/60">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-md">
+                            360° Perception Analysis
+                        </span>
+                        @if($metrics['completed_assessments'] > 0)
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $metrics['perception_gap'] >= 0 ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-teal-50 text-teal-800 border border-teal-200' }}">
+                                Gap: {{ $metrics['perception_gap'] > 0 ? '+' : '' }}{{ number_format($metrics['perception_gap'], 2) }}%
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="py-4 space-y-4">
+                        <!-- Self Rating -->
+                        <div class="p-3 rounded-2xl bg-white border border-indigo-100 flex items-center justify-between shadow-2xs">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-100">
+                                    <i data-lucide="user" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-800 block">Self-Assessed Average</span>
+                                    <span class="text-[10px] text-slate-400">{{ $metrics['self_completed_count'] }} employee self-evaluations</span>
+                                </div>
+                            </div>
+                            <span class="text-lg font-black text-indigo-700">{{ number_format($metrics['self_average_percentage'], 2) }}%</span>
+                        </div>
+
+                        <!-- Peer Rating -->
+                        <div class="p-3 rounded-2xl bg-white border border-teal-100 flex items-center justify-between shadow-2xs">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 font-bold flex items-center justify-center text-xs border border-teal-100">
+                                    <i data-lucide="users" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-bold text-slate-800 block">Peer-Assessed Average</span>
+                                    <span class="text-[10px] text-slate-400">{{ $metrics['peer_completed_count'] }} peer reviews from colleagues</span>
+                                </div>
+                            </div>
+                            <span class="text-lg font-black text-teal-700">{{ number_format($metrics['peer_average_percentage'], 2) }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-indigo-100/60 text-[11px] text-slate-500">
+                    @if($metrics['completed_assessments'] === 0)
+                        <span>Complete cohort assessments to view company-wide perception analysis.</span>
+                    @elseif($metrics['perception_gap'] > 5)
+                        <span class="text-amber-800 font-medium">⚠️ Company-wide self-ratings are {{ number_format($metrics['perception_gap'], 1) }}% higher than colleague reviews.</span>
+                    @elseif($metrics['perception_gap'] < -5)
+                        <span class="text-teal-800 font-medium">✨ Employees are modest: peer reviews rate the team {{ number_format(abs($metrics['perception_gap']), 1) }}% higher than self-ratings.</span>
+                    @else
+                        <span class="text-emerald-800 font-medium">🎯 High self-awareness: self-ratings and peer feedback are strongly aligned (within {{ number_format(abs($metrics['perception_gap']), 1) }}%).</span>
+                    @endif
+                </div>
+            </div>
+
+        </div>
 
         <!-- 2 Columns Grid: Employees & Company Surveys -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

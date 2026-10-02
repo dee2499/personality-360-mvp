@@ -214,10 +214,77 @@ class RouteHealthAndNullSafetyTest extends TestCase
         $res = $this->actingAs($this->admin)->get(route('admin.companies.show', $this->company));
         $res->assertOk();
         $res->assertSee('Acme Corporation');
+        $res->assertSee('Company Visual Gauge');
+        $res->assertSee('Overall 360° Evaluation Score');
 
         // Edit
         $res = $this->actingAs($this->admin)->get(route('admin.companies.edit', $this->company));
         $res->assertOk();
+    }
+
+    public function test_company_profile_calculates_and_displays_overall_score_meter(): void
+    {
+        $survey = Survey::create([
+            'title' => 'Acme Annual 360',
+            'status' => 'published',
+            'created_by' => $this->admin->id,
+            'company_id' => $this->company->id,
+        ]);
+
+        $q = Question::create([
+            'survey_id' => $survey->id,
+            'question_text' => 'Demonstrates company values?',
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $survey->participants()->attach([$this->participant1->id, $this->participant2->id]);
+        app(AssessmentGenerationService::class)->generateForSurvey($survey);
+
+        // Complete 1 self assessment (score 10 = 100%) and 1 peer assessment (score 8 = 80%)
+        $selfAssessment = Assessment::where('survey_id', $survey->id)
+            ->where('assessor_id', $this->participant1->id)
+            ->where('subject_id', $this->participant1->id)
+            ->first();
+
+        AssessmentAnswer::create([
+            'assessment_id' => $selfAssessment->id,
+            'question_id' => $q->id,
+            'score' => 10,
+        ]);
+        $selfAssessment->update(['status' => 'completed']);
+        app(AssessmentScoreService::class)->calculateAssessmentScore($selfAssessment);
+
+        $peerAssessment = Assessment::where('survey_id', $survey->id)
+            ->where('assessor_id', $this->participant1->id)
+            ->where('subject_id', $this->participant2->id)
+            ->first();
+
+        AssessmentAnswer::create([
+            'assessment_id' => $peerAssessment->id,
+            'question_id' => $q->id,
+            'score' => 8,
+        ]);
+        $peerAssessment->update(['status' => 'completed']);
+        app(AssessmentScoreService::class)->calculateAssessmentScore($peerAssessment);
+
+        // Average percentage = (100 + 80) / 2 = 90.00%
+        $response = $this->actingAs($this->admin)->get(route('admin.companies.show', $this->company));
+        $response->assertOk();
+        $response->assertSee('Company Visual Gauge');
+        $response->assertSee('90.00%');
+        $response->assertSee('Self-Assessed Average');
+        $response->assertSee('100.00%');
+        $response->assertSee('Peer-Assessed Average');
+        $response->assertSee('80.00%');
+
+        // Test filtering by survey ID
+        $surveyFilterRes = $this->actingAs($this->admin)->get(route('admin.companies.show', [
+            'company' => $this->company,
+            'survey_id' => $survey->id,
+        ]));
+        $surveyFilterRes->assertOk();
+        $surveyFilterRes->assertSee('90.00%');
     }
 
     public function test_participant_dashboard_and_taking_surveys(): void

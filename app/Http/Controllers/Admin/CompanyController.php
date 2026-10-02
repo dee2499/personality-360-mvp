@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Survey;
 use App\Models\User;
 use App\Notifications\EmployeeInvitationNotification;
 use App\Services\AssessmentGenerationService;
+use App\Services\AssessmentScoreService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +18,10 @@ use Illuminate\View\View;
 
 class CompanyController extends Controller
 {
+    public function __construct(
+        protected AssessmentScoreService $scoreService
+    ) {}
+
     /**
      * Display a listing of all companies.
      */
@@ -54,16 +60,23 @@ class CompanyController extends Controller
     }
 
     /**
-     * Display the specified company with its employees and surveys.
+     * Display the specified company with its employees, surveys, and overall score meter.
      */
-    public function show(Company $company): View
+    public function show(Company $company, Request $request): View
     {
+        $selectedSurveyId = $request->query('survey_id');
+        $selectedSurvey = $selectedSurveyId ? Survey::find($selectedSurveyId) : null;
+
         $company->load([
             'users' => fn ($q) => $q->orderBy('name'),
             'surveys' => fn ($q) => $q->withCount(['participants', 'assessments'])->orderByDesc('created_at'),
         ]);
 
-        return view('admin.companies.show', compact('company'));
+        $surveys = $company->surveys;
+
+        $metrics = $this->scoreService->calculateCompanyMetrics($company, $selectedSurvey);
+
+        return view('admin.companies.show', compact('company', 'metrics', 'surveys', 'selectedSurvey'));
     }
 
     /**

@@ -22,38 +22,13 @@
     $semiCircumference = 329.867;
     $dashOffset = round($semiCircumference * (1 - ($pct / 100)), 3);
 
-    $categoryConfig = match ($category) {
-        'Apple' => [
-            'emoji' => '🍏',
-            'color' => '#10B981', // Emerald
-            'badge' => 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-600/20',
-        ],
-        'Orange' => [
-            'emoji' => '🍊',
-            'color' => '#F97316', // Orange
-            'badge' => 'bg-orange-50 text-orange-700 border-orange-200 ring-orange-600/20',
-        ],
-        'Tomato' => [
-            'emoji' => '🍅',
-            'color' => '#EF4444', // Red
-            'badge' => 'bg-rose-50 text-rose-700 border-rose-200 ring-rose-600/20',
-        ],
-        'Lemon' => [
-            'emoji' => '🍋',
-            'color' => '#F59E0B', // Amber / Yellow
-            'badge' => 'bg-amber-50 text-amber-800 border-amber-200 ring-amber-600/20',
-        ],
-        'Cucumber' => [
-            'emoji' => '🥒',
-            'color' => '#059669', // Green
-            'badge' => 'bg-teal-50 text-teal-800 border-teal-200 ring-teal-600/20',
-        ],
-        default => [
-            'emoji' => '⏳',
-            'color' => '#9CA3AF', // Gray
-            'badge' => 'bg-gray-50 text-gray-700 border-gray-200 ring-gray-600/20',
-        ],
-    };
+    $catService = app(\App\Services\AssessmentCategoryService::class);
+    $categoryConfig = [
+        'emoji' => $category === 'Pending' ? '⏳' : $catService->getEmoji($category),
+        'color' => $category === 'Pending' ? '#9CA3AF' : $catService->getColorHex($category),
+        'badge' => $category === 'Pending' ? 'bg-gray-50 text-gray-700 border-gray-200 ring-gray-600/20' : $catService->getBadgeClass($category),
+    ];
+    $allCats = $catService->getAllCategories();
 @endphp
 
 @if($onlyGauge)
@@ -219,32 +194,14 @@
             @endif
         </div>
 
-        <div class="w-full pt-1.5 border-t border-slate-100 grid grid-cols-5 text-center text-[9px] leading-tight">
-            <div class="flex flex-col items-center">
-                <span>🍏</span>
-                <span class="font-bold text-slate-700">Apple</span>
-                <span class="text-slate-400 text-[8px]">0–20%</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span>🍊</span>
-                <span class="font-bold text-slate-700">Orange</span>
-                <span class="text-slate-400 text-[8px]">>20–40%</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span>🍅</span>
-                <span class="font-bold text-slate-700">Tomato</span>
-                <span class="text-slate-400 text-[8px]">>40–60%</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span>🍋</span>
-                <span class="font-bold text-slate-700">Lemon</span>
-                <span class="text-slate-400 text-[8px]">>60–80%</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span>🥒</span>
-                <span class="font-bold text-slate-700">Cucumber</span>
-                <span class="text-slate-400 text-[8px]">>80–100%</span>
-            </div>
+        <div class="w-full pt-2 border-t border-slate-100 flex items-center justify-around text-center text-[9px] leading-tight">
+            @foreach($allCats as $cItem)
+                <div class="flex flex-col items-center">
+                    <span>{{ $cItem['emoji'] }}</span>
+                    <span class="font-bold text-slate-700 truncate max-w-[55px]">{{ $cItem['name'] }}</span>
+                    <span class="text-slate-400 text-[8px]">{{ $cItem['range'] }}</span>
+                </div>
+            @endforeach
         </div>
     </div>
 @endif

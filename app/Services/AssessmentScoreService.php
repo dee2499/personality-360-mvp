@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Assessment;
+use App\Models\Company;
 use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -334,6 +335,104 @@ class AssessmentScoreService
             'self' => $selfMetrics,
             'peer' => $peerMetrics,
             'comparison' => $comparison,
+        ];
+    }
+
+    /**
+     * Calculate aggregated 360 metrics and average score for an entire company.
+     *
+     * @return array{
+     *     total_assessments: int,
+     *     completed_assessments: int,
+     *     pending_assessments: int,
+     *     completion_rate: float,
+     *     average_percentage: float,
+     *     total_score: int,
+     *     max_score: int,
+     *     category: string,
+     *     category_emoji: string,
+     *     category_color: string,
+     *     category_badge: string,
+     *     self_average_percentage: float,
+     *     peer_average_percentage: float,
+     *     self_completed_count: int,
+     *     peer_completed_count: int,
+     *     perception_gap: float
+     * }
+     */
+    public function calculateCompanyMetrics(Company $company, ?Survey $survey = null): array
+    {
+        $query = Assessment::query()
+            ->has('survey')
+            ->where(function ($q) use ($company) {
+                $q->whereHas('survey', fn ($sq) => $sq->where('company_id', $company->id))
+                    ->orWhereHas('subject', fn ($sq) => $sq->where('company_id', $company->id));
+            });
+
+        if ($survey !== null) {
+            $query->where('survey_id', $survey->id);
+        }
+
+        $allAssessments = $query->get();
+        $totalCount = $allAssessments->count();
+
+        $completedAssessments = $allAssessments->where('status', 'completed');
+        $completedCount = $completedAssessments->count();
+        $pendingCount = $totalCount - $completedCount;
+        $completionRate = $totalCount > 0 ? round(($completedCount / $totalCount) * 100, 2) : 0.0;
+
+        if ($completedCount === 0) {
+            return [
+                'total_assessments' => $totalCount,
+                'completed_assessments' => 0,
+                'pending_assessments' => $pendingCount,
+                'completion_rate' => $completionRate,
+                'average_percentage' => 0.0,
+                'total_score' => 0,
+                'max_score' => 0,
+                'category' => 'Pending',
+                'category_emoji' => '⏳',
+                'category_color' => '#9CA3AF',
+                'category_badge' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'self_average_percentage' => 0.0,
+                'peer_average_percentage' => 0.0,
+                'self_completed_count' => 0,
+                'peer_completed_count' => 0,
+                'perception_gap' => 0.0,
+            ];
+        }
+
+        $totalScore = (int) $completedAssessments->sum('total_score');
+        $maxScore = (int) $completedAssessments->sum('max_score');
+        $avgPercentage = round((float) $completedAssessments->avg('percentage'), 2);
+
+        $category = $this->categoryService->getCategory($avgPercentage);
+
+        // Self vs Peer breakdowns for the company
+        $selfAssessments = $completedAssessments->filter(fn ($a) => $a->isSelfAssessment());
+        $peerAssessments = $completedAssessments->filter(fn ($a) => ! $a->isSelfAssessment());
+
+        $selfAvg = $selfAssessments->isNotEmpty() ? round((float) $selfAssessments->avg('percentage'), 2) : 0.0;
+        $peerAvg = $peerAssessments->isNotEmpty() ? round((float) $peerAssessments->avg('percentage'), 2) : 0.0;
+        $perceptionGap = round($selfAvg - $peerAvg, 2);
+
+        return [
+            'total_assessments' => $totalCount,
+            'completed_assessments' => $completedCount,
+            'pending_assessments' => $pendingCount,
+            'completion_rate' => $completionRate,
+            'average_percentage' => $avgPercentage,
+            'total_score' => $totalScore,
+            'max_score' => $maxScore,
+            'category' => $category,
+            'category_emoji' => $this->categoryService->getEmoji($category),
+            'category_color' => $this->categoryService->getColorHex($category),
+            'category_badge' => $this->categoryService->getBadgeClass($category),
+            'self_average_percentage' => $selfAvg,
+            'peer_average_percentage' => $peerAvg,
+            'self_completed_count' => $selfAssessments->count(),
+            'peer_completed_count' => $peerAssessments->count(),
+            'perception_gap' => $perceptionGap,
         ];
     }
 }
