@@ -27,7 +27,7 @@ class CompanyController extends Controller
      */
     public function index(): View
     {
-        $companies = Company::withCount(['users', 'surveys'])
+        $companies = Company::withCount(['employees', 'surveys'])
             ->orderBy('name')
             ->get();
 
@@ -68,7 +68,7 @@ class CompanyController extends Controller
         $selectedSurvey = $selectedSurveyId ? Survey::find($selectedSurveyId) : null;
 
         $company->load([
-            'users' => fn ($q) => $q->orderBy('name'),
+            'employees' => fn ($q) => $q->orderBy('name'),
             'surveys' => fn ($q) => $q->withCount(['participants', 'assessments'])->orderByDesc('created_at'),
         ]);
 
@@ -124,7 +124,6 @@ class CompanyController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'role' => ['nullable', 'in:participant,admin'],
         ]);
 
         $token = Str::random(40);
@@ -133,7 +132,7 @@ class CompanyController extends Controller
             'company_id' => $company->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'role' => $validated['role'] ?? 'participant',
+            'role' => 'participant',
             'password' => Hash::make(Str::random(32)),
             'invitation_token' => $token,
             'invitation_sent_at' => now(),
@@ -176,6 +175,10 @@ class CompanyController extends Controller
     {
         if ($employee->id === $request->user()->id) {
             return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        if ($employee->isAdmin()) {
+            return back()->with('error', 'Administrators cannot be managed or deleted as company employees.');
         }
 
         if ($employee->company_id !== $company->id) {

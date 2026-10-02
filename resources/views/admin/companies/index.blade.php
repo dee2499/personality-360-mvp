@@ -72,7 +72,7 @@
                                     <td class="py-4 px-6">
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
                                             <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>
-                                            {{ $company->users_count }} Employees
+                                            {{ $company->employees_count }} Employees
                                         </span>
                                     </td>
                                     <td class="py-4 px-6">

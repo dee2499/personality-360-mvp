@@ -36,7 +36,7 @@
                                 </span>
                                 <span>•</span>
                             @endif
-                            <span class="font-medium text-slate-700">{{ $company->users->count() }} Employees</span>
+                            <span class="font-medium text-slate-700">{{ $company->employees->count() }} Employees</span>
                             <span>•</span>
                             <span class="font-medium text-slate-700">{{ $company->surveys->count() }} Surveys</span>
                         </div>
@@ -426,12 +426,12 @@
                         <p class="text-xs text-slate-500">All registered and invited team members eligible for survey cohorts</p>
                     </div>
                     <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
-                        {{ $company->users->count() }} Total
+                        {{ $company->employees->count() }} Total
                     </span>
                 </div>
 
                 <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
-                    @if($company->users->isEmpty())
+                    @if($company->employees->isEmpty())
                         <div class="py-12 px-6 text-center">
                             <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
                                 <i data-lucide="user-plus" class="w-6 h-6"></i>
@@ -453,7 +453,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
-                                    @foreach($company->users as $employee)
+                                    @foreach($company->employees as $employee)
                                         <tr class="hover:bg-slate-50/50 transition">
                                             <td class="py-4 px-6">
                                                 <div class="flex items-center gap-3">
@@ -652,18 +652,6 @@
                         @enderror
                     </div>
 
-                    <div>
-                        <label for="invite_role" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                            Role
-                        </label>
-                        <div class="mt-1">
-                            <select id="invite_role" name="role" 
-                                    class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
-                                <option value="participant" {{ old('role') === 'participant' ? 'selected' : '' }}>Participant (Employee)</option>
-                                <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Company Administrator</option>
-                            </select>
-                        </div>
-                    </div>
 
                     <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
                         <button type="button" @click="showInviteModal = false"
