@@ -17,6 +17,134 @@
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
                 </select>
 
+                <!-- Searchable Company Select Box -->
+                <div class="relative min-w-[180px] sm:min-w-[220px]"
+                     x-data="{
+                         open: false,
+                         searchQuery: '',
+                         selectedCompanyName: '{{ $selectedCompany?->name ?? 'All Companies' }}',
+                         companyNames: @js(array_merge(['All Companies'], $companies->pluck('name')->values()->all())),
+                         matches(name) {
+                             if (!this.searchQuery.trim()) return true;
+                             return name.toLowerCase().includes(this.searchQuery.toLowerCase().trim());
+                         },
+                         selectCompany(id) {
+                             const sel = document.getElementById('assessments_company_id');
+                             if (sel) {
+                                 sel.value = id;
+                                 document.getElementById('assessments-filter-form').submit();
+                             }
+                         }
+                     }"
+                     @click.outside="open = false"
+                     @keydown.escape.window="open = false">
+                    
+                    <!-- Select Trigger Button -->
+                    <button type="button"
+                            @click="open = !open; if (open) $nextTick(() => $refs.compSearchInput?.focus())"
+                            class="w-full flex items-center justify-between gap-2 px-3 py-2 bg-white hover:bg-slate-50 rounded-xl border border-slate-300 text-left text-xs transition shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 cursor-pointer">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <i data-lucide="building-2" class="w-3.5 h-3.5 text-indigo-500 shrink-0"></i>
+                            <span class="font-medium text-slate-900 truncate" x-text="selectedCompanyName"></span>
+                        </div>
+                        <i data-lucide="chevron-down" 
+                           class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0"
+                           :class="{ 'rotate-180': open }"></i>
+                    </button>
+
+                    <!-- Floating Dropdown Menu -->
+                    <div x-show="open"
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                         class="absolute right-0 left-0 sm:left-auto sm:right-0 sm:w-72 mt-1.5 z-40 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden py-1">
+                        
+                        <!-- Search by Name Input -->
+                        <div class="p-2 border-b border-slate-100 bg-slate-50/70">
+                            <div class="relative">
+                                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text"
+                                       x-ref="compSearchInput"
+                                       x-model="searchQuery"
+                                       placeholder="Search companies..."
+                                       @keydown.escape.stop="if (searchQuery) { searchQuery = '' } else { open = false }"
+                                       class="w-full text-xs pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-xl focus:border-indigo-600 focus:outline-hidden focus:ring-1 focus:ring-indigo-600 transition placeholder-slate-400 font-medium">
+                                <button type="button"
+                                        x-show="searchQuery.length > 0"
+                                        x-cloak
+                                        @click="searchQuery = ''; $refs.compSearchInput?.focus()"
+                                        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Options List -->
+                        <div class="max-h-60 overflow-y-auto divide-y divide-slate-100">
+                            <!-- All Companies Option -->
+                            <button type="button"
+                                    x-show="matches('All Companies')"
+                                    @click="selectCompany('')"
+                                    class="w-full flex items-center justify-between gap-3 px-3.5 py-2 hover:bg-indigo-50/50 transition cursor-pointer text-left {{ !request('company_id') && !request('company') ? 'bg-indigo-50/70' : '' }}">
+                                <div class="flex items-center gap-2 truncate">
+                                    <div class="w-4 h-4 rounded-md flex items-center justify-center shrink-0 {{ !request('company_id') && !request('company') ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                        <i data-lucide="check" class="w-2.5 h-2.5"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold text-slate-800 truncate {{ !request('company_id') && !request('company') ? 'text-indigo-950 font-bold' : '' }}">
+                                        All Companies
+                                    </span>
+                                </div>
+                            </button>
+
+                            <!-- Individual Companies -->
+                            @foreach($companies as $comp)
+                                @php
+                                    $isSelected = (request('company_id') == $comp->id) || (request('company') == $comp->name);
+                                @endphp
+                                <button type="button"
+                                        x-show="matches('{{ addslashes($comp->name) }}')"
+                                        @click="selectCompany('{{ $comp->id }}')"
+                                        class="w-full flex items-center justify-between gap-3 px-3.5 py-2 hover:bg-indigo-50/50 transition cursor-pointer text-left {{ $isSelected ? 'bg-indigo-50/70' : '' }}">
+                                    <div class="flex items-center gap-2 truncate">
+                                        <div class="w-4 h-4 rounded-md flex items-center justify-center shrink-0 {{ $isSelected ? 'bg-indigo-600 text-white' : 'border border-slate-200 text-transparent' }}">
+                                            <i data-lucide="check" class="w-2.5 h-2.5"></i>
+                                        </div>
+                                        <span class="text-xs font-semibold text-slate-800 truncate {{ $isSelected ? 'text-indigo-950 font-bold' : '' }}">
+                                            {{ $comp->name }}
+                                        </span>
+                                    </div>
+                                </button>
+                            @endforeach
+
+                            <!-- Empty State when search matches nothing -->
+                            <div x-show="!companyNames.some(t => matches(t))"
+                                 x-cloak
+                                 class="py-6 px-4 text-center">
+                                <p class="text-xs text-slate-500 font-medium">No companies found matching "<span x-text="searchQuery" class="font-bold text-slate-700"></span>"</p>
+                                <button type="button" @click="searchQuery = ''; $refs.compSearchInput?.focus()" class="mt-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-800">Clear search</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Native select for accessibility & form serialization -->
+                    <select name="company_id" id="assessments_company_id" class="sr-only" onchange="this.form.submit()">
+                        <option value="">All Companies</option>
+                        @foreach($companies as $comp)
+                            <option value="{{ $comp->id }}" {{ (request('company_id') == $comp->id || request('company') == $comp->name) ? 'selected' : '' }}>
+                                {{ $comp->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Searchable Survey Select Box -->
                 <div class="relative min-w-[200px] sm:min-w-[260px]"
                      x-data="{
@@ -142,7 +270,7 @@
                     </select>
                 </div>
 
-                @if(request('status') || request('survey_id'))
+                @if(request('status') || request('survey_id') || request('company_id') || request('company'))
                     <a href="{{ route('admin.assessments.index') }}" class="text-xs font-semibold text-rose-600 hover:text-rose-800 p-2">
                         Clear
                     </a>
@@ -200,8 +328,18 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td class="py-3.5 px-6 text-slate-600 truncate max-w-[160px]">
-                                        {{ $assessment->survey?->title ?? 'General Survey' }}
+                                    <td class="py-3.5 px-6 text-slate-600 max-w-[180px]">
+                                        <div class="truncate font-semibold text-slate-900" title="{{ $assessment->survey?->title }}">
+                                            {{ $assessment->survey?->title ?? 'General Survey' }}
+                                        </div>
+                                        @if($assessment->survey?->company)
+                                            <a href="{{ route('admin.assessments.index', array_filter(['company_id' => $assessment->survey->company->id, 'status' => request('status')])) }}" 
+                                               class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-1.5 py-0.5 rounded border border-indigo-100 mt-0.5 transition"
+                                               title="Filter assessments by {{ $assessment->survey->company->name }}">
+                                                <i data-lucide="building-2" class="w-3 h-3 text-indigo-500"></i>
+                                                <span>{{ $assessment->survey->company->name }}</span>
+                                            </a>
+                                        @endif
                                     </td>
                                     <td class="py-3.5 px-6 font-bold text-slate-800">
                                         @if($assessment->isCompleted())
