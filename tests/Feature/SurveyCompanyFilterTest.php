@@ -103,20 +103,46 @@ class SurveyCompanyFilterTest extends TestCase
         $response->assertDontSee('Stark Engineering 360');
     }
 
-    public function test_filter_shows_empty_state_when_company_has_no_surveys(): void
+    public function test_admin_can_search_surveys_by_title_or_description(): void
     {
-        $emptyCompany = Company::create([
-            'name' => 'Wayne Enterprises',
-            'contact_email' => 'bruce@wayne.com',
-        ]);
-
         $response = $this->actingAs($this->admin)->get(route('admin.surveys.index', [
-            'company' => 'Wayne Enterprises',
+            'search' => 'Leadership',
         ]));
 
         $response->assertOk();
-        $response->assertSee('No surveys found for company "Wayne Enterprises"', false);
+        $response->assertSee('Acme Leadership 360');
+        $response->assertDontSee('Stark Engineering 360');
+    }
+
+    public function test_admin_can_search_surveys_within_selected_company(): void
+    {
+        // Another Acme survey
+        Survey::create([
+            'company_id' => $this->companyA->id,
+            'title' => 'Acme Sales 360',
+            'status' => 'published',
+            'created_by' => $this->admin->id,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.surveys.index', [
+            'company' => 'Acme Corporation',
+            'search' => 'Sales',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('Acme Sales 360');
         $response->assertDontSee('Acme Leadership 360');
         $response->assertDontSee('Stark Engineering 360');
+    }
+
+    public function test_survey_table_displays_company_name_prominently_in_list(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.surveys.index'));
+
+        $response->assertOk();
+        // Checks that company table header and company names exist in the table
+        $response->assertSee('Company</th>', false);
+        $response->assertSee('Acme Corporation');
+        $response->assertSee('Stark Industries');
     }
 }

@@ -17,12 +17,21 @@ class SurveyController extends Controller
 {
     public function index(Request $request): View
     {
+        $search = $request->query('search');
         $companyFilter = $request->query('company');
         $companyId = $request->query('company_id');
 
         $surveysQuery = Survey::withCount(['questions', 'participants', 'assessments'])
             ->with(['creator', 'company'])
             ->latest();
+
+        if ($request->filled('search')) {
+            $searchTerm = trim((string) $search);
+            $surveysQuery->where(function ($query) use ($searchTerm) {
+                $query->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
+        }
 
         if ($request->filled('company')) {
             $companyName = trim((string) $companyFilter);
@@ -57,6 +66,7 @@ class SurveyController extends Controller
         return view('admin.surveys.index', compact(
             'surveys',
             'companies',
+            'search',
             'companyFilter',
             'companyId',
             'selectedCompany',

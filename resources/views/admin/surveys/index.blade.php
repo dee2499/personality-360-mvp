@@ -15,19 +15,25 @@
 
         <!-- Search & Company Filter Bar -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <!-- Filter Form with Search Input -->
+            <!-- Filter Form with Survey Search Input -->
             <form method="GET" action="{{ route('admin.surveys.index') }}" class="flex-1 flex flex-col sm:flex-row sm:items-center gap-3">
+                @if($companyFilter)
+                    <input type="hidden" name="company" value="{{ $companyFilter }}">
+                @elseif($companyId)
+                    <input type="hidden" name="company_id" value="{{ $companyId }}">
+                @endif
+
                 <div class="relative flex-1 max-w-md">
                     <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                     <input type="text" 
-                           name="company" 
-                           value="{{ $companyFilter }}" 
-                           placeholder="Filter surveys by company name..."
+                           name="search" 
+                           value="{{ $search }}" 
+                           placeholder="Search surveys by title or description..."
                            class="w-full text-xs pl-9 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-600 focus:outline-hidden focus:ring-1 focus:ring-indigo-600 transition placeholder-slate-400 font-medium">
-                    @if($companyFilter)
-                        <a href="{{ route('admin.surveys.index') }}" 
+                    @if($search)
+                        <a href="{{ route('admin.surveys.index', array_filter(['company' => $companyFilter, 'company_id' => $companyId])) }}" 
                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5" 
-                           title="Clear company filter">
+                           title="Clear search">
                             <i data-lucide="x" class="w-3.5 h-3.5"></i>
                         </a>
                     @endif
@@ -36,12 +42,12 @@
                 <div class="flex items-center gap-2">
                     <button type="submit" 
                             class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition cursor-pointer">
-                        Filter
+                        Search
                     </button>
-                    @if($companyFilter || $companyId)
+                    @if($search || $companyFilter || $companyId)
                         <a href="{{ route('admin.surveys.index') }}" 
                            class="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
-                            Reset
+                            Reset All
                         </a>
                     @endif
                 </div>
@@ -52,10 +58,18 @@
                  x-data="{
                      open: false,
                      search: '',
+                     currentSearchParam: '{{ $search ?? '' }}',
                      companies: @js($companies->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'count' => $c->surveys_count])),
                      filteredCompanies() {
                          if (!this.search.trim()) return this.companies;
                          return this.companies.filter(c => c.name.toLowerCase().includes(this.search.toLowerCase().trim()));
+                     },
+                     buildUrl(companyName) {
+                         const params = new URLSearchParams();
+                         if (companyName) params.set('company', companyName);
+                         if (this.currentSearchParam) params.set('search', this.currentSearchParam);
+                         const qs = params.toString();
+                         return '{{ route('admin.surveys.index') }}' + (qs ? '?' + qs : '');
                      }
                  }"
                  @click.outside="open = false"
@@ -87,12 +101,12 @@
                         <input type="text"
                                x-ref="compSearch"
                                x-model="search"
-                               placeholder="Search companies..."
+                               placeholder="Filter companies..."
                                class="w-full text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-lg focus:border-indigo-600 focus:outline-hidden text-slate-800">
                     </div>
 
                     <div class="max-h-60 overflow-y-auto divide-y divide-slate-100">
-                        <a href="{{ route('admin.surveys.index') }}" 
+                        <a :href="buildUrl('')" 
                            class="flex items-center justify-between px-3.5 py-2.5 hover:bg-indigo-50/50 text-xs transition {{ empty($companyFilter) && empty($companyId) ? 'bg-indigo-50 font-bold text-indigo-900' : 'text-slate-700' }}">
                             <span>All Companies</span>
                             <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full text-slate-600 font-bold">
@@ -101,7 +115,7 @@
                         </a>
 
                         <template x-for="comp in filteredCompanies()" :key="comp.id">
-                            <a :href="'{{ route('admin.surveys.index') }}?company=' + encodeURIComponent(comp.name)"
+                            <a :href="buildUrl(comp.name)"
                                class="flex items-center justify-between px-3.5 py-2.5 hover:bg-indigo-50/50 text-xs transition"
                                :class="{ 'bg-indigo-50 font-bold text-indigo-900': '{{ strtolower($companyFilter ?? '') }}' === comp.name.toLowerCase() }">
                                 <span class="truncate pr-2" x-text="comp.name"></span>
@@ -110,7 +124,7 @@
                         </template>
 
                         @if($unassignedSurveysCount > 0)
-                            <a href="{{ route('admin.surveys.index', ['company' => 'none']) }}"
+                            <a :href="buildUrl('none')"
                                class="flex items-center justify-between px-3.5 py-2.5 hover:bg-indigo-50/50 text-xs transition {{ strtolower($companyFilter ?? '') === 'none' ? 'bg-indigo-50 font-bold text-indigo-900' : 'text-slate-500 italic' }}">
                                 <span>No Company / Unassigned</span>
                                 <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full text-slate-500 font-bold">
@@ -127,16 +141,44 @@
             </div>
         </div>
 
-        @if($companyFilter || $companyId)
-            <div class="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between text-xs text-indigo-950">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="filter" class="w-4 h-4 text-indigo-600"></i>
-                    <span>Filtering surveys for company: <strong>{{ $selectedCompany?->name ?? $companyFilter }}</strong> ({{ $surveys->total() }} survey{{ $surveys->total() === 1 ? '' : 's' }} found)</span>
+        @if($search || $companyFilter || $companyId)
+            <div class="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between text-xs text-indigo-950 flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <i data-lucide="filter" class="w-4 h-4 text-indigo-600 shrink-0"></i>
+                    <span>
+                        @if($companyFilter || $companyId)
+                            Filtering surveys for company: <strong>{{ $selectedCompany?->name ?? $companyFilter }}</strong>
+                            @if($search)
+                                • matching search: <strong class="underline decoration-indigo-300">"{{ $search }}"</strong>
+                            @endif
+                        @else
+                            Filtering surveys matching search: <strong class="underline decoration-indigo-300">"{{ $search }}"</strong>
+                        @endif
+                        ({{ $surveys->total() }} survey{{ $surveys->total() === 1 ? '' : 's' }} found)
+                    </span>
                 </div>
-                <a href="{{ route('admin.surveys.index') }}" class="font-bold text-indigo-700 hover:text-indigo-900 underline flex items-center gap-1">
-                    <span>Clear filter</span>
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                </a>
+                <div class="flex items-center gap-2">
+                    @if($search)
+                        <a href="{{ route('admin.surveys.index', array_filter(['company' => $companyFilter, 'company_id' => $companyId])) }}" 
+                           class="text-indigo-700 hover:text-indigo-900 font-medium hover:underline">
+                            Clear search
+                        </a>
+                    @endif
+                    @if($search && ($companyFilter || $companyId))
+                        <span>•</span>
+                    @endif
+                    @if($companyFilter || $companyId)
+                        <a href="{{ route('admin.surveys.index', array_filter(['search' => $search])) }}" 
+                           class="text-indigo-700 hover:text-indigo-900 font-medium hover:underline">
+                            Clear company
+                        </a>
+                    @endif
+                    <span>•</span>
+                    <a href="{{ route('admin.surveys.index') }}" class="font-bold text-indigo-700 hover:text-indigo-900 underline flex items-center gap-1">
+                        <span>Reset all</span>
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </a>
+                </div>
             </div>
         @endif
 
@@ -147,15 +189,21 @@
                     <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
                         <i data-lucide="clipboard-list" class="w-6 h-6"></i>
                     </div>
-                    @if($companyFilter || $companyId)
-                        <h3 class="text-sm font-bold text-slate-800">No surveys found for company "{{ $selectedCompany?->name ?? $companyFilter }}"</h3>
+                    @if($search || $companyFilter || $companyId)
+                        <h3 class="text-sm font-bold text-slate-800">No matching surveys found</h3>
                         <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">
-                            There are currently no 360-degree personality assessment surveys matching this company name.
+                            @if($search && ($companyFilter || $companyId))
+                                No surveys matching "{{ $search }}" were found for company "{{ $selectedCompany?->name ?? $companyFilter }}".
+                            @elseif($search)
+                                No surveys matching the search query "{{ $search }}" were found.
+                            @else
+                                There are currently no surveys for company "{{ $selectedCompany?->name ?? $companyFilter }}".
+                            @endif
                         </p>
                         <div class="mt-4 flex items-center justify-center gap-3">
                             <a href="{{ route('admin.surveys.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
                                 <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                                <span>Clear Filter</span>
+                                <span>Reset Filters</span>
                             </a>
                             <a href="{{ route('admin.surveys.create', ['company_id' => $selectedCompany?->id]) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
@@ -180,7 +228,8 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-slate-50/75 border-b border-slate-100 text-slate-400 uppercase font-semibold tracking-wider text-[10px]">
-                                <th class="py-3 px-6">Survey Title & Company</th>
+                                <th class="py-3 px-6">Survey Title</th>
+                                <th class="py-3 px-6">Company</th>
                                 <th class="py-3 px-6">Status</th>
                                 <th class="py-3 px-6">Questions</th>
                                 <th class="py-3 px-6">Participants</th>
@@ -193,26 +242,28 @@
                             @foreach($surveys as $survey)
                                 <tr class="hover:bg-slate-50/50 transition">
                                     <td class="py-4 px-6 font-semibold text-slate-900">
-                                        <div class="flex items-center gap-2 flex-wrap mb-1">
-                                            @if($survey->company)
-                                                <a href="{{ route('admin.surveys.index', ['company' => $survey->company->name]) }}" 
-                                                   class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-md border border-indigo-200 transition" 
-                                                   title="Filter by {{ $survey->company->name }}">
-                                                    <i data-lucide="building-2" class="w-3 h-3 text-indigo-500"></i>
-                                                    <span>{{ $survey->company->name }}</span>
-                                                </a>
-                                            @else
-                                                <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
-                                                    <i data-lucide="building-2" class="w-3 h-3 text-slate-300"></i>
-                                                    <span>No Company</span>
-                                                </span>
-                                            @endif
-                                        </div>
                                         <a href="{{ route('admin.surveys.show', $survey) }}" class="hover:text-indigo-600 transition font-bold text-sm block">
                                             {{ $survey->title }}
                                         </a>
                                         @if($survey->description)
                                             <p class="text-[11px] text-slate-400 font-normal truncate max-w-xs mt-0.5">{{ $survey->description }}</p>
+                                        @endif
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        @if($survey->company)
+                                            <a href="{{ route('admin.surveys.index', array_filter(['company' => $survey->company->name, 'search' => $search])) }}" 
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold text-slate-800 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 transition group" 
+                                               title="Filter surveys by {{ $survey->company->name }}">
+                                                <div class="w-5 h-5 rounded-md bg-indigo-100 text-indigo-700 font-black flex items-center justify-center text-[10px] group-hover:bg-indigo-600 group-hover:text-white transition">
+                                                    {{ substr($survey->company->name, 0, 1) }}
+                                                </div>
+                                                <span class="truncate max-w-[130px] font-bold">{{ $survey->company->name }}</span>
+                                            </a>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
+                                                <i data-lucide="building-2" class="w-3 h-3 text-slate-300"></i>
+                                                <span>No Company</span>
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="py-4 px-6">
