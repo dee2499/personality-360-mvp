@@ -15,14 +15,54 @@ use Illuminate\View\View;
 
 class SurveyController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $surveys = Survey::withCount(['questions', 'participants', 'assessments'])
-            ->with(['creator', 'company'])
-            ->latest()
-            ->paginate(10);
+        $companyFilter = $request->query('company');
+        $companyId = $request->query('company_id');
 
-        return view('admin.surveys.index', compact('surveys'));
+        $surveysQuery = Survey::withCount(['questions', 'participants', 'assessments'])
+            ->with(['creator', 'company'])
+            ->latest();
+
+        if ($request->filled('company')) {
+            $companyName = trim((string) $companyFilter);
+            if (strtolower($companyName) === 'none' || strtolower($companyName) === 'unassigned') {
+                $surveysQuery->whereNull('company_id');
+            } else {
+                $surveysQuery->whereHas('company', function ($query) use ($companyName) {
+                    $query->where('name', 'like', "%{$companyName}%");
+                });
+            }
+        } elseif ($request->filled('company_id')) {
+            if ($companyId === 'none') {
+                $surveysQuery->whereNull('company_id');
+            } else {
+                $surveysQuery->where('company_id', $companyId);
+            }
+        }
+
+        $surveys = $surveysQuery->paginate(10)->withQueryString();
+        $companies = Company::withCount('surveys')->orderBy('name')->get();
+        $totalSurveysCount = Survey::count();
+        $unassignedSurveysCount = Survey::whereNull('company_id')->count();
+
+        $selectedCompany = null;
+        if ($request->filled('company_id') && $companyId !== 'none') {
+            $selectedCompany = $companies->firstWhere('id', (int) $companyId);
+        } elseif ($request->filled('company')) {
+            $selectedCompany = $companies->first(fn ($c) => strcasecmp($c->name, trim((string) $companyFilter)) === 0)
+                ?? (object) ['name' => trim((string) $companyFilter), 'id' => null];
+        }
+
+        return view('admin.surveys.index', compact(
+            'surveys',
+            'companies',
+            'companyFilter',
+            'companyId',
+            'selectedCompany',
+            'totalSurveysCount',
+            'unassignedSurveysCount'
+        ));
     }
 
     public function create(Request $request): View
