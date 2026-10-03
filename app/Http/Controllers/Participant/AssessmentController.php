@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Participant\SubmitAssessmentRequest;
 use App\Models\Assessment;
 use App\Models\AssessmentAnswer;
+use App\Models\GroupSyncAnswer;
 use App\Models\Survey;
 use App\Services\AssessmentCategoryService;
 use App\Services\AssessmentGenerationService;
 use App\Services\AssessmentScoreService;
+use App\Services\ChangeQuotientQuestionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -242,6 +244,9 @@ class AssessmentController extends Controller
     /**
      * Show the question-first multi-subject assessment slider wizard.
      */
+    /**
+     * Show the question-first multi-subject assessment slider wizard.
+     */
     public function takeSurvey(Request $request, Survey $survey): View|RedirectResponse
     {
         $user = $request->user();
@@ -258,7 +263,12 @@ class AssessmentController extends Controller
             abort(403, 'You are not assigned to this survey cohort.');
         }
 
-        // 2. Always ensure assessments are synchronized for all participants
+        // 2. Ensure survey has default questions if empty
+        if ($survey->questions()->count() === 0) {
+            app(ChangeQuotientQuestionService::class)->seedForSurvey($survey);
+        }
+
+        // 3. Always ensure assessments are synchronized for all participants
         app(AssessmentGenerationService::class)->generateForSurvey($survey);
 
         $assessments = Assessment::with(['subject', 'answers'])
@@ -266,10 +276,19 @@ class AssessmentController extends Controller
             ->where('assessor_id', $user->id)
             ->get();
 
-        // 3. Questions sorted
-        $questions = $survey->questions()->where('is_active', true)->orderBy('sort_order')->get();
+        // 4. Questions: Split into 11 Individual CQ questions and 3 Group Sync questions
+        $allQuestions = $survey->questions()->where('is_active', true)->orderBy('sort_order')->get();
+        $individualQuestions = $allQuestions->where('type', 'individual')->values();
+        if ($individualQuestions->isEmpty()) {
+            $individualQuestions = $allQuestions->take(11)->values();
+        }
 
-        // 4. Subjects list: Current user (Self) STRICTLY FIRST (Index 0), followed by other colleagues
+        $groupSyncQuestions = $allQuestions->where('type', 'group_sync')->values();
+        if ($groupSyncQuestions->isEmpty()) {
+            $groupSyncQuestions = $allQuestions->slice(11)->values();
+        }
+
+        // 5. Subjects list: Current user (Self) STRICTLY FIRST (Index 0), followed by other colleagues
         $subjects = $survey->participants()
             ->get()
             ->sortBy(fn ($s) => $s->id === $user->id ? 0 : 1)
@@ -287,32 +306,46 @@ class AssessmentController extends Controller
             }
         }
 
-        $isAllCompleted = $assessments->isNotEmpty() && $assessments->every(fn ($a) => $a->isCompleted());
+        // Existing Group Sync scores: [question_id => score]
+        $existingGroupSyncScores = GroupSyncAnswer::where('survey_id', $survey->id)
+            ->where('user_id', $user->id)
+            ->pluck('score', 'question_id')
+            ->all();
 
-        return view('participant.surveys.take', compact(
-            'survey',
-            'questions',
-            'subjects',
-            'existingScores',
-            'isAllCompleted',
-            'user'
-        ));
+        $isAllCompleted = $assessments->isNotEmpty()
+            && $assessments->every(fn ($a) => $a->isCompleted())
+            && ($groupSyncQuestions->isEmpty() || count($existingGroupSyncScores) >= $groupSyncQuestions->count());
+
+        return view('participant.surveys.take', [
+            'survey' => $survey,
+            'questions' => $individualQuestions,
+            'individualQuestions' => $individualQuestions,
+            'groupSyncQuestions' => $groupSyncQuestions,
+            'allQuestions' => $allQuestions,
+            'subjects' => $subjects,
+            'existingScores' => $existingScores,
+            'existingGroupSyncScores' => $existingGroupSyncScores,
+            'isAllCompleted' => $isAllCompleted,
+            'user' => $user,
+        ]);
     }
 
     /**
-     * Submit all answers across all questions for the entire cohort.
+     * Submit all answers across all questions for the entire cohort and group sync.
      */
     public function submitSurveyMatrix(Request $request, Survey $survey): RedirectResponse
     {
         $user = $request->user();
 
         $answersData = $request->input('answers', []); // [subject_id => [question_id => score]]
+        $groupSyncData = $request->input('group_sync', []); // [question_id => score]
 
-        if (empty($answersData)) {
+        if (empty($answersData) && empty($groupSyncData)) {
             return back()->with('error', 'Please provide ratings before submitting.');
         }
 
-        DB::transaction(function () use ($survey, $user, $answersData) {
+        DB::transaction(function () use ($survey, $user, $answersData, $groupSyncData) {
+            // 1. Save Individual CQ ratings
             foreach ($answersData as $subjectId => $questionScores) {
                 $assessment = Assessment::firstOrCreate(
                     [
@@ -347,10 +380,26 @@ class AssessmentController extends Controller
 
                 $this->scoreService->calculateAssessmentScore($assessment);
             }
+
+            // 2. Save Group Sync ratings (My Views - About our Group)
+            foreach ($groupSyncData as $questionId => $score) {
+                if ($score !== null && $score !== '') {
+                    GroupSyncAnswer::updateOrCreate(
+                        [
+                            'survey_id' => $survey->id,
+                            'user_id' => $user->id,
+                            'question_id' => $questionId,
+                        ],
+                        [
+                            'score' => (int) $score,
+                        ]
+                    );
+                }
+            }
         });
 
-        return redirect()->route('participant.assessments.index')
-            ->with('success', "Great job! All evaluations for '{$survey->title}' have been successfully submitted.");
+        return redirect()->route('participant.assessments.report', $survey)
+            ->with('success', "Great job! All evaluations and Group Sync ratings for '{$survey->title}' have been successfully submitted.");
     }
 
     /**

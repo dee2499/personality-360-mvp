@@ -111,7 +111,7 @@ class AssessmentSubmissionTest extends TestCase
         $this->assertEquals(17, $assessment->total_score); // 9 + 8
         $this->assertEquals(20, $assessment->max_score);   // 2 * 10
         $this->assertEquals(85.0, $assessment->percentage); // 17 / 20 * 100
-        $this->assertEquals('Cucumber', $assessment->category); // >80-100% -> Cucumber
+        $this->assertEquals('Achiever', $assessment->category); // >80-100% -> Achiever
         $this->assertNotNull($assessment->completed_at);
     }
 }

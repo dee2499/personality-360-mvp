@@ -83,6 +83,21 @@ class Survey extends Model
         return $this->hasMany(Question::class)->orderBy('sort_order');
     }
 
+    public function individualQuestions(): HasMany
+    {
+        return $this->hasMany(Question::class)->where('type', 'individual')->orderBy('sort_order');
+    }
+
+    public function groupSyncQuestions(): HasMany
+    {
+        return $this->hasMany(Question::class)->where('type', 'group_sync')->orderBy('sort_order');
+    }
+
+    public function groupSyncAnswers(): HasMany
+    {
+        return $this->hasMany(GroupSyncAnswer::class);
+    }
+
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'survey_participants');

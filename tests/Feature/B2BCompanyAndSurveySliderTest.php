@@ -167,7 +167,7 @@ class B2BCompanyAndSurveySliderTest extends TestCase
             'answers' => $answersMatrix,
         ]);
 
-        $responseSubmit->assertRedirect(route('participant.assessments.index'));
+        $responseSubmit->assertRedirect(route('participant.assessments.report', $survey));
         $responseSubmit->assertSessionHas('success');
 
         // Verify that 3 completed assessments were stored for Dipak
@@ -179,7 +179,7 @@ class B2BCompanyAndSurveySliderTest extends TestCase
             $this->assertEquals(88, $assessment->total_score); // 11 * 8
             $this->assertEquals(110, $assessment->max_score); // 11 * 10
             $this->assertEquals(80.0, $assessment->percentage);
-            $this->assertEquals('Lemon', $assessment->category);
+            $this->assertEquals('Initiator', $assessment->category);
         }
     }
 
@@ -274,7 +274,7 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $response->assertSee('Three Score Meters (Normalised, Self, Peer)');
         $response->assertSee('Meter 1: Normalised');
         $response->assertSee('Normalised Score');
-        $response->assertSee('82.54'); // 40% of 86.36 + 60% of 80.00
+        $response->assertSee('83.18'); // Moderated: (86.36 + 80.00) / 2
         $response->assertSee('Meter 2: Self');
         $response->assertSee('Self Score');
         $response->assertSee('86.36');

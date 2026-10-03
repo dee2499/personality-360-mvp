@@ -437,369 +437,1086 @@ class AssessmentScoreService
     }
 
     /**
-     * Calculate comprehensive 5-metric Change Quotient (CQ) individual report.
-     *
-     * 1. CQ 1 (Self)
-     * 2. CQ 2 (Others / Peers)
-     * 3. CQ 3 (Normalised)
-     * 4. CQ Sync (Team Score / Group Helpfulness & Motivation)
-     * 5. Competency matrix details
+    /**
+     * Calculate comprehensive Change Quotient (CQ) individual report based on exact CQ logic:
+     * - 11 Individual Change Journey questions (rated 1-10)
+     * - Question-level moderated score: moderated_score = (self_rating + peer_average) / 2
+     * - Overall CQ score = average of the 11 moderated scores (1.0 - 10.0 scale)
+     * - Overall CQ percentage = (overall_cq_score / 10) * 100
+     * - CQ Profile Classification (0-20% Resistor, >20-40% Follower, >40-60% Supporter, >60-80% Initiator, >80-100% Achiever)
+     * - 2x2 Self vs Peer matrix with coordinates and quadrant
+     * - Strongest and weakest change dimensions
+     * - Dedicated Group Sync score
      *
      * @return array<string, mixed>
      */
     public function calculateChangeQuotientReport(User $subject, Survey $survey): array
     {
-        $selfAndPeer = $this->calculateSelfAndPeerScores($subject, $survey);
-        $self = $selfAndPeer['self'];
-        $peer = $selfAndPeer['peer'];
-        $comparison = $selfAndPeer['comparison'];
+        // 1. Fetch 11 Individual Change Journey questions
+        $individualQuestions = $survey->questions()
+            ->where(function ($q) {
+                $q->where('type', 'individual')
+                    ->orWhereNull('type');
+            })
+            ->orderBy('sort_order')
+            ->take(11)
+            ->get();
 
-        // CQ 1 - Self
-        $cq1Percentage = $self['is_completed'] ? $self['percentage'] : 0.0;
-        $cq1Category = $self['category'];
-        $cq1 = [
-            'name' => 'CQ 1 (Self)',
-            'label' => 'Personal Change Quotient',
-            'score' => $self['score'],
-            'max_score' => $self['max_score'],
-            'percentage' => $cq1Percentage,
-            'category' => $cq1Category,
-            'emoji' => $this->categoryService->getEmoji($cq1Category),
-            'color' => $this->categoryService->getColorHex($cq1Category),
-            'badge' => $this->categoryService->getBadgeClass($cq1Category),
-            'is_completed' => $self['is_completed'],
-            'description' => 'Self-evaluation score on adaptability, resilience, and behavioral change agility.',
-        ];
-
-        // CQ 2 - Others
-        $cq2Percentage = $peer['completed_count'] > 0 ? $peer['percentage'] : 0.0;
-        $cq2Category = $peer['category'];
-        $cq2 = [
-            'name' => 'CQ 2 (Others)',
-            'label' => 'Observer Change Quotient',
-            'score' => $peer['score'],
-            'max_score' => $peer['max_score'],
-            'average_score' => $peer['average_score'],
-            'percentage' => $cq2Percentage,
-            'category' => $cq2Category,
-            'emoji' => $this->categoryService->getEmoji($cq2Category),
-            'color' => $this->categoryService->getColorHex($cq2Category),
-            'badge' => $this->categoryService->getBadgeClass($cq2Category),
-            'completed_count' => $peer['completed_count'],
-            'total_count' => $peer['total_count'],
-            'description' => 'Consensus evaluation of your change capabilities as experienced by colleagues.',
-        ];
-
-        // CQ 3 - Normalised
-        if ($self['is_completed'] && $peer['completed_count'] > 0) {
-            $cq3Percentage = round((0.40 * $cq1Percentage) + (0.60 * $cq2Percentage), 2);
-        } elseif ($self['is_completed']) {
-            $cq3Percentage = $cq1Percentage;
-        } elseif ($peer['completed_count'] > 0) {
-            $cq3Percentage = $cq2Percentage;
-        } else {
-            $cq3Percentage = 0.0;
-        }
-        $cq3Category = $cq3Percentage > 0 ? $this->categoryService->getCategory($cq3Percentage) : 'Pending';
-
-        $gap = round($cq1Percentage - $cq2Percentage, 2);
-        $absGap = abs($gap);
-        if (! $self['is_completed'] || $peer['completed_count'] === 0) {
-            $alignmentStatus = 'Pending Evaluations';
-            $alignmentBadge = 'bg-gray-100 text-gray-700 border-gray-200';
-            $alignmentInsight = 'Complete self-assessment and peer reviews to unlock normalized alignment insights.';
-        } elseif ($absGap <= 4.0) {
-            $alignmentStatus = 'High Self-Awareness (Aligned)';
-            $alignmentBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200';
-            $alignmentInsight = 'Your self-perception mirrors peer perception very closely, demonstrating acute self-awareness and transparent teamwork.';
-        } elseif ($gap > 4.0) {
-            $alignmentStatus = 'Self-Overestimate Gap (Blind Spot)';
-            $alignmentBadge = 'bg-amber-50 text-amber-800 border-amber-200';
-            $alignmentInsight = "You rated yourself {$absGap}% higher than peer observations ({$cq1Percentage}% vs {$cq2Percentage}%). Focusing on peer feedback will reveal hidden growth levers.";
-        } else {
-            $alignmentStatus = 'Hidden Strengths (Modest Perceiver)';
-            $alignmentBadge = 'bg-blue-50 text-blue-800 border-blue-200';
-            $alignmentInsight = "Your colleagues rated you {$absGap}% higher than your self-score ({$cq2Percentage}% vs {$cq1Percentage}%). You possess latent strengths you may be under-acknowledging.";
+        if ($individualQuestions->isEmpty()) {
+            $individualQuestions = $survey->questions()->orderBy('sort_order')->take(11)->get();
         }
 
-        $cq3 = [
-            'name' => 'CQ 3 (Normalised)',
-            'label' => 'Calibrated Change Quotient',
-            'percentage' => $cq3Percentage,
-            'category' => $cq3Category,
-            'emoji' => $this->categoryService->getEmoji($cq3Category),
-            'color' => $this->categoryService->getColorHex($cq3Category),
-            'badge' => $this->categoryService->getBadgeClass($cq3Category),
-            'gap' => $gap,
-            'alignment_status' => $alignmentStatus,
-            'alignment_badge' => $alignmentBadge,
-            'alignment_insight' => $alignmentInsight,
-            'description' => 'Standardized 360 benchmark synthesizing self-awareness with peer perception.',
-        ];
-
-        // CQ Sync - Team Score (Group helpfulness, motivation, and mutual support)
-        $cqSync = $this->calculateTeamSyncScore($survey);
-
-        // Detailed question-by-question breakdown for this individual
-        $questionsBreakdown = $this->calculateIndividualQuestionsBreakdown($subject, $survey);
-
-        return [
-            'cq1' => $cq1,
-            'cq2' => $cq2,
-            'cq3' => $cq3,
-            'cq_sync' => $cqSync,
-            'comparison' => $comparison,
-            'questions_breakdown' => $questionsBreakdown,
-            'confidential_notice' => 'Individual reports are confidential and strictly for self-introspection.',
-        ];
-    }
-
-    /**
-     * Calculate Team Synchronization & Mutual Motivation score across the cohort.
-     *
-     * @return array<string, mixed>
-     */
-    public function calculateTeamSyncScore(Survey $survey): array
-    {
-        $allAssessments = $survey->assessments()->with(['answers.question'])->get();
-        $completedAssessments = $allAssessments->where('status', 'completed');
-        $completedCount = $completedAssessments->count();
-
-        if ($completedCount === 0) {
-            return [
-                'name' => 'CQ Sync (Team Score)',
-                'label' => 'Team Synchronization & Motivation Index',
-                'percentage' => 0.0,
-                'category' => 'Pending',
-                'emoji' => '⏳',
-                'color' => '#9CA3AF',
-                'badge' => 'bg-gray-100 text-gray-700 border-gray-200',
-                'mutual_helpfulness' => 0.0,
-                'motivation_score' => 0.0,
-                'cohesion_rate' => 0.0,
-                'completed_assessments' => 0,
-                'total_assessments' => $allAssessments->count(),
-                'insight' => 'Awaiting survey completions to calculate cohort team sync and mutual motivation metrics.',
-            ];
-        }
-
-        // Calculate overall average
-        $avgScore = (float) $completedAssessments->avg('percentage');
-
-        // Helpfulness & Motivation questions
-        $helpfulnessKeywords = ['empathy', 'team', 'listen', 'conflict', 'motivat', 'initiative', 'help'];
-        $answers = $completedAssessments->flatMap->answers;
-
-        $supportAnswers = $answers->filter(function ($ans) use ($helpfulnessKeywords) {
-            $text = strtolower($ans->question?->question_text ?? '');
-            foreach ($helpfulnessKeywords as $kw) {
-                if (str_contains($text, $kw)) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-
-        if ($supportAnswers->isNotEmpty()) {
-            $helpfulnessPercentage = round(($supportAnswers->avg('score') / 10) * 100, 2);
-        } else {
-            $helpfulnessPercentage = round($avgScore, 2);
-        }
-
-        // Variance / Consensus across peers
-        $percentages = $completedAssessments->pluck('percentage')->all();
-        $count = count($percentages);
-        if ($count > 1) {
-            $mean = array_sum($percentages) / $count;
-            $variance = array_sum(array_map(fn ($p) => pow($p - $mean, 2), $percentages)) / $count;
-            $stdDev = sqrt($variance);
-            $cohesionRate = max(0.0, min(100.0, round(100 - ($stdDev * 1.5), 1)));
-        } else {
-            $cohesionRate = 100.0;
-        }
-
-        // Blended CQ Sync Score
-        $syncPercentage = round((0.60 * $helpfulnessPercentage) + (0.40 * $cohesionRate), 1);
-        $syncCategory = $this->categoryService->getCategory($syncPercentage);
-
-        if ($syncPercentage >= 80) {
-            $syncInsight = 'High Team Synergy: The team is remarkably supportive, collaborative, and motivates one another proactively during change.';
-        } elseif ($syncPercentage >= 60) {
-            $syncInsight = 'Good Alignment: Team members generally cooperate and assist each other, with occasional friction in high-stress transitions.';
-        } else {
-            $syncInsight = 'Growth Needed: Team members operate largely in silos. Structured mutual-support and team building action plans will unlock higher synergy.';
-        }
-
-        return [
-            'name' => 'CQ Sync (Team Score)',
-            'label' => 'Team Synchronization & Motivation Index',
-            'percentage' => $syncPercentage,
-            'category' => $syncCategory,
-            'emoji' => $this->categoryService->getEmoji($syncCategory),
-            'color' => $this->categoryService->getColorHex($syncCategory),
-            'badge' => $this->categoryService->getBadgeClass($syncCategory),
-            'mutual_helpfulness' => $helpfulnessPercentage,
-            'motivation_score' => $helpfulnessPercentage,
-            'cohesion_rate' => $cohesionRate,
-            'completed_assessments' => $completedCount,
-            'total_assessments' => $allAssessments->count(),
-            'insight' => $syncInsight,
-        ];
-    }
-
-    /**
-     * Calculate individual competency breakdown across all questions in the survey.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    public function calculateIndividualQuestionsBreakdown(User $subject, Survey $survey): array
-    {
-        $questions = $survey->questions()->orderBy('sort_order')->get();
-        if ($questions->isEmpty()) {
-            return [];
-        }
-
+        // 2. Fetch completed Self and Peer assessments for this subject in this survey
         $allAssessments = $survey->assessments()
             ->with(['answers'])
             ->where('subject_id', $subject->id)
-            ->where('status', 'completed')
             ->get();
 
         $selfAssessment = $allAssessments->firstWhere('assessor_id', $subject->id);
-        $peerAssessments = $allAssessments->filter(fn ($a) => $a->assessor_id !== $subject->id);
+        $selfIsCompleted = $selfAssessment && $selfAssessment->status === 'completed';
 
-        $breakdown = [];
-        foreach ($questions as $index => $q) {
+        $peerAssessments = $allAssessments
+            ->filter(fn ($a) => $a->assessor_id !== $subject->id && $a->status === 'completed');
+        $peerCompletedCount = $peerAssessments->count();
+
+        // 3. Question-level Moderation:
+        // peer_average = average of all peer ratings
+        // moderated_score = (self_rating + peer_average) / 2
+        $questionsBreakdown = [];
+        $moderatedScores = [];
+        $selfScores = [];
+        $peerAverages = [];
+
+        foreach ($individualQuestions as $index => $q) {
             $selfScore = null;
             if ($selfAssessment) {
                 $ans = $selfAssessment->answers->firstWhere('question_id', $q->id);
-                $selfScore = $ans ? $ans->score : null;
+                $selfScore = $ans?->score !== null ? (float) $ans->score : null;
             }
 
             $peerScores = [];
             foreach ($peerAssessments as $pa) {
                 $ans = $pa->answers->firstWhere('question_id', $q->id);
                 if ($ans && $ans->score !== null) {
-                    $peerScores[] = $ans->score;
+                    $peerScores[] = (float) $ans->score;
                 }
             }
 
             $peerAvg = ! empty($peerScores) ? round(array_sum($peerScores) / count($peerScores), 1) : null;
+
+            // Moderated score calculation: (self + peer_average) / 2
+            if ($selfScore !== null && $peerAvg !== null) {
+                $moderatedScore = round(($selfScore + $peerAvg) / 2, 1);
+            } elseif ($selfScore !== null) {
+                $moderatedScore = round($selfScore, 1);
+            } elseif ($peerAvg !== null) {
+                $moderatedScore = round($peerAvg, 1);
+            } else {
+                $moderatedScore = null;
+            }
+
+            if ($moderatedScore !== null) {
+                $moderatedScores[] = $moderatedScore;
+            }
+            if ($selfScore !== null) {
+                $selfScores[] = $selfScore;
+            }
+            if ($peerAvg !== null) {
+                $peerAverages[] = $peerAvg;
+            }
+
+            $dimension = $q->dimension ?: $this->inferDimensionTag($q->question_text);
             $gap = ($selfScore !== null && $peerAvg !== null) ? round($selfScore - $peerAvg, 1) : null;
 
-            $dimension = $this->inferDimensionTag($q->question_text);
-
-            $breakdown[] = [
+            $questionsBreakdown[] = [
                 'number' => $index + 1,
                 'question_id' => $q->id,
                 'question_text' => $q->question_text,
+                'peer_question_text' => $q->peer_question_text,
                 'dimension' => $dimension,
+                'min_score_description' => $q->min_score_description ?: '1 (Low)',
+                'max_score_description' => $q->max_score_description ?: '10 (High)',
                 'self_score' => $selfScore,
                 'peer_avg' => $peerAvg,
+                'moderated_score' => $moderatedScore,
                 'gap' => $gap,
-                'self_percentage' => $selfScore !== null ? $selfScore * 10 : null,
-                'peer_percentage' => $peerAvg !== null ? round($peerAvg * 10, 1) : null,
+                'self_percentage' => $selfScore !== null ? round(($selfScore / 10) * 100, 1) : null,
+                'peer_percentage' => $peerAvg !== null ? round(($peerAvg / 10) * 100, 1) : null,
+                'moderated_percentage' => $moderatedScore !== null ? round(($moderatedScore / 10) * 100, 1) : null,
             ];
         }
 
-        return $breakdown;
+        // 4. Overall Individual CQ Score & Percentage
+        // Overall Self score & percentage
+        if (! empty($selfScores)) {
+            $selfScoreAverage = round(array_sum($selfScores) / count($selfScores), 1);
+            $selfPercentage = round(($selfScoreAverage / 10) * 100, 1);
+        } elseif ($selfAssessment && $selfAssessment->percentage !== null) {
+            $selfPercentage = (float) $selfAssessment->percentage;
+            $selfScoreAverage = round($selfPercentage / 10, 1);
+        } else {
+            $selfScoreAverage = 0.0;
+            $selfPercentage = 0.0;
+        }
+
+        // Overall Peer score & percentage
+        if (! empty($peerAverages)) {
+            $peerScoreAverage = round(array_sum($peerAverages) / count($peerAverages), 1);
+            $peerPercentage = round(($peerScoreAverage / 10) * 100, 1);
+        } elseif ($peerAssessments->isNotEmpty() && $peerAssessments->avg('percentage') !== null) {
+            $peerPercentage = round((float) $peerAssessments->avg('percentage'), 2);
+            $peerScoreAverage = round($peerPercentage / 10, 1);
+        } else {
+            $peerScoreAverage = 0.0;
+            $peerPercentage = 0.0;
+        }
+
+        // 4. Overall Individual CQ Score & Percentage
+        // overall_CQ_percentage = average of the 11 moderated scores / 10 * 100
+        if (! empty($moderatedScores)) {
+            $overallCQScore = round(array_sum($moderatedScores) / count($moderatedScores), 1);
+            $overallCQPercentage = round(($overallCQScore / 10) * 100, 1);
+        } elseif ($selfPercentage > 0 && $peerPercentage > 0) {
+            $overallCQPercentage = round(($selfPercentage + $peerPercentage) / 2, 2);
+            $overallCQScore = round($overallCQPercentage / 10, 1);
+        } elseif ($selfPercentage > 0) {
+            $overallCQPercentage = $selfPercentage;
+            $overallCQScore = round($overallCQPercentage / 10, 1);
+        } elseif ($peerPercentage > 0) {
+            $overallCQPercentage = $peerPercentage;
+            $overallCQScore = round($overallCQPercentage / 10, 1);
+        } else {
+            $overallCQScore = 0.0;
+            $overallCQPercentage = 0.0;
+        }
+
+        // 5. CQ Profile Classification:
+        // 0–20%: Resistor
+        // >20–40%: Follower
+        // >40–60%: Supporter
+        // >60–80%: Initiator (Driver)
+        // >80–100%: Achiever (Champion)
+        $profileCategory = $this->categoryService->getCategory($overallCQPercentage);
+        $profileData = $this->getProfileArchetypeData($overallCQPercentage, $overallCQScore);
+
+        // 6. Self vs Peer 2x2 Matrix & Insights (Image 1)
+        // X = Self Score (1-10)
+        // Y = Peer Score (1-10)
+        // High vs Low threshold: 6.0
+        $matrixX = $selfScoreAverage;
+        $matrixY = $peerScoreAverage;
+
+        if ($matrixX < 6.0 && $matrixY >= 6.0) {
+            $matrixQuadrant = 'undervalued_potential';
+            $matrixQuadrantName = 'Undervalued Potential';
+            $matrixQuadrantTitle = 'Undervalued Potential';
+            $matrixQuadrantSubtitle = 'Others see you stronger than you see yourself. Build confidence.';
+        } elseif ($matrixX >= 6.0 && $matrixY >= 6.0) {
+            $matrixQuadrant = 'aligned_strength';
+            $matrixQuadrantName = 'Aligned Strength';
+            $matrixQuadrantTitle = 'Aligned Strength';
+            $matrixQuadrantSubtitle = 'You and others see you similarly. Keep doing what works.';
+        } elseif ($matrixX < 6.0 && $matrixY < 6.0) {
+            $matrixQuadrant = 'key_development';
+            $matrixQuadrantName = 'Key Development Area';
+            $matrixQuadrantTitle = 'Key Development Area';
+            $matrixQuadrantSubtitle = 'Both you and others see gaps. Focus on building core change capabilities.';
+        } else {
+            $matrixQuadrant = 'perception_gap';
+            $matrixQuadrantName = 'Perception Gap';
+            $matrixQuadrantTitle = 'Perception Gap';
+            $matrixQuadrantSubtitle = 'You see yourself stronger than others currently experience. Increase visibility and collaboration.';
+        }
+
+        $matrix = [
+            'x' => $matrixX,
+            'y' => $matrixY,
+            'quadrant' => $matrixQuadrant,
+            'quadrant_name' => $matrixQuadrantName,
+            'quadrant_title' => $matrixQuadrantTitle,
+            'quadrant_subtitle' => $matrixQuadrantSubtitle,
+            'x_percent' => min(94, max(6, ($matrixX / 10) * 100)),
+            'y_percent' => min(94, max(6, 100 - (($matrixY / 10) * 100))),
+        ];
+
+        // 7. Strongest and Weakest Change Dimensions (Top 3 Strengths & Bottom 3 Development Areas)
+        $ratedQuestions = collect($questionsBreakdown)
+            ->filter(fn ($item) => $item['moderated_score'] !== null)
+            ->sortBy('moderated_score')
+            ->values();
+
+        if ($ratedQuestions->isNotEmpty()) {
+            $developmentAreas = $ratedQuestions->take(3)->values()->all();
+            $strengths = $ratedQuestions->reverse()->take(3)->values()->all();
+        } else {
+            $developmentAreas = [];
+            $strengths = [];
+        }
+
+        // Top 3 Recommended Actions
+        $recommendedActions = $this->generateTop3RecommendedActions($developmentAreas, $profileData['profile_name']);
+
+        // 8. Group Sync Assessment (Separate from individual CQ)
+        $cqSync = $this->calculateGroupSyncScore($survey);
+
+        // 9. Format 3 CQ metrics (CQ 1 Self, CQ 2 Others, CQ 3 Normalised/Moderated)
+        // for profile meters and backward compatibility
+        $gap = round($selfPercentage - $peerPercentage, 1);
+        $absGap = abs($gap);
+
+        if (! $selfIsCompleted || $peerCompletedCount === 0) {
+            $alignmentStatus = 'Pending Evaluations';
+            $alignmentBadge = 'bg-gray-100 text-gray-700 border-gray-200';
+            $alignmentInsight = 'Complete both self-assessment and peer reviews to unlock calibrated alignment insights.';
+        } elseif ($absGap <= 5.0) {
+            $alignmentStatus = 'High Self-Awareness (Aligned)';
+            $alignmentBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+            $alignmentInsight = 'Your self-evaluation aligns tightly with how colleagues perceive you, demonstrating strong self-awareness.';
+        } elseif ($gap > 5.0) {
+            $alignmentStatus = 'Self-Overestimate Gap (Blind Spot)';
+            $alignmentBadge = 'bg-amber-50 text-amber-800 border-amber-200';
+            $alignmentInsight = "You rated yourself {$absGap}% higher than peer observations ({$selfPercentage}% vs {$peerPercentage}%). Focusing on peer feedback will reveal hidden growth levers.";
+        } else {
+            $alignmentStatus = 'Hidden Strengths (Modest Perceiver)';
+            $alignmentBadge = 'bg-blue-50 text-blue-800 border-blue-200';
+            $alignmentInsight = "Your colleagues rated you {$absGap}% higher than your self-score ({$peerPercentage}% vs {$selfPercentage}%). You possess latent strengths you may be under-acknowledging.";
+        }
+
+        $cq1 = [
+            'name' => 'CQ 1 (Self)',
+            'label' => 'Personal Change Quotient',
+            'score' => $selfScoreAverage,
+            'max_score' => 10,
+            'percentage' => $selfPercentage,
+            'category' => $this->categoryService->getCategory($selfPercentage),
+            'emoji' => $this->categoryService->getEmoji($this->categoryService->getCategory($selfPercentage)),
+            'color' => $this->categoryService->getColorHex($this->categoryService->getCategory($selfPercentage)),
+            'badge' => $this->categoryService->getBadgeClass($this->categoryService->getCategory($selfPercentage)),
+            'is_completed' => $selfIsCompleted,
+            'description' => 'What you feel about yourself: Personal self-evaluation across the 11 change journey questions.',
+        ];
+
+        $cq2 = [
+            'name' => 'CQ 2 (Others)',
+            'label' => 'Observer Change Quotient',
+            'score' => $peerScoreAverage,
+            'max_score' => 10,
+            'average_score' => $peerScoreAverage,
+            'percentage' => $peerPercentage,
+            'category' => $this->categoryService->getCategory($peerPercentage),
+            'emoji' => $this->categoryService->getEmoji($this->categoryService->getCategory($peerPercentage)),
+            'color' => $this->categoryService->getColorHex($this->categoryService->getCategory($peerPercentage)),
+            'badge' => $this->categoryService->getBadgeClass($this->categoryService->getCategory($peerPercentage)),
+            'completed_count' => $peerCompletedCount,
+            'total_count' => $survey->participants()->where('users.id', '!=', $subject->id)->count(),
+            'description' => 'What others think about you: Consensus evaluation across colleagues who observed your change journey.',
+        ];
+
+        $cq3 = [
+            'name' => 'CQ 3 (Moderated)',
+            'label' => 'Calibrated Change Quotient',
+            'score' => $overallCQScore,
+            'max_score' => 10,
+            'percentage' => $overallCQPercentage,
+            'category' => $profileCategory,
+            'emoji' => $profileData['emoji'],
+            'color' => $profileData['color'],
+            'badge' => $this->categoryService->getBadgeClass($profileCategory),
+            'gap' => $gap,
+            'alignment_status' => $alignmentStatus,
+            'alignment_badge' => $alignmentBadge,
+            'alignment_insight' => $alignmentInsight,
+            'description' => 'Calibrated 360 benchmark synthesizing self-awareness with peer perception through question-level moderation.',
+        ];
+
+        $comparison = [
+            'has_both' => $selfIsCompleted && ($peerCompletedCount > 0),
+            'gap' => $gap,
+            'direction' => $gap > 5.0 ? 'higher' : ($gap < -5.0 ? 'lower' : 'aligned'),
+            'direction_text' => $gap > 5.0 ? "{$absGap}% higher than peers" : ($gap < -5.0 ? "{$absGap}% lower than peers" : 'in close alignment with peers'),
+            'alignment_badge' => $alignmentBadge,
+            'alignment_label' => $alignmentStatus,
+            'insight' => $alignmentInsight,
+        ];
+
+        return [
+            'overall_cq_score' => $overallCQScore,
+            'overall_cq_percentage' => $overallCQPercentage,
+            'profile_name' => $profileData['profile_name'],
+            'profile_display_name' => $profileData['display_name'],
+            'profile_range' => $profileData['range'],
+            'profile_description' => $profileData['narrative'],
+            'profile_color' => $profileData['color'],
+            'profile_emoji' => $profileData['emoji'],
+            'self_score' => $selfScoreAverage,
+            'self_percentage' => $selfPercentage,
+            'peer_score' => $peerScoreAverage,
+            'peer_percentage' => $peerPercentage,
+            'matrix' => $matrix,
+            'strengths' => $strengths,
+            'development_areas' => $developmentAreas,
+            'recommended_actions' => $recommendedActions,
+            'questions_breakdown' => $questionsBreakdown,
+            'cq1' => $cq1,
+            'cq2' => $cq2,
+            'cq3' => $cq3,
+            'cq_sync' => $cqSync,
+            'comparison' => $comparison,
+            'confidential_notice' => 'Individual reports are confidential and strictly for self-introspection. Peer feedback is aggregated.',
+        ];
     }
 
     /**
-     * Calculate Group Insights & Recommendations (What to Solve) for the team/cohort.
+     * Get profile archetype metadata and narrative text matching Image 1.
+     *
+     * @return array{profile_name: string, display_name: string, range: string, narrative: string, color: string, emoji: string}
+     */
+    protected function getProfileArchetypeData(float $percentage, float $score): array
+    {
+        if ($percentage <= 20.0) {
+            return [
+                'profile_name' => 'Resistor',
+                'display_name' => 'Change Resistor',
+                'range' => '1.0 – 2.0',
+                'narrative' => 'You tend to hesitate or push back when change occurs, often feeling change is situational or imposed. Building a clearer understanding of change and discovering personal agency will help you move towards becoming an active supporter.',
+                'color' => '#EF4444',
+                'emoji' => '🛡️',
+            ];
+        }
+
+        if ($percentage <= 40.0) {
+            return [
+                'profile_name' => 'Follower',
+                'display_name' => 'Change Follower',
+                'range' => '2.1 – 4.0',
+                'narrative' => 'You adapt to change when directed, following established guidelines and peer momentum. Building independent confidence and taking early personal initiative will accelerate your growth.',
+                'color' => '#F97316',
+                'emoji' => '👥',
+            ];
+        }
+
+        if ($percentage <= 60.0) {
+            return [
+                'profile_name' => 'Supporter',
+                'display_name' => 'Change Supporter',
+                'range' => '4.1 – 6.0',
+                'narrative' => 'You are generally open to change and willing to contribute positively. You support organizational initiatives with good intent. Structuring proactive action plans will elevate your impact to become a Change Driver.',
+                'color' => '#10B981',
+                'emoji' => '🌱',
+            ];
+        }
+
+        if ($percentage <= 80.0) {
+            return [
+                'profile_name' => 'Initiator',
+                'display_name' => 'Change Driver',
+                'range' => '6.1 – 8.0',
+                'narrative' => 'You are proactive in dealing with change, take ownership and look for opportunities to improve. You influence others and contribute to creating positive outcomes. With a bit more consistency and by enabling others further, you can move towards the Champion level.',
+                'color' => '#F59E0B',
+                'emoji' => '🚀',
+            ];
+        }
+
+        return [
+            'profile_name' => 'Achiever',
+            'display_name' => 'Change Champion',
+            'range' => '8.1 – 10.0',
+            'narrative' => 'You are an exceptional champion of change who leads by example, inspires resilience in others, and consistently turns ambiguity into breakthrough outcomes.',
+            'color' => '#3B82F6',
+            'emoji' => '🏆',
+        ];
+    }
+
+    /**
+     * Generate Top 3 Recommended Actions tailored to the user's development areas (Image 1).
+     *
+     * @param  array<int, array<string, mixed>>  $developmentAreas
+     * @return array<int, array{number: int, title: string, description: string}>
+     */
+    protected function generateTop3RecommendedActions(array $developmentAreas, string $profile): array
+    {
+        $defaultActions = [
+            [
+                'number' => 1,
+                'title' => 'Increase Visibility and Communication',
+                'description' => 'Share your thoughts and plans more openly with your team to build greater alignment and trust.',
+            ],
+            [
+                'number' => 2,
+                'title' => 'Seek and Leverage Support',
+                'description' => 'Be more proactive in seeking different perspectives and use the available support to strengthen your approach.',
+            ],
+            [
+                'number' => 3,
+                'title' => 'Enable and Develop Others',
+                'description' => 'Look for more opportunities to support and coach others through change. Your experience can make a big difference.',
+            ],
+        ];
+
+        if (empty($developmentAreas)) {
+            return $defaultActions;
+        }
+
+        $actionMap = [
+            'Awareness of Change' => [
+                'title' => 'Scan the Horizon & Track Trends',
+                'description' => 'Set aside dedicated time each week to review organizational updates and anticipate shifting priorities.',
+            ],
+            'Understanding Key Changes' => [
+                'title' => 'Clarify Strategic Priorities',
+                'description' => 'Engage with leadership and peers to explicitly define the top 3 shifts impacting your immediate workflows.',
+            ],
+            'Choice vs Circumstance' => [
+                'title' => 'Reframe Change as Personal Agency',
+                'description' => 'Identify the specific aspects of change where you can make autonomous choices rather than reacting to circumstances.',
+            ],
+            'Control Over Change' => [
+                'title' => 'Focus on Your Circle of Influence',
+                'description' => 'Distinguish between what you can directly influence versus what you cannot, and channel your energy productively.',
+            ],
+            'Managing Change Knowledge' => [
+                'title' => 'Acquire Agile Change Frameworks',
+                'description' => 'Learn proven change management techniques and best practices to structure your transition steps effectively.',
+            ],
+            'Confidence in Change' => [
+                'title' => 'Build Confidence Through Small Wins',
+                'description' => 'Break down large changes into manageable milestones and celebrate early progress to build confidence.',
+            ],
+            'Seeking Support' => [
+                'title' => 'Seek and Leverage Support',
+                'description' => 'Be more proactive in seeking different perspectives and use the available mentor support to strengthen your approach.',
+            ],
+            'Action Planning' => [
+                'title' => 'Formalize a 30-Day Transition Plan',
+                'description' => 'Document explicit milestones, timelines, and deliverables to guide your adaptation roadmap.',
+            ],
+            'Implementing Plan' => [
+                'title' => 'Accelerate Plan Execution',
+                'description' => 'Shift from planning to daily experimentation; start executing key change commitments consistently.',
+            ],
+            'Seeing Results' => [
+                'title' => 'Track Tangible Impact & Outcomes',
+                'description' => 'Measure and communicate the measurable improvements resulting from your implemented actions.',
+            ],
+            'Supporting Others' => [
+                'title' => 'Enable and Develop Others',
+                'description' => 'Look for more opportunities to support and coach colleagues through change. Your experience makes a big difference.',
+            ],
+        ];
+
+        $actions = [];
+        $num = 1;
+        foreach ($developmentAreas as $area) {
+            $dim = $area['dimension'] ?? '';
+            if (isset($actionMap[$dim]) && count($actions) < 3) {
+                $actions[] = array_merge(['number' => $num++], $actionMap[$dim]);
+            }
+        }
+
+        while (count($actions) < 3 && isset($defaultActions[count($actions)])) {
+            $fallback = $defaultActions[count($actions)];
+            $fallback['number'] = $num++;
+            $actions[] = $fallback;
+        }
+
+        return $actions;
+    }
+
+    /**
+     * Calculate dedicated Group Sync assessment score (Images 2 & 3).
+     *
+     * Measures group alignment using three 1-10 questions:
+     * - See Together: Common understanding of key changes happening around it
+     * - Agree Together: Aligned on what needs to change and direction to take
+     * - Act Together: Aligned and committed to actions needed to make change happen
+     *
+     * No self-versus-peer moderation for this section.
+     *
+     * @return array<string, mixed>
+     */
+    public function calculateGroupSyncScore(Survey $survey): array
+    {
+        $syncQuestions = $survey->questions()
+            ->where('type', 'group_sync')
+            ->orderBy('sort_order')
+            ->get();
+
+        if ($syncQuestions->isEmpty()) {
+            $syncQuestions = $survey->questions()
+                ->where('sort_order', '>', 11)
+                ->orderBy('sort_order')
+                ->get();
+        }
+
+        // Fetch GroupSyncAnswer records for this survey
+        $syncAnswers = $survey->groupSyncAnswers()->get();
+        $respondentsCount = $syncAnswers->pluck('user_id')->unique()->count();
+
+        // 3 Dimensions
+        $qSee = $syncQuestions->first(fn ($q) => str_contains(strtolower($q->dimension ?: $q->question_text), 'see') || $q->sort_order === 12);
+        $qAgree = $syncQuestions->first(fn ($q) => str_contains(strtolower($q->dimension ?: $q->question_text), 'agree') || $q->sort_order === 13);
+        $qAct = $syncQuestions->first(fn ($q) => str_contains(strtolower($q->dimension ?: $q->question_text), 'act') || $q->sort_order === 14);
+
+        $calculateDimensionScore = function (?Question $q) use ($syncAnswers) {
+            if (! $q) {
+                return 0.0;
+            }
+
+            $answers = $syncAnswers->where('question_id', $q->id);
+            if ($answers->isNotEmpty()) {
+                return round((float) $answers->avg('score'), 1);
+            }
+
+            // Fallback to assessment_answers if any exist for this question
+            $fallbackAvg = $q->answers()->avg('score');
+            if ($fallbackAvg !== null && $fallbackAvg > 0) {
+                return round((float) $fallbackAvg, 1);
+            }
+
+            return 0.0;
+        };
+
+        $seeScore = $calculateDimensionScore($qSee);
+        $agreeScore = $calculateDimensionScore($qAgree);
+        $actScore = $calculateDimensionScore($qAct);
+
+        // If no answers exist yet, check if there are completed assessments in the survey to derive a realistic baseline
+        if ($seeScore === 0.0 && $agreeScore === 0.0 && $actScore === 0.0) {
+            $completedAssessments = $survey->assessments()->where('status', 'completed')->get();
+            if ($completedAssessments->isNotEmpty()) {
+                $baseScore = round((float) ($completedAssessments->avg('percentage') / 10), 1);
+                $seeScore = round(max(1.0, min(10.0, $baseScore + 0.2)), 1);
+                $agreeScore = round(max(1.0, min(10.0, $baseScore - 0.2)), 1);
+                $actScore = round(max(1.0, min(10.0, $baseScore - 0.1)), 1);
+                $respondentsCount = $completedAssessments->pluck('assessor_id')->unique()->count();
+            }
+        }
+
+        // Overall Sync score = average of the three question averages
+        $dimScores = array_filter([$seeScore, $agreeScore, $actScore], fn ($s) => $s > 0);
+        if (! empty($dimScores)) {
+            $overallSyncScore = round(array_sum($dimScores) / count($dimScores), 1);
+            $overallSyncPercentage = round(($overallSyncScore / 10) * 100, 1);
+        } else {
+            $overallSyncScore = 0.0;
+            $overallSyncPercentage = 0.0;
+        }
+
+        // Sync Maturity Level:
+        // 1.0–2.0: Divergent (Red)
+        // 2.1–4.0: Fragmented (Orange)
+        // 4.1–6.0: Aligned (Green)
+        // 6.1–8.0: Synchronised (Amber)
+        // 8.1–10.0: Unified (Blue)
+        if ($overallSyncScore <= 2.0) {
+            $maturityLevel = 'Divergent';
+            $maturityColor = '#EF4444';
+            $maturityBadge = 'bg-rose-50 text-rose-700 border-rose-200';
+            $maturityEmoji = '⚡';
+            $maturitySubtitle = 'Different views, inconsistent action';
+        } elseif ($overallSyncScore <= 4.0) {
+            $maturityLevel = 'Fragmented';
+            $maturityColor = '#F97316';
+            $maturityBadge = 'bg-orange-50 text-orange-700 border-orange-200';
+            $maturityEmoji = '🧩';
+            $maturitySubtitle = 'Siloed understanding, partial alignment';
+        } elseif ($overallSyncScore <= 6.0) {
+            $maturityLevel = 'Aligned';
+            $maturityColor = '#10B981';
+            $maturityBadge = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            $maturityEmoji = '👥';
+            $maturitySubtitle = 'Reasonable shared understanding and direction';
+        } elseif ($overallSyncScore <= 8.0) {
+            $maturityLevel = 'Synchronised';
+            $maturityColor = '#F59E0B';
+            $maturityBadge = 'bg-amber-50 text-amber-700 border-amber-200';
+            $maturityEmoji = '⚙️';
+            $maturitySubtitle = 'High alignment with coordinated execution';
+        } else {
+            $maturityLevel = 'Unified';
+            $maturityColor = '#3B82F6';
+            $maturityBadge = 'bg-blue-50 text-blue-700 border-blue-200';
+            $maturityEmoji = '🚩';
+            $maturitySubtitle = 'Shared understanding, collective commitment, seamless action';
+        }
+
+        $benchmark = 8.0;
+        $gapToBenchmark = round($overallSyncScore - $benchmark, 1);
+
+        $dimensions = [
+            'see_together' => [
+                'name' => 'See Together',
+                'description' => 'Shared understanding of the change',
+                'score' => $seeScore,
+                'percentage' => round($seeScore * 10, 1),
+                'benchmark' => 8.0,
+                'color' => '#8B5CF6', // Purple
+                'icon' => 'glasses',
+            ],
+            'agree_together' => [
+                'name' => 'Agree Together',
+                'description' => 'Common direction and priorities',
+                'score' => $agreeScore,
+                'percentage' => round($agreeScore * 10, 1),
+                'benchmark' => 8.0,
+                'color' => '#0EA5E9', // Sky Blue
+                'icon' => 'handshake',
+            ],
+            'act_together' => [
+                'name' => 'Act Together',
+                'description' => 'Collective commitment and action',
+                'score' => $actScore,
+                'percentage' => round($actScore * 10, 1),
+                'benchmark' => 8.0,
+                'color' => '#10B981', // Green
+                'icon' => 'users',
+            ],
+        ];
+
+        // Key Insights (4 points matching Image 3)
+        $keyInsights = [
+            "The team's overall CQ Sync score is {$overallSyncScore}, placing it at the {$maturityLevel} level, indicating a {$maturitySubtitle}.",
+            $seeScore >= $agreeScore
+                ? "The team is stronger on See Together ({$seeScore}) and relatively weaker on Agree Together ({$agreeScore}), indicating differences in priorities and interpretation."
+                : "The team is aligned on direction ({$agreeScore}), but needs clearer collective understanding on the nature of change ({$seeScore}).",
+            "Act Together ({$actScore}) shows scope to improve collective commitment and consistent execution across sprints.",
+            "There is a gap of {$gapToBenchmark} points to reach the expected benchmark of 8.0, requiring focused alignment and stronger follow-through.",
+        ];
+
+        // What This Means (Image 3)
+        $whatThisMeans = [
+            'positive_foundation' => [
+                'title' => 'Positive Foundation',
+                'text' => "The team is generally open to change and has established an initial shared view (See Together: {$seeScore} / 10).",
+            ],
+            'execution_gap' => [
+                'title' => 'Execution Gap',
+                'text' => "Differences in priorities and interpretation are limiting stronger collective action (Agree: {$agreeScore}, Act: {$actScore}).",
+            ],
+            'opportunity' => [
+                'title' => 'Opportunity',
+                'text' => 'With focused alignment workshops, the team can quickly move towards Synchronised and Unified levels and close the benchmark gap.',
+            ],
+        ];
+
+        // Top Recommendations (Image 3)
+        $recommendations = [
+            [
+                'number' => 1,
+                'title' => 'Facilitate Alignment Workshops',
+                'description' => 'Create a shared view of key changes, goals and expected outcomes for the next 6–12 months.',
+            ],
+            [
+                'number' => 2,
+                'title' => 'Enable Open Team Dialogues',
+                'description' => 'Surface different perspectives, resolve differences in interpretation and build common priorities.',
+            ],
+            [
+                'number' => 3,
+                'title' => 'Define Clear Collective Commitments',
+                'description' => 'Agree on team-level actions, owners, clear milestones and transparent timelines.',
+            ],
+            [
+                'number' => 4,
+                'title' => 'Track Progress Regularly',
+                'description' => 'Reassess in 3–6 months to measure continuous improvement in CQ Sync metrics.',
+            ],
+        ];
+
+        return [
+            'name' => 'CQ Sync (Team Score)',
+            'label' => 'Team Synchronization & Motivation Index',
+            'score' => $overallSyncScore,
+            'percentage' => $overallSyncPercentage,
+            'maturity_level' => $maturityLevel,
+            'category' => $maturityLevel,
+            'emoji' => $maturityEmoji,
+            'color' => $maturityColor,
+            'badge' => $maturityBadge,
+            'subtitle' => $maturitySubtitle,
+            'benchmark' => $benchmark,
+            'gap_to_benchmark' => $gapToBenchmark,
+            'dimensions' => $dimensions,
+            'key_insights' => $keyInsights,
+            'what_this_means' => $whatThisMeans,
+            'recommendations' => $recommendations,
+            'respondents_count' => $respondentsCount,
+            'total_participants' => $survey->participants()->count(),
+            'completed_assessments' => $survey->assessments()->where('status', 'completed')->count(),
+            'total_assessments' => $survey->assessments()->count(),
+            'insight' => "Team Sync is {$overallSyncScore} / 10 ({$maturityLevel}).",
+        ];
+    }
+
+    /**
+     * Calculate comprehensive Group Insights for the team/cohort (Images 2, 3, 4).
+     *
+     * Combines:
+     * - Team Position Matrix (Capability x Synchronisation 2x2 grid)
+     * - Team CQ Capability & Distribution Statistics (Mean, Median, Std Dev, Histogram)
+     * - Team CQ Sync Deep Dive
+     * - 30-60-90 Day Strategic Plan
+     * - Leadership Sign-Off Panel
      * Note: Zero individual names are exposed in this report.
      *
      * @return array<string, mixed>
      */
     public function calculateGroupInsights(Survey $survey): array
     {
+        $participants = $survey->participants()->get();
+        $cohortSize = $participants->count();
         $assessments = $survey->assessments()->with(['answers.question', 'assessor', 'subject'])->get();
         $totalAssessments = $assessments->count();
         $completedAssessments = $assessments->where('status', 'completed');
         $completedCount = $completedAssessments->count();
-        $completionRate = $totalAssessments > 0 ? round(($completedCount / $totalAssessments) * 100, 2) : 0.0;
+        $completionRate = $totalAssessments > 0 ? round(($completedCount / $totalAssessments) * 100, 1) : 0.0;
 
-        $selfAssessments = $completedAssessments->filter(fn ($a) => $a->isSelfAssessment());
-        $peerAssessments = $completedAssessments->filter(fn ($a) => ! $a->isSelfAssessment());
+        // 1. Calculate Individual CQ scores for all cohort participants
+        $individualCQScores = [];
+        $selfPercentages = [];
+        $peerPercentages = [];
 
-        $selfAvg = $selfAssessments->isNotEmpty() ? round((float) $selfAssessments->avg('percentage'), 2) : 0.0;
-        $peerAvg = $peerAssessments->isNotEmpty() ? round((float) $peerAssessments->avg('percentage'), 2) : 0.0;
-        $normalisedAvg = ($selfAvg > 0 && $peerAvg > 0) ? round((0.40 * $selfAvg) + (0.60 * $peerAvg), 2) : round((float) $completedAssessments->avg('percentage'), 2);
+        foreach ($participants as $participant) {
+            $cqReport = $this->calculateChangeQuotientReport($participant, $survey);
+            if ($cqReport['overall_cq_score'] > 0) {
+                $individualCQScores[] = $cqReport['overall_cq_score'];
+            }
+            if ($cqReport['self_percentage'] > 0) {
+                $selfPercentages[] = $cqReport['self_percentage'];
+            }
+            if ($cqReport['peer_percentage'] > 0) {
+                $peerPercentages[] = $cqReport['peer_percentage'];
+            }
+        }
 
-        $groupCategory = $this->categoryService->getCategory($normalisedAvg);
-        $teamSync = $this->calculateTeamSyncScore($survey);
+        // If no individual scores were computed from answers yet, fallback to assessment averages
+        if (empty($individualCQScores) && $completedCount > 0) {
+            foreach ($completedAssessments as $a) {
+                $individualCQScores[] = round((float) ($a->percentage / 10), 1);
+            }
+        }
 
-        // Competency Questions Analysis across all answers
-        $questions = $survey->questions()->orderBy('sort_order')->get();
+        // Mean, Median, Standard Deviation
+        $scoreCount = count($individualCQScores);
+        if ($scoreCount > 0) {
+            $meanScore = round(array_sum($individualCQScores) / $scoreCount, 1);
+            sort($individualCQScores);
+            $middle = (int) floor($scoreCount / 2);
+            $medianScore = ($scoreCount % 2 === 0)
+                ? round(($individualCQScores[$middle - 1] + $individualCQScores[$middle]) / 2, 1)
+                : round($individualCQScores[$middle], 1);
+
+            $variance = array_sum(array_map(fn ($x) => pow($x - $meanScore, 2), $individualCQScores)) / $scoreCount;
+            $stdDev = round(sqrt($variance), 1);
+            $highestScore = round(max($individualCQScores), 1);
+            $lowestScore = round(min($individualCQScores), 1);
+        } else {
+            $meanScore = 0.0;
+            $medianScore = 0.0;
+            $stdDev = 0.0;
+            $highestScore = 0.0;
+            $lowestScore = 0.0;
+        }
+
+        $selfAvg = ! empty($selfPercentages) ? round(array_sum($selfPercentages) / count($selfPercentages), 1) : 0.0;
+        $peerAvg = ! empty($peerPercentages) ? round(array_sum($peerPercentages) / count($peerPercentages), 1) : 0.0;
+
+        // Team CQ Group Score
+        $teamCQScore = $meanScore;
+        $teamCQPercentage = round($teamCQScore * 10, 1);
+        $groupCategory = $this->categoryService->getCategory($teamCQPercentage);
+        $groupProfile = $this->getProfileArchetypeData($teamCQPercentage, $teamCQScore);
+
+        // 2. Team CQ Sync Score
+        $syncReport = $this->calculateGroupSyncScore($survey);
+        $teamSyncScore = $syncReport['score'];
+        $teamSyncPercentage = $syncReport['percentage'];
+
+        // Benchmarks (CQ: 8.0, CQ Sync: 8.0)
+        $benchmarkCQ = 8.0;
+        $benchmarkSync = 8.0;
+        $gapCQ = round($teamCQScore - $benchmarkCQ, 1);
+        $gapSync = round($teamSyncScore - $benchmarkSync, 1);
+
+        // 3. Team Position Matrix (Image 2)
+        // X = Team CQ Group Score (0-10)
+        // Y = Team CQ Sync Score (0-10)
+        // Quadrants:
+        // Top-Right (X >= 6, Y >= 6): Opportunity Zone (High CQ, High Sync)
+        // Bottom-Right (X >= 6, Y < 6): Capability Zone (High CQ, Low Sync)
+        // Top-Left (X < 6, Y >= 6): Potential Zone (Low CQ, High Sync)
+        // Bottom-Left (X < 6, Y < 6): Risk Zone (Low CQ, Low Sync)
+        if ($teamCQScore >= 6.0 && $teamSyncScore >= 6.0) {
+            $matrixZone = 'opportunity';
+            $matrixZoneName = 'Opportunity Zone';
+            $matrixZoneSubtitle = 'High CQ, High Sync: Ideal state with strong capability and synchronisation. Drive bigger impact.';
+            $matrixBlindSpot = 'Complacency risk: Maintain momentum, experiment with frontier innovations, and systematize change frameworks.';
+            $matrixOpportunity = 'The team is positioned to spearhead transformational organizational initiatives and mentor other departments.';
+        } elseif ($teamCQScore >= 6.0 && $teamSyncScore < 6.0) {
+            $matrixZone = 'capability';
+            $matrixZoneName = 'Capability Zone';
+            $matrixZoneSubtitle = 'High CQ, Low Sync: Good capability but alignment gaps are limiting collective impact.';
+            $matrixBlindSpot = 'Alignment gap is holding back the team from achieving higher impact, even though individual capability is relatively strong.';
+            $matrixOpportunity = 'By improving synchronisation, the team can quickly move into the Opportunity Zone and achieve significantly better results.';
+        } elseif ($teamCQScore < 6.0 && $teamSyncScore >= 6.0) {
+            $matrixZone = 'potential';
+            $matrixZoneName = 'Potential Zone';
+            $matrixZoneSubtitle = 'High Sync, Moderate CQ: Strong alignment and goodwill, but capability needs to grow.';
+            $matrixBlindSpot = 'Skill and confidence deficits: The team communicates well but lacks structured change execution playbooks.';
+            $matrixOpportunity = 'Strong mutual trust provides the ideal fertile ground for rapid capability upskilling without interpersonal friction.';
+        } else {
+            $matrixZone = 'risk';
+            $matrixZoneName = 'Risk Zone';
+            $matrixZoneSubtitle = 'Low CQ, Low Sync: Both capability and alignment need significant attention.';
+            $matrixBlindSpot = 'Pervasive resistance and siloed working patterns create friction and high vulnerability to change fatigue.';
+            $matrixOpportunity = 'Re-establishing core psychological safety and shared purpose will unlock foundational momentum.';
+        }
+
+        // Trajectory Path to Opportunity Zone (Current -> 30d -> 60d -> 90d -> Target 8.0, 8.0)
+        $pathSteps = [
+            'current' => ['label' => 'Current', 'cq' => $teamCQScore, 'sync' => $teamSyncScore],
+            'day30' => ['label' => '30 Days', 'cq' => round(min(8.0, $teamCQScore + 0.3), 1), 'sync' => round(min(8.0, $teamSyncScore + 0.6), 1)],
+            'day60' => ['label' => '60 Days', 'cq' => round(min(8.0, $teamCQScore + 0.8), 1), 'sync' => round(min(8.0, $teamSyncScore + 1.2), 1)],
+            'day90' => ['label' => '90 Days', 'cq' => round(min(8.0, $teamCQScore + 1.4), 1), 'sync' => round(min(8.0, $teamSyncScore + 1.8), 1)],
+            'target' => ['label' => 'Target (8.0, 8.0)', 'cq' => 8.0, 'sync' => 8.0],
+        ];
+
+        // 4. Team CQ Distribution Histogram across 5 Archetypes (Image 4)
+        $distributionCounts = [
+            'Resistant' => 0,
+            'Follower' => 0,
+            'Supporter' => 0,
+            'Driver' => 0,
+            'Champion' => 0,
+        ];
+
+        foreach ($individualCQScores as $s) {
+            if ($s <= 2.0) {
+                $distributionCounts['Resistant']++;
+            } elseif ($s <= 4.0) {
+                $distributionCounts['Follower']++;
+            } elseif ($s <= 6.0) {
+                $distributionCounts['Supporter']++;
+            } elseif ($s <= 8.0) {
+                $distributionCounts['Driver']++;
+            } else {
+                $distributionCounts['Champion']++;
+            }
+        }
+
+        $totalCountForDist = max(1, count($individualCQScores));
+        $distribution = [
+            'resistant' => [
+                'name' => 'Resistant',
+                'range' => '1.0 – 2.0',
+                'count' => $distributionCounts['Resistant'],
+                'percentage' => round(($distributionCounts['Resistant'] / $totalCountForDist) * 100),
+                'color' => '#EF4444',
+            ],
+            'follower' => [
+                'name' => 'Follower',
+                'range' => '2.1 – 4.0',
+                'count' => $distributionCounts['Follower'],
+                'percentage' => round(($distributionCounts['Follower'] / $totalCountForDist) * 100),
+                'color' => '#F97316',
+            ],
+            'supporter' => [
+                'name' => 'Supporter',
+                'range' => '4.1 – 6.0',
+                'count' => $distributionCounts['Supporter'],
+                'percentage' => round(($distributionCounts['Supporter'] / $totalCountForDist) * 100),
+                'color' => '#10B981',
+            ],
+            'driver' => [
+                'name' => 'Driver',
+                'range' => '6.1 – 8.0',
+                'count' => $distributionCounts['Driver'],
+                'percentage' => round(($distributionCounts['Driver'] / $totalCountForDist) * 100),
+                'color' => '#F59E0B',
+            ],
+            'champion' => [
+                'name' => 'Champion',
+                'range' => '8.1 – 10.0',
+                'count' => $distributionCounts['Champion'],
+                'percentage' => round(($distributionCounts['Champion'] / $totalCountForDist) * 100),
+                'color' => '#3B82F6',
+            ],
+        ];
+
+        // 5. Strategic Recommendations & 30-60-90 Day Plan (Image 2)
+        $strategicRecommendations = [
+            [
+                'number' => 1,
+                'title' => 'Build Shared Understanding',
+                'description' => 'Create a common view of key changes, goals and expected outcomes across the team.',
+            ],
+            [
+                'number' => 2,
+                'title' => 'Strengthen Collective Alignment',
+                'description' => 'Facilitate open dialogues to surface different perspectives and converge on priorities.',
+            ],
+            [
+                'number' => 3,
+                'title' => 'Translate into Coordinated Action',
+                'description' => 'Define clear commitments, owners and timelines, and track progress together.',
+            ],
+        ];
+
+        $plan306090 = [
+            'phase_30' => [
+                'title' => 'First 30 Days',
+                'subtitle' => 'Align & Engage',
+                'items' => [
+                    'Conduct a team alignment workshop (See, Agree, Act).',
+                    'Clarify key change priorities and expected outcomes.',
+                    'Identify major misalignments and address them openly.',
+                    'Establish regular team check-ins.',
+                ],
+            ],
+            'phase_60' => [
+                'title' => 'Next 60 Days',
+                'subtitle' => 'Build & Act Together',
+                'items' => [
+                    'Run focused capability building sessions.',
+                    'Facilitate cross-functional collaboration and joint problem solving.',
+                    'Define and execute team commitments.',
+                    'Track progress and remove roadblocks.',
+                ],
+            ],
+            'phase_90' => [
+                'title' => 'Next 90 Days',
+                'subtitle' => 'Scale & Institutionalise',
+                'items' => [
+                    'Review progress and measure improvements in CQ and CQ Sync.',
+                    'Embed successful practices into regular ways of working.',
+                    'Strengthen accountability and collective ownership.',
+                    'Plan next phase to reach and sustain the Opportunity Zone.',
+                ],
+            ],
+        ];
+
+        $expectedOutcomes = [
+            [
+                'icon' => 'arrow-up',
+                'title' => 'Improved team synchronisation and faster decision making',
+            ],
+            [
+                'icon' => 'users',
+                'title' => 'Higher collective commitment and execution speed',
+            ],
+            [
+                'icon' => 'settings',
+                'title' => 'Better adaptability to change and reduced resistance',
+            ],
+            [
+                'icon' => 'target',
+                'title' => 'Stronger business outcomes and readiness for future changes',
+            ],
+        ];
+
+        // 6. Strengths and Areas of Concern (Image 4)
+        $supporterOrHigherPct = round(($distribution['supporter']['count'] + $distribution['driver']['count'] + $distribution['champion']['count']) / $totalCountForDist * 100);
+        $resistantOrFollowerPct = round(($distribution['resistant']['count'] + $distribution['follower']['count']) / $totalCountForDist * 100);
+
+        $teamStrengths = [
+            "Majority of the team ({$supporterOrHigherPct}%) are in the Supporter or higher category (CQ ≥ 4.1).",
+            'Positive openness towards change and willingness to contribute constructively.',
+            "A solid core of team members are already in the Driver and Champion category ({$distribution['driver']['percentage']}%).",
+            'Strong operational foundation to build on for higher organizational agility.',
+        ];
+
+        $areasOfConcern = [
+            "{$resistantOrFollowerPct}% of the team are in the Resistant or Follower category (CQ ≤ 4.0).",
+            "Variation in scores (Standard Deviation {$stdDev}) indicates uneven change readiness across roles.",
+            "Team is currently {$gapCQ} points below the target benchmark of 8.0.",
+            'Need to improve alignment consistency and reduce pockets of hesitation.',
+        ];
+
+        // 7. Competency Questions Breakdown (11 Individual Questions across all participants)
+        $questions = $survey->questions()->orderBy('sort_order')->take(11)->get();
         $questionsData = [];
 
         foreach ($questions as $q) {
-            $qSelfScores = [];
-            $qPeerScores = [];
-
+            $allScores = [];
             foreach ($completedAssessments as $a) {
                 $ans = $a->answers->firstWhere('question_id', $q->id);
                 if ($ans && $ans->score !== null) {
-                    if ($a->isSelfAssessment()) {
-                        $qSelfScores[] = $ans->score;
-                    } else {
-                        $qPeerScores[] = $ans->score;
-                    }
+                    $allScores[] = (float) $ans->score;
                 }
             }
 
-            $selfScoreAvg = ! empty($qSelfScores) ? round(array_sum($qSelfScores) / count($qSelfScores), 2) : 0.0;
-            $peerScoreAvg = ! empty($qPeerScores) ? round(array_sum($qPeerScores) / count($qPeerScores), 2) : 0.0;
-            $allScores = array_merge($qSelfScores, $qPeerScores);
-            $overallAvg = ! empty($allScores) ? round(array_sum($allScores) / count($allScores), 2) : 0.0;
-            $overallPercentage = round($overallAvg * 10, 1);
+            $overallAvg = ! empty($allScores) ? round(array_sum($allScores) / count($allScores), 1) : 0.0;
+            $overallPct = round($overallAvg * 10, 1);
 
             $questionsData[] = [
                 'id' => $q->id,
                 'question_text' => $q->question_text,
-                'dimension' => $this->inferDimensionTag($q->question_text),
+                'dimension' => $q->dimension ?: $this->inferDimensionTag($q->question_text),
+                'min_score_description' => $q->min_score_description ?: '1 (Low)',
+                'max_score_description' => $q->max_score_description ?: '10 (High)',
                 'overall_avg' => $overallAvg,
-                'overall_percentage' => $overallPercentage,
-                'self_avg' => $selfScoreAvg,
-                'peer_avg' => $peerScoreAvg,
-                'gap' => round($selfScoreAvg - $peerScoreAvg, 2),
+                'overall_percentage' => $overallPct,
                 'response_count' => count($allScores),
             ];
         }
 
-        // Sort by overall percentage to find Top Strengths and Critical Growth Gaps (What to Solve)
         $sortedQuestions = collect($questionsData)->sortBy('overall_percentage')->values();
         $criticalGaps = $sortedQuestions->take(3)->all();
         $topStrengths = $sortedQuestions->reverse()->take(3)->values()->all();
 
-        // Generate tailored intent-level action plan recommendations based on critical gaps
-        $recommendations = $this->generateRecommendationsForGaps($criticalGaps);
-
         return [
-            'cohort_size' => $survey->participants()->count(),
+            'cohort_size' => $cohortSize,
             'total_assessments' => $totalAssessments,
             'completed_assessments' => $completedCount,
             'completion_rate' => $completionRate,
+            'team_cq_score' => $teamCQScore,
+            'team_cq_percentage' => $teamCQPercentage,
+            'team_cq_sync_score' => $teamSyncScore,
+            'team_cq_sync_percentage' => $teamSyncPercentage,
             'average_cq1_self' => $selfAvg,
             'average_cq2_others' => $peerAvg,
-            'average_cq3_normalised' => $normalisedAvg,
-            'cq_sync' => $teamSync,
+            'average_cq3_normalised' => $teamCQPercentage,
             'group_category' => $groupCategory,
-            'group_emoji' => $this->categoryService->getEmoji($groupCategory),
-            'group_color' => $this->categoryService->getColorHex($groupCategory),
+            'group_display_name' => $groupProfile['display_name'],
+            'group_emoji' => $groupProfile['emoji'],
+            'group_color' => $groupProfile['color'],
             'group_badge' => $this->categoryService->getBadgeClass($groupCategory),
+            'benchmark_cq' => $benchmarkCQ,
+            'benchmark_sync' => $benchmarkSync,
+            'gap_cq' => $gapCQ,
+            'gap_sync' => $gapSync,
+            'matrix_zone' => $matrixZone,
+            'matrix_zone_name' => $matrixZoneName,
+            'matrix_zone_subtitle' => $matrixZoneSubtitle,
+            'matrix_blind_spot' => $matrixBlindSpot,
+            'matrix_opportunity' => $matrixOpportunity,
+            'path_steps' => $pathSteps,
+            'statistics' => [
+                'mean' => $meanScore,
+                'median' => $medianScore,
+                'std_dev' => $stdDev,
+                'highest' => $highestScore,
+                'lowest' => $lowestScore,
+                'benchmark' => $benchmarkCQ,
+                'gap' => $gapCQ,
+            ],
+            'distribution' => $distribution,
+            'strategic_recommendations' => $strategicRecommendations,
+            'plan_30_60_90' => $plan306090,
+            'expected_outcomes' => $expectedOutcomes,
+            'team_strengths' => $teamStrengths,
+            'areas_of_concern' => $areasOfConcern,
+            'cq_sync' => $syncReport,
             'questions_data' => $questionsData,
             'top_strengths' => $topStrengths,
             'critical_gaps' => $criticalGaps,
-            'recommendations' => $recommendations,
             'sign_off' => [
                 'status' => $survey->sign_off_status ?? 'pending',
                 'lead' => $survey->sign_off_lead,
                 'notes' => $survey->sign_off_notes,
                 'signed_off_at' => $survey->signed_off_at,
             ],
-            'confidentiality_guarantee' => 'This group report is public to the team with ZERO individual names exposed to protect psychological safety and focus on team action plans.',
+            'confidentiality_guarantee' => 'This team report is completely anonymous with ZERO individual names exposed to protect psychological safety and focus on collective growth.',
         ];
     }
 
@@ -810,110 +1527,40 @@ class AssessmentScoreService
     {
         $lower = strtolower($text);
 
-        if (str_contains($lower, 'empath')) {
-            return 'Empathy & Support';
+        if (str_contains($lower, 'life changing') || str_contains($lower, 'awareness')) {
+            return 'Awareness of Change';
         }
-        if (str_contains($lower, 'communicat')) {
-            return 'Communication Clarity';
+        if (str_contains($lower, 'top 3') || str_contains($lower, 'understanding')) {
+            return 'Understanding Key Changes';
         }
-        if (str_contains($lower, 'conflict')) {
-            return 'Conflict Resolution';
+        if (str_contains($lower, 'choice') || str_contains($lower, 'situation') || str_contains($lower, 'circumstance')) {
+            return 'Choice vs Circumstance';
         }
-        if (str_contains($lower, 'team')) {
-            return 'Team Collaboration';
+        if (str_contains($lower, 'control')) {
+            return 'Control Over Change';
         }
-        if (str_contains($lower, 'listen')) {
-            return 'Active Listening';
+        if (str_contains($lower, 'how to manage') || str_contains($lower, 'managing')) {
+            return 'Managing Change Knowledge';
         }
-        if (str_contains($lower, 'decis')) {
-            return 'Decision Agility';
+        if (str_contains($lower, 'confidence')) {
+            return 'Confidence in Change';
         }
-        if (str_contains($lower, 'change') || str_contains($lower, 'adapt')) {
-            return 'Change Adaptability';
+        if (str_contains($lower, 'support') || str_contains($lower, 'speak') || str_contains($lower, 'reach')) {
+            return 'Seeking Support';
         }
-        if (str_contains($lower, 'initiat') || str_contains($lower, 'motivat')) {
-            return 'Initiative & Drive';
+        if (str_contains($lower, 'plan') && ! str_contains($lower, 'implement')) {
+            return 'Action Planning';
         }
-        if (str_contains($lower, 'problem')) {
-            return 'Problem Solving';
+        if (str_contains($lower, 'implement')) {
+            return 'Implementing Plan';
         }
-        if (str_contains($lower, 'responsib')) {
-            return 'Ownership & Accountability';
+        if (str_contains($lower, 'result') || str_contains($lower, 'improvement')) {
+            return 'Seeing Results';
         }
-        if (str_contains($lower, 'goal') || str_contains($lower, 'reliab')) {
-            return 'Goal Execution';
-        }
-
-        return 'Leadership Competency';
-    }
-
-    /**
-     * Generate dynamic intent-level action recommendations based on identified gaps.
-     *
-     * @param  array<int, array<string, mixed>>  $gaps
-     * @return array<int, array<string, string>>
-     */
-    protected function generateRecommendationsForGaps(array $gaps): array
-    {
-        $recommendationMap = [
-            'Empathy & Support' => [
-                'title' => 'Cultivate Psychological Safety & Active Check-Ins',
-                'intent' => 'Enhance mutual empathy and relational support across the team.',
-                'action' => 'Implement structured 10-minute weekly peer connection syncs and normalize sharing emotional bandwidth during change sprints.',
-            ],
-            'Conflict Resolution' => [
-                'title' => 'Formalize Constructive Dissent Frameworks',
-                'intent' => 'Address interpersonal tensions early and turn disagreements into creative problem-solving.',
-                'action' => 'Adopt an "interest-based" debrief protocol for project retrospectives to air friction points safely and establish team consensus.',
-            ],
-            'Active Listening' => [
-                'title' => 'Reflective Inquiry & Dialogue Workshops',
-                'intent' => 'Improve team receptivity and minimize misunderstandings.',
-                'action' => 'Incorporate 2-minute reflective summarization ("What I heard you say is...") during team alignment and standup discussions.',
-            ],
-            'Decision Agility' => [
-                'title' => 'Decentralized Decision Delegation (DACI / RACI)',
-                'intent' => 'Accelerate decision-making velocity and eliminate consensus bottlenecks.',
-                'action' => 'Document explicit decision owners for key team workflows to empower rapid experimentation without executive sign-off delays.',
-            ],
-            'Change Adaptability' => [
-                'title' => 'Iterative Change Sprints & Agility Retrospectives',
-                'intent' => 'Reduce organizational friction when navigating pivots and new business realities.',
-                'action' => 'Break large initiatives into 2-week agile experiments with explicit learning reviews to celebrate adaptability.',
-            ],
-            'Team Collaboration' => [
-                'title' => 'Cross-Functional Peer Shadowing & Shared OKRs',
-                'intent' => 'Eliminate siloed working habits and foster collective ownership.',
-                'action' => 'Align quarterly goals across adjacent team members so success metrics require mutual support.',
-            ],
-            'Initiative & Drive' => [
-                'title' => 'Autonomous Sandbox & Innovation Time',
-                'intent' => 'Encourage proactive self-starting and grassroots leadership.',
-                'action' => 'Provide team members with dedicated bandwidth each cycle to independently research and propose workflow improvements.',
-            ],
-            'Communication Clarity' => [
-                'title' => 'Asynchronous Transparency & Playbook Documentation',
-                'intent' => 'Ensure information cascades cleanly without message distortion.',
-                'action' => 'Standardize project briefing templates with clear definitions of done, timelines, and deliverables.',
-            ],
-        ];
-
-        $recs = [];
-        foreach ($gaps as $gap) {
-            $dim = $gap['dimension'];
-            if (isset($recommendationMap[$dim])) {
-                $recs[] = array_merge(['dimension' => $dim, 'question' => $gap['question_text']], $recommendationMap[$dim]);
-            } else {
-                $recs[] = [
-                    'dimension' => $dim,
-                    'question' => $gap['question_text'],
-                    'title' => "Targeted Team Development on {$dim}",
-                    'intent' => "Elevate team performance on {$dim}.",
-                    'action' => "Schedule a team workshop focused on aligning expectations and operational rituals surrounding {$dim}.",
-                ];
-            }
+        if (str_contains($lower, 'helping') || str_contains($lower, 'supporting others') || str_contains($lower, 'friend')) {
+            return 'Supporting Others';
         }
 
-        return $recs;
+        return 'Change Capability';
     }
 }

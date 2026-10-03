@@ -56,22 +56,22 @@ class AssessmentCategoryService
         }
 
         if ($percentage <= 20.0) {
-            return 'Apple';
+            return 'Resistor';
         }
 
         if ($percentage <= 40.0) {
-            return 'Orange';
+            return 'Follower';
         }
 
         if ($percentage <= 60.0) {
-            return 'Tomato';
+            return 'Supporter';
         }
 
         if ($percentage <= 80.0) {
-            return 'Lemon';
+            return 'Initiator';
         }
 
-        return 'Cucumber';
+        return 'Achiever';
     }
 
     /**
@@ -84,12 +84,17 @@ class AssessmentCategoryService
             return $cat->emoji;
         }
 
-        return match ($category) {
-            'Apple' => '🍏',
-            'Orange' => '🍊',
-            'Tomato' => '🍅',
-            'Lemon' => '🍋',
-            'Cucumber' => '🥒',
+        return match (strtolower(trim($category))) {
+            'resistor', 'resistant' => '🛡️',
+            'follower' => '👥',
+            'supporter' => '🌱',
+            'initiator', 'driver' => '🚀',
+            'achiever', 'champion' => '🏆',
+            'divergent' => '⚡',
+            'fragmented' => '🧩',
+            'aligned' => '👥',
+            'synchronised' => '⚙️',
+            'unified' => '🚩',
             default => '🎯',
         };
     }
@@ -104,12 +109,12 @@ class AssessmentCategoryService
             return $cat->color;
         }
 
-        return match ($category) {
-            'Apple' => '#10B981',    // Emerald 500
-            'Orange' => '#F97316',   // Orange 500
-            'Tomato' => '#EF4444',   // Red / Rose 500
-            'Lemon' => '#F59E0B',    // Amber / Yellow 500
-            'Cucumber' => '#059669', // Green 600
+        return match (strtolower(trim($category))) {
+            'resistor', 'resistant', 'divergent' => '#EF4444',    // Red 500
+            'follower', 'fragmented' => '#F97316',                // Orange 500
+            'supporter', 'aligned' => '#10B981',                  // Green 500
+            'initiator', 'driver', 'synchronised' => '#F59E0B',   // Amber / Yellow 500
+            'achiever', 'champion', 'unified' => '#3B82F6',       // Blue 500
             default => '#6B7280',
         };
     }
@@ -124,12 +129,12 @@ class AssessmentCategoryService
             return $cat->badge_class;
         }
 
-        return match ($category) {
-            'Apple' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 border-emerald-200',
-            'Orange' => 'bg-orange-50 text-orange-700 ring-orange-600/20 border-orange-200',
-            'Tomato' => 'bg-rose-50 text-rose-700 ring-rose-600/20 border-rose-200',
-            'Lemon' => 'bg-amber-50 text-amber-700 ring-amber-600/20 border-amber-200',
-            'Cucumber' => 'bg-teal-50 text-teal-700 ring-teal-600/20 border-teal-200',
+        return match (strtolower(trim($category))) {
+            'resistor', 'resistant', 'divergent' => 'bg-rose-50 text-rose-700 ring-rose-600/20 border-rose-200',
+            'follower', 'fragmented' => 'bg-orange-50 text-orange-700 ring-orange-600/20 border-orange-200',
+            'supporter', 'aligned' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 border-emerald-200',
+            'initiator', 'driver', 'synchronised' => 'bg-amber-50 text-amber-700 ring-amber-600/20 border-amber-200',
+            'achiever', 'champion', 'unified' => 'bg-blue-50 text-blue-700 ring-blue-600/20 border-blue-200',
             default => 'bg-indigo-50 text-indigo-700 ring-indigo-600/20 border-indigo-200',
         };
     }
@@ -153,11 +158,11 @@ class AssessmentCategoryService
         }
 
         return [
-            ['name' => 'Apple', 'range' => '0–20%', 'emoji' => '🍏', 'color' => '#10B981'],
-            ['name' => 'Orange', 'range' => '>20–40%', 'emoji' => '🍊', 'color' => '#F97316'],
-            ['name' => 'Tomato', 'range' => '>40–60%', 'emoji' => '🍅', 'color' => '#EF4444'],
-            ['name' => 'Lemon', 'range' => '>60–80%', 'emoji' => '🍋', 'color' => '#F59E0B'],
-            ['name' => 'Cucumber', 'range' => '>80–100%', 'emoji' => '🥒', 'color' => '#059669'],
+            ['name' => 'Resistor', 'range' => '0–20%', 'emoji' => '🛡️', 'color' => '#EF4444'],
+            ['name' => 'Follower', 'range' => '>20–40%', 'emoji' => '👥', 'color' => '#F97316'],
+            ['name' => 'Supporter', 'range' => '>40–60%', 'emoji' => '🌱', 'color' => '#10B981'],
+            ['name' => 'Initiator', 'range' => '>60–80%', 'emoji' => '🚀', 'color' => '#F59E0B'],
+            ['name' => 'Achiever', 'range' => '>80–100%', 'emoji' => '🏆', 'color' => '#3B82F6'],
         ];
     }
 }

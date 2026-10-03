@@ -10,6 +10,7 @@ use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentGenerationService;
 use App\Services\AssessmentScoreService;
+use App\Services\ChangeQuotientQuestionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -80,20 +81,7 @@ class SurveyController extends Controller
     {
         $companies = Company::orderBy('name')->get();
         $selectedCompanyId = $request->query('company_id');
-
-        $defaultQuestions = [
-            'How effectively does this person communicate with others?',
-            'How well does this person work in a team?',
-            'How confidently does this person make decisions?',
-            'How adaptable is this person to change?',
-            'How well does this person handle responsibility?',
-            'How effectively does this person solve problems?',
-            'How well does this person listen to others?',
-            'How effectively does this person manage conflict?',
-            'How consistently does this person demonstrate empathy?',
-            'How effectively does this person take initiative?',
-            'How reliable is this person when working toward goals?',
-        ];
+        $defaultQuestions = ChangeQuotientQuestionService::getDefaultQuestions();
 
         return view('admin.surveys.create', compact('defaultQuestions', 'companies', 'selectedCompanyId'));
     }
@@ -112,15 +100,28 @@ class SurveyController extends Controller
         ]);
 
         $questions = $request->input('questions', []);
-        $order = 1;
-        foreach ($questions as $questionText) {
-            if (! empty(trim((string) $questionText))) {
-                Question::create([
-                    'survey_id' => $survey->id,
-                    'question_text' => trim((string) $questionText),
-                    'sort_order' => $order++,
-                    'is_active' => true,
-                ]);
+        $defaults = ChangeQuotientQuestionService::getDefaultQuestions();
+
+        if (empty($questions)) {
+            app(ChangeQuotientQuestionService::class)->seedForSurvey($survey);
+        } else {
+            $order = 1;
+            foreach ($questions as $index => $qInput) {
+                $text = is_array($qInput) ? ($qInput['question_text'] ?? '') : (string) $qInput;
+                if (! empty(trim($text))) {
+                    $default = $defaults[$index] ?? null;
+                    Question::create([
+                        'survey_id' => $survey->id,
+                        'question_text' => trim($text),
+                        'peer_question_text' => is_array($qInput) ? ($qInput['peer_question_text'] ?? $default['peer_question_text'] ?? null) : ($default['peer_question_text'] ?? null),
+                        'dimension' => is_array($qInput) ? ($qInput['dimension'] ?? $default['dimension'] ?? null) : ($default['dimension'] ?? null),
+                        'type' => is_array($qInput) ? ($qInput['type'] ?? $default['type'] ?? 'individual') : ($default['type'] ?? ($order > 11 ? 'group_sync' : 'individual')),
+                        'min_score_description' => is_array($qInput) ? ($qInput['min_score_description'] ?? $default['min_score_description'] ?? '1') : ($default['min_score_description'] ?? '1'),
+                        'max_score_description' => is_array($qInput) ? ($qInput['max_score_description'] ?? $default['max_score_description'] ?? '10') : ($default['max_score_description'] ?? '10'),
+                        'sort_order' => $order++,
+                        'is_active' => true,
+                    ]);
+                }
             }
         }
 

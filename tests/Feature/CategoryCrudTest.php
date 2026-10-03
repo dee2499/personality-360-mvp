@@ -130,11 +130,11 @@ class CategoryCrudTest extends TestCase
         $response = $this->actingAs($this->admin)->post(route('admin.categories.reset-defaults'));
         $response->assertRedirect(route('admin.categories.index'));
 
-        $this->assertDatabaseHas('score_categories', ['name' => 'Apple']);
-        $this->assertDatabaseHas('score_categories', ['name' => 'Orange']);
-        $this->assertDatabaseHas('score_categories', ['name' => 'Tomato']);
-        $this->assertDatabaseHas('score_categories', ['name' => 'Lemon']);
-        $this->assertDatabaseHas('score_categories', ['name' => 'Cucumber']);
+        $this->assertDatabaseHas('score_categories', ['name' => 'Resistor']);
+        $this->assertDatabaseHas('score_categories', ['name' => 'Follower']);
+        $this->assertDatabaseHas('score_categories', ['name' => 'Supporter']);
+        $this->assertDatabaseHas('score_categories', ['name' => 'Initiator']);
+        $this->assertDatabaseHas('score_categories', ['name' => 'Achiever']);
         $this->assertEquals(5, ScoreCategory::count());
     }
 

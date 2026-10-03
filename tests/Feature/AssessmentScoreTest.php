@@ -21,31 +21,31 @@ class AssessmentScoreTest extends TestCase
     {
         $categoryService = new AssessmentCategoryService;
 
-        // Boundary tests strictly per Section 4 and Section 43:
-        // 0-20 -> Apple
-        $this->assertEquals('Apple', $categoryService->getCategory(0.0));
-        $this->assertEquals('Apple', $categoryService->getCategory(15.5));
-        $this->assertEquals('Apple', $categoryService->getCategory(20.0));
+        // Boundary tests per Change Quotient (CQ) specifications:
+        // 0-20 -> Resistor
+        $this->assertEquals('Resistor', $categoryService->getCategory(0.0));
+        $this->assertEquals('Resistor', $categoryService->getCategory(15.5));
+        $this->assertEquals('Resistor', $categoryService->getCategory(20.0));
 
-        // >20-40 -> Orange
-        $this->assertEquals('Orange', $categoryService->getCategory(20.01));
-        $this->assertEquals('Orange', $categoryService->getCategory(35.0));
-        $this->assertEquals('Orange', $categoryService->getCategory(40.0));
+        // >20-40 -> Follower
+        $this->assertEquals('Follower', $categoryService->getCategory(20.01));
+        $this->assertEquals('Follower', $categoryService->getCategory(35.0));
+        $this->assertEquals('Follower', $categoryService->getCategory(40.0));
 
-        // >40-60 -> Tomato
-        $this->assertEquals('Tomato', $categoryService->getCategory(40.01));
-        $this->assertEquals('Tomato', $categoryService->getCategory(55.0));
-        $this->assertEquals('Tomato', $categoryService->getCategory(60.0));
+        // >40-60 -> Supporter
+        $this->assertEquals('Supporter', $categoryService->getCategory(40.01));
+        $this->assertEquals('Supporter', $categoryService->getCategory(55.0));
+        $this->assertEquals('Supporter', $categoryService->getCategory(60.0));
 
-        // >60-80 -> Lemon
-        $this->assertEquals('Lemon', $categoryService->getCategory(60.01));
-        $this->assertEquals('Lemon', $categoryService->getCategory(75.0));
-        $this->assertEquals('Lemon', $categoryService->getCategory(80.0));
+        // >60-80 -> Initiator
+        $this->assertEquals('Initiator', $categoryService->getCategory(60.01));
+        $this->assertEquals('Initiator', $categoryService->getCategory(75.0));
+        $this->assertEquals('Initiator', $categoryService->getCategory(80.0));
 
-        // >80-100 -> Cucumber
-        $this->assertEquals('Cucumber', $categoryService->getCategory(80.01));
-        $this->assertEquals('Cucumber', $categoryService->getCategory(95.0));
-        $this->assertEquals('Cucumber', $categoryService->getCategory(100.0));
+        // >80-100 -> Achiever
+        $this->assertEquals('Achiever', $categoryService->getCategory(80.01));
+        $this->assertEquals('Achiever', $categoryService->getCategory(95.0));
+        $this->assertEquals('Achiever', $categoryService->getCategory(100.0));
     }
 
     public function test_assessment_generation_creates_n_squared_matrix(): void
@@ -160,7 +160,7 @@ class AssessmentScoreTest extends TestCase
         $this->assertEquals(218, $metrics['combined_score']); // 72 + 81 + 65
         $this->assertEquals(330, $metrics['combined_max_score']); // 3 * 110
         $this->assertEquals(66.06, $metrics['percentage']); // 218 / 330 * 100
-        $this->assertEquals('Lemon', $metrics['category']);
+        $this->assertEquals('Initiator', $metrics['category']);
     }
 
     public function test_people_profile_and_participant_portal_list_pending_surveys(): void

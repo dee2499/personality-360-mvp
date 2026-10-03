@@ -135,34 +135,33 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $response = $this->actingAs($data['alice'])->get(route('participant.assessments.report', $data['survey']));
         $response->assertOk();
 
-        // 1. Check Confidentiality Guarantees
-        $response->assertSee('Confidential: For Your Self-Introspection Only');
-        $response->assertSee('Individual Change Quotient (CQ) Report');
+        // 1. Check Confidentiality Guarantees & Headers
+        $response->assertSee('Confidential');
         $response->assertSee('Alice Confidential Subject');
+        $response->assertSee('ChangeQuo');
 
-        // 2. Requirement 1: CQ 1 (Self)
-        $response->assertSee('CQ 1 (Self)');
-        $response->assertSee('90%'); // Alice self percentage
+        // 2. Requirement 1: Self Score
+        $response->assertSee('Your Self Score');
+        $response->assertSee('9.0'); // Alice self rating average
 
-        // 3. Requirement 2: CQ 2 (Others)
-        $response->assertSee('CQ 2 (Others)');
-        $response->assertSee('80%'); // Observer consensus
+        // 3. Requirement 2: Peer Score (Average)
+        $response->assertSee('Peer Score (Average)');
+        $response->assertSee('8.0'); // Observer consensus
 
-        // 4. Requirement 3: CQ 3 (Normalised - 40% self + 60% others)
-        // 0.40 * 90 + 0.60 * 80 = 36 + 48 = 84%
-        $response->assertSee('CQ 3 (Normalised)');
-        $response->assertSee('84%');
+        // 4. Requirement 3: Moderated Score & Archetype
+        // Moderated = (9.0 + 8.0) / 2 = 8.5 (Achiever / Change Champion)
+        $response->assertSee('8.5');
+        $response->assertSee('Achiever');
+        $response->assertSee('Change Champion');
 
-        // Perception Gap (+10%)
-        $response->assertSee('+10%');
-
-        // 5. Requirement 4: CQ Sync (Team Score)
-        $response->assertSee('CQ Sync');
+        // 5. 2x2 Self vs Peer Insight Matrix & Key Insights
+        $response->assertSee('Self vs Peer Insight');
+        $response->assertSee('Aligned Strength');
+        $response->assertSee('Key Insights');
+        $response->assertSee('Your Strengths');
 
         // 6. Question-by-question matrix
-        $response->assertSee('Detailed Question Comparison');
-        $response->assertSee('How adaptable is this person to change and organizational shifts?');
-        $response->assertSee('How consistently does this person demonstrate empathy and support colleagues?');
+        $response->assertSee('11 Change Journey Dimensions');
 
         // Verify peer assessor names are NOT exposed on Alice's confidential report
         $response->assertDontSee('Bob Peer Assessor');
@@ -189,15 +188,11 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $response->assertOk();
 
         // Check group insights page content
-        $response->assertSee('Team Group Insights & Action Plans', false);
+        $response->assertSee('Team ChangeQuo Report');
         $response->assertSee('Zero Names Exposed');
-        $response->assertSee('Cohort CQ 1 (Self)');
-        $response->assertSee('Cohort CQ 2 (Others)');
-        $response->assertSee('Cohort CQ 3');
-        $response->assertSee('CQ Sync');
-        $response->assertSee('Top 3 Team Superpowers');
-        $response->assertSee('What to Solve: Top 3 Critical Gaps');
-        $response->assertSee('Intent-Level Recommendations & Sprints', false);
+        $response->assertSee('Team CQ (Group Score)');
+        $response->assertSee('Team CQ Sync');
+        $response->assertSee('Team Position Matrix');
 
         // Peer assessor and subject names are NOT displayed in the anonymous team insights
         $response->assertDontSee('Bob Peer Assessor');
@@ -216,12 +211,10 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $response->assertDontSee('Bob Peer Assessor');
         $response->assertDontSee('Charlie Peer Assessor');
 
-        $response->assertSee('Group Analytics, Insights & Action Plan Sign-Off', false);
-        $response->assertSee('Zero Individual Names Guarantee');
-        $response->assertSee('Leadership Sign-Off Panel');
-        $response->assertSee('Sign-Off Lead / Executive Name');
-        $response->assertSee('What to Solve: Top 3 Critical Gaps');
-        $response->assertSee('Intent-Level Action Plan Recommendations');
+        $response->assertSee('Team ChangeQuo Report');
+        $response->assertSee('Confidential • Zero Names Exposed');
+        $response->assertSee('Leadership Sign-Off');
+        $response->assertSee('Executive Sponsor / Leadership Lead');
 
         // Admin submits sign-off
         $signOffResponse = $this->actingAs($data['admin'])->post(route('admin.surveys.sign-off', $data['survey']), [
@@ -244,7 +237,7 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $followUp = $this->actingAs($data['admin'])->get(route('admin.surveys.group-insights', $data['survey']));
         $followUp->assertOk();
         $followUp->assertSee('Chief People Officer Sarah Vance');
-        $followUp->assertSee('Sign-Off: Approved');
+        $followUp->assertSee('Status: Approved');
     }
 
     public function test_sign_off_validation_requires_lead_and_valid_status(): void
