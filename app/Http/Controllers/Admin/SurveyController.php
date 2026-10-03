@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentGenerationService;
+use App\Services\AssessmentScoreService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -216,5 +217,38 @@ class SurveyController extends Controller
         ]);
 
         return back()->with('success', 'Survey unpublished and set to draft.');
+    }
+
+    /**
+     * Display group analytics, intent-level recommendations, and leadership sign-off panel.
+     * Note: Zero individual names are exposed in this report.
+     */
+    public function groupInsights(Survey $survey, AssessmentScoreService $scoreService): View
+    {
+        $insights = $scoreService->calculateGroupInsights($survey);
+
+        return view('admin.surveys.group-insights', compact('survey', 'insights'));
+    }
+
+    /**
+     * Record leadership sign-off for the survey group action plan.
+     */
+    public function signOff(Request $request, Survey $survey): RedirectResponse
+    {
+        $validated = $request->validate([
+            'sign_off_lead' => ['required', 'string', 'max:255'],
+            'sign_off_status' => ['required', 'in:approved,pending,needs_review'],
+            'sign_off_notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $survey->update([
+            'sign_off_lead' => $validated['sign_off_lead'],
+            'sign_off_status' => $validated['sign_off_status'],
+            'sign_off_notes' => $validated['sign_off_notes'] ?? null,
+            'signed_off_at' => now(),
+        ]);
+
+        return redirect()->route('admin.surveys.group-insights', $survey)
+            ->with('success', 'Leadership sign-off has been successfully recorded for this survey.');
     }
 }

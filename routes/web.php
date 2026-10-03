@@ -50,6 +50,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-assessments', [ParticipantAssessmentController::class, 'index'])
         ->name('participant.assessments.index');
 
+    // Confidential Individual Change Quotient (CQ 1-3, CQ Sync) Report
+    Route::get('/my-assessments/reports/{survey}', [ParticipantAssessmentController::class, 'report'])
+        ->name('participant.assessments.report');
+
+    // Participant View of Anonymous Group Insights & Action Recommendations
+    Route::get('/my-surveys/{survey}/group-insights', [ParticipantAssessmentController::class, 'groupInsights'])
+        ->name('participant.surveys.group-insights');
+
     // New 11-Question Slider Wizard for Entire Cohort
     Route::get('/my-surveys/{survey}', [ParticipantAssessmentController::class, 'takeSurvey'])
         ->name('participant.surveys.take');
@@ -76,6 +84,8 @@ Route::prefix('admin')
         Route::delete('companies/{company}/employees/{employee}', [AdminCompanyController::class, 'destroyEmployee'])->name('companies.employees.destroy');
 
         // Surveys
+        Route::get('surveys/{survey}/group-insights', [AdminSurveyController::class, 'groupInsights'])->name('surveys.group-insights');
+        Route::post('surveys/{survey}/sign-off', [AdminSurveyController::class, 'signOff'])->name('surveys.sign-off');
         Route::resource('surveys', AdminSurveyController::class);
         Route::post('surveys/{survey}/publish', [AdminSurveyController::class, 'publish'])->name('surveys.publish');
         Route::post('surveys/{survey}/unpublish', [AdminSurveyController::class, 'unpublish'])->name('surveys.unpublish');

@@ -352,4 +352,56 @@ class AssessmentController extends Controller
         return redirect()->route('participant.assessments.index')
             ->with('success', "Great job! All evaluations for '{$survey->title}' have been successfully submitted.");
     }
+
+    /**
+     * Display the confidential individual Change Quotient (CQ 1-3, CQ Sync) report.
+     * Strictly confidential for the authenticated user's self-introspection.
+     */
+    public function report(Request $request, Survey $survey): View
+    {
+        $user = $request->user();
+
+        // Check if user is a participant or has an assessment record in this survey
+        $isCohortMember = $survey->participants()->where('users.id', $user->id)->exists()
+            || Assessment::where('survey_id', $survey->id)->where(function ($q) use ($user) {
+                $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+            })->exists();
+
+        if (! $isCohortMember && ! $user->isAdmin()) {
+            abort(403, 'Unauthorized. This individual CQ report is confidential.');
+        }
+
+        $cq = $this->scoreService->calculateChangeQuotientReport($user, $survey);
+
+        return view('participant.assessments.report', [
+            'survey' => $survey,
+            'user' => $user,
+            'cq' => $cq,
+        ]);
+    }
+
+    /**
+     * Display the team-level anonymous group insights and recommendations for the survey cohort.
+     * Public to cohort members with ZERO individual names displayed.
+     */
+    public function groupInsights(Request $request, Survey $survey): View
+    {
+        $user = $request->user();
+
+        $isCohortMember = $survey->participants()->where('users.id', $user->id)->exists()
+            || Assessment::where('survey_id', $survey->id)->where(function ($q) use ($user) {
+                $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+            })->exists();
+
+        if (! $isCohortMember && ! $user->isAdmin()) {
+            abort(403, 'Unauthorized. You must belong to this survey cohort to view team insights.');
+        }
+
+        $insights = $this->scoreService->calculateGroupInsights($survey);
+
+        return view('participant.assessments.group-insights', [
+            'survey' => $survey,
+            'insights' => $insights,
+        ]);
+    }
 }

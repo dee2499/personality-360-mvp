@@ -25,6 +25,10 @@ class Survey extends Model
         'title',
         'description',
         'status',
+        'sign_off_status',
+        'sign_off_lead',
+        'sign_off_notes',
+        'signed_off_at',
         'created_by',
         'published_at',
     ];
@@ -60,6 +64,7 @@ class Survey extends Model
     {
         return [
             'published_at' => 'datetime',
+            'signed_off_at' => 'datetime',
         ];
     }
 

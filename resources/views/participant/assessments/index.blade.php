@@ -245,17 +245,23 @@
 
                         <!-- CTA Actions -->
                         <div class="shrink-0 flex flex-wrap items-center gap-2">
+                            <a href="{{ route('participant.assessments.report', $survey) }}" 
+                               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition shadow-2xs">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600"></i>
+                                <span>Confidential CQ Report</span>
+                            </a>
+
+                            <a href="{{ route('participant.surveys.group-insights', $survey) }}" 
+                               class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                                <i data-lucide="users" class="w-4 h-4 text-slate-500"></i>
+                                <span>Team Insights</span>
+                            </a>
+
                             <a href="{{ route('participant.surveys.take', $survey) }}" 
                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-100 transition">
                                 <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
                                 <span>{{ $isCompleted ? 'Review in 11-Question Wizard' : 'Take 11-Question Survey' }}</span>
                                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </a>
-
-                            <a href="{{ route('profile.show') }}" 
-                               class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
-                                <i data-lucide="user" class="w-4 h-4 text-slate-500"></i>
-                                <span>Profile Analysis</span>
                             </a>
                         </div>
                     </div>
