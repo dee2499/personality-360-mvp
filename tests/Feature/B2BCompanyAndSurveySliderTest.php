@@ -224,7 +224,7 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $person->id]);
     }
 
-    public function test_user_profile_displays_user_info_and_password_form_without_survey_meters(): void
+    public function test_user_profile_displays_three_meters_normalised_self_and_peer(): void
     {
         $company = Company::factory()->create(['name' => 'Acme Labs']);
         $admin = User::factory()->create(['role' => 'admin', 'company_id' => $company->id]);
@@ -269,9 +269,18 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $response->assertSee('Alice');
         $response->assertSee('Acme Labs');
         $response->assertSee('Change Password');
-        $response->assertDontSee('360° Survey Meters (Self vs Peers)');
-        $response->assertDontSee('Meter 1: Self Evaluation');
-        $response->assertDontSee('Meter 2: Peer Evaluations');
+
+        // Check the 3 Meters: Normalised, Self, Peer
+        $response->assertSee('Three Score Meters (Normalised, Self, Peer)');
+        $response->assertSee('Meter 1: Normalised');
+        $response->assertSee('Normalised Score');
+        $response->assertSee('82.54'); // 40% of 86.36 + 60% of 80.00
+        $response->assertSee('Meter 2: Self');
+        $response->assertSee('Self Score');
+        $response->assertSee('86.36');
+        $response->assertSee('Meter 3: Peer');
+        $response->assertSee('Peer Score');
+        $response->assertSee('80.00');
     }
 
     public function test_user_dashboard_displays_dual_meters_and_switches_between_two_surveys(): void
