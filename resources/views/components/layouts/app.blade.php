@@ -10,14 +10,33 @@
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full font-sans antialiased text-slate-800 {{ auth()->check() && auth()->user()->isAdmin() ? 'bg-slate-50' : 'flex flex-col' }}" 
+<body class="h-full font-sans antialiased text-slate-800 {{ auth()->check() ? 'bg-slate-50' : 'flex flex-col' }}" 
       x-data="{ mobileNavOpen: false }" 
       @keydown.window.escape="mobileNavOpen = false">
 
-    @if(auth()->check() && auth()->user()->isAdmin())
-        <!-- ========================================== -->
-        <!-- ADMIN LAYOUT: LEFT SIDEBAR + MAIN AREA     -->
-        <!-- ========================================== -->
+    @if(auth()->check())
+        @php
+            $isAdmin = auth()->user()->isAdmin();
+            $portalLabel = $isAdmin ? 'Admin Console' : 'Participant Portal';
+            
+            $currentSection = 'Dashboard';
+            if ($isAdmin) {
+                if (request()->routeIs('admin.dashboard')) $currentSection = 'Dashboard';
+                elseif (request()->routeIs('admin.companies.*')) $currentSection = 'Companies';
+                elseif (request()->routeIs('admin.surveys.*')) $currentSection = 'Surveys';
+                elseif (request()->routeIs('admin.people.*')) $currentSection = 'People Directory';
+                elseif (request()->routeIs('admin.assessments.*')) $currentSection = 'Assessment Matrix';
+                elseif (request()->routeIs('admin.categories.*')) $currentSection = 'Score Categories';
+                elseif (request()->routeIs('profile.*')) $currentSection = 'User Profile';
+            } else {
+                if (request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*')) $currentSection = 'My Assessments';
+                elseif (request()->routeIs('profile.*')) $currentSection = 'My Profile';
+            }
+        @endphp
+
+        <!-- ==================================================== -->
+        <!-- AUTHENTICATED LAYOUT: LEFT SIDEBAR + MOBILE DRAWER   -->
+        <!-- ==================================================== -->
 
         <!-- Mobile Off-Canvas Sidebar (Drawer) -->
         <div x-cloak x-show="mobileNavOpen" class="relative z-50 lg:hidden" role="dialog" aria-modal="true">
@@ -45,87 +64,117 @@
                     
                     <!-- Drawer Header & Close Button -->
                     <div class="flex items-center justify-between px-6 pb-4 border-b border-slate-100">
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 font-bold text-base text-slate-900">
+                        <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2.5 font-bold text-base text-slate-900">
                             <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-sm shadow-indigo-100">
                                 <i data-lucide="compass" class="w-4 h-4"></i>
                             </div>
                             <div class="flex flex-col">
                                 <span class="leading-tight tracking-tight text-slate-900 font-extrabold">Personality 360</span>
-                                <span class="text-[9px] font-bold tracking-wider uppercase text-indigo-600">Admin Console</span>
+                                <span class="text-[9px] font-bold tracking-wider uppercase text-indigo-600">{{ $portalLabel }}</span>
                             </div>
                         </a>
                         <button type="button" 
                                 @click="mobileNavOpen = false" 
-                                class="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
-                            <span class="sr-only">Close sidebar</span>
+                                class="rounded-xl p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+                                aria-label="Close menu">
                             <i data-lucide="x" class="w-5 h-5"></i>
                         </button>
                     </div>
 
-                    <!-- Navigation Links -->
+                    <!-- Navigation Links for Mobile Drawer -->
                     <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-                        <div>
-                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                Overview
+                        @if($isAdmin)
+                            <div>
+                                <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    Overview
+                                </div>
+                                <div class="space-y-1">
+                                    <a href="{{ route('admin.dashboard') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.dashboard') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                </div>
                             </div>
-                            <div class="space-y-1">
-                                <a href="{{ route('admin.dashboard') }}" 
-                                   @click="mobileNavOpen = false"
-                                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.dashboard') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                    <span>Dashboard</span>
-                                </a>
-                            </div>
-                        </div>
 
-                        <div>
-                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                Management
-                            </div>
-                            <div class="space-y-1">
-                                <a href="{{ route('admin.companies.index') }}" 
-                                   @click="mobileNavOpen = false"
-                                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                    <span>Companies</span>
-                                </a>
+                            <div>
+                                <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    Management
+                                </div>
+                                <div class="space-y-1">
+                                    <a href="{{ route('admin.companies.index') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>Companies</span>
+                                    </a>
 
-                                <a href="{{ route('admin.surveys.index') }}" 
-                                   @click="mobileNavOpen = false"
-                                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.surveys.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                    <span>Surveys</span>
-                                </a>
+                                    <a href="{{ route('admin.surveys.index') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.surveys.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>Surveys</span>
+                                    </a>
 
-                                <a href="{{ route('admin.people.index') }}" 
-                                   @click="mobileNavOpen = false"
-                                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                    <span>People Directory</span>
-                                </a>
+                                    <a href="{{ route('admin.people.index') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>People Directory</span>
+                                    </a>
 
-                                <a href="{{ route('admin.assessments.index') }}" 
-                                   @click="mobileNavOpen = false"
-                                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.assessments.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="table" class="w-4 h-4 {{ request()->routeIs('admin.assessments.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                    <span>Assessments</span>
-                                </a>
+                                    <a href="{{ route('admin.assessments.index') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.assessments.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="table" class="w-4 h-4 {{ request()->routeIs('admin.assessments.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>Assessments</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                Configuration
+                            <div>
+                                <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    Configuration
+                                </div>
+                                <div class="space-y-1">
+                                    <a href="{{ route('admin.categories.index') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="sliders-horizontal" class="w-4 h-4 {{ request()->routeIs('admin.categories.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>Categories</span>
+                                    </a>
+                                </div>
                             </div>
-                            <div class="space-y-1">
-                                <a href="{{ route('admin.categories.index') }}" 
-                                   @click="mobileNavOpen = false"
-                                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="sliders-horizontal" class="w-4 h-4 {{ request()->routeIs('admin.categories.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                    <span>Categories</span>
-                                </a>
+                        @else
+                            <div>
+                                <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    Assessments
+                                </div>
+                                <div class="space-y-1">
+                                    <a href="{{ route('participant.assessments.index') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>My Assessments</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+
+                            <div>
+                                <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    Account
+                                </div>
+                                <div class="space-y-1">
+                                    <a href="{{ route('profile.show') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('profile.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="user" class="w-4 h-4 {{ request()->routeIs('profile.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>My Profile</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Drawer Footer / Profile -->
@@ -138,7 +187,9 @@
                             </div>
                             <div class="flex flex-col text-left overflow-hidden">
                                 <span class="text-xs font-bold text-slate-800 truncate">{{ auth()->user()->name }}</span>
-                                <span class="text-[10px] text-slate-400 capitalize font-medium">Administrator</span>
+                                <span class="text-[10px] text-slate-400 capitalize font-medium">
+                                    {{ auth()->user()->company?->name ?? ($isAdmin ? 'Administrator' : 'Team Member') }}
+                                </span>
                             </div>
                         </a>
 
@@ -159,13 +210,13 @@
         <aside class="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col border-r border-slate-200 bg-white shadow-xs">
             <!-- Sidebar Brand Header -->
             <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-slate-100">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 font-bold text-lg text-slate-900 group">
+                <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2.5 font-bold text-lg text-slate-900 group">
                     <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-sm shadow-indigo-200 group-hover:bg-indigo-700 transition">
                         <i data-lucide="compass" class="w-5 h-5"></i>
                     </div>
                     <div class="flex flex-col">
                         <span class="leading-tight tracking-tight text-slate-900 font-extrabold">Personality 360</span>
-                        <span class="text-[10px] font-bold tracking-wider uppercase text-indigo-600">Admin Console</span>
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-indigo-600">{{ $portalLabel }}</span>
                     </div>
                 </a>
             </div>
@@ -173,62 +224,90 @@
             <!-- Sidebar Navigation Links -->
             <div class="flex flex-1 flex-col overflow-y-auto px-4 py-5 justify-between">
                 <nav class="space-y-6">
-                    <div>
-                        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Overview
+                    @if($isAdmin)
+                        <div>
+                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Overview
+                            </div>
+                            <div class="space-y-1">
+                                <a href="{{ route('admin.dashboard') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.dashboard') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </div>
                         </div>
-                        <div class="space-y-1">
-                            <a href="{{ route('admin.dashboard') }}" 
-                               class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.dashboard') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </div>
-                    </div>
 
-                    <div>
-                        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Management
-                        </div>
-                        <div class="space-y-1">
-                            <a href="{{ route('admin.companies.index') }}" 
-                               class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                <span>Companies</span>
-                            </a>
+                        <div>
+                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Management
+                            </div>
+                            <div class="space-y-1">
+                                <a href="{{ route('admin.companies.index') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>Companies</span>
+                                </a>
 
-                            <a href="{{ route('admin.surveys.index') }}" 
-                               class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.surveys.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                <span>Surveys</span>
-                            </a>
+                                <a href="{{ route('admin.surveys.index') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.surveys.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>Surveys</span>
+                                </a>
 
-                            <a href="{{ route('admin.people.index') }}" 
-                               class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                <span>People Directory</span>
-                            </a>
+                                <a href="{{ route('admin.people.index') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>People Directory</span>
+                                </a>
 
-                            <a href="{{ route('admin.assessments.index') }}" 
-                               class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.assessments.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <i data-lucide="table" class="w-4 h-4 {{ request()->routeIs('admin.assessments.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                <span>Assessments</span>
-                            </a>
+                                <a href="{{ route('admin.assessments.index') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.assessments.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="table" class="w-4 h-4 {{ request()->routeIs('admin.assessments.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>Assessments</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Configuration
+                        <div>
+                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Configuration
+                            </div>
+                            <div class="space-y-1">
+                                <a href="{{ route('admin.categories.index') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="sliders-horizontal" class="w-4 h-4 {{ request()->routeIs('admin.categories.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>Categories</span>
+                                </a>
+                            </div>
                         </div>
-                        <div class="space-y-1">
-                            <a href="{{ route('admin.categories.index') }}" 
-                               class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                <i data-lucide="sliders-horizontal" class="w-4 h-4 {{ request()->routeIs('admin.categories.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                <span>Categories</span>
-                            </a>
+                    @else
+                        <div>
+                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Evaluations
+                            </div>
+                            <div class="space-y-1">
+                                <a href="{{ route('participant.assessments.index') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>My Assessments</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+
+                        <div>
+                            <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                Account
+                            </div>
+                            <div class="space-y-1">
+                                <a href="{{ route('profile.show') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('profile.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="user" class="w-4 h-4 {{ request()->routeIs('profile.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>My Profile</span>
+                                </a>
+                            </div>
+                        </div>
+                    @endif
                 </nav>
 
                 <!-- Sidebar Footer User Card & Logout -->
@@ -244,7 +323,7 @@
                                 {{ auth()->user()->name }}
                             </span>
                             <span class="text-[10px] text-slate-400 truncate font-medium">
-                                Administrator
+                                {{ auth()->user()->company?->name ?? ($isAdmin ? 'Administrator' : 'Team Member') }}
                             </span>
                         </div>
                     </a>
@@ -261,7 +340,7 @@
             </div>
         </aside>
 
-        <!-- Admin Content Area (Pushed right on desktop by lg:pl-64) -->
+        <!-- Main Content Area (Pushed right on desktop by lg:pl-64) -->
         <div class="lg:pl-64 flex flex-col min-h-screen">
             <!-- Mobile Sticky Top Bar -->
             <div class="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6 lg:hidden">
@@ -272,7 +351,7 @@
                             aria-label="Open sidebar menu">
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </button>
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 font-bold text-sm text-slate-900">
+                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2 font-bold text-sm text-slate-900">
                         <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-xs">
                             <i data-lucide="compass" class="w-4 h-4"></i>
                         </div>
@@ -289,19 +368,8 @@
 
             <!-- Desktop Sticky Header Bar -->
             <header class="sticky top-0 z-30 hidden lg:flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-xs px-8">
-                @php
-                    $currentSection = 'Console';
-                    if (request()->routeIs('admin.dashboard')) $currentSection = 'Dashboard';
-                    elseif (request()->routeIs('admin.companies.*')) $currentSection = 'Companies';
-                    elseif (request()->routeIs('admin.surveys.*')) $currentSection = 'Surveys';
-                    elseif (request()->routeIs('admin.people.*')) $currentSection = 'People Directory';
-                    elseif (request()->routeIs('admin.assessments.*')) $currentSection = 'Assessment Matrix';
-                    elseif (request()->routeIs('admin.categories.*')) $currentSection = 'Score Categories';
-                    elseif (request()->routeIs('profile.*')) $currentSection = 'User Profile';
-                @endphp
-
                 <div class="flex items-center gap-2.5 text-xs">
-                    <span class="font-bold uppercase tracking-wider text-slate-400">Admin Console</span>
+                    <span class="font-bold uppercase tracking-wider text-slate-400">{{ $portalLabel }}</span>
                     <span class="text-slate-300">/</span>
                     <span class="font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100">
                         {{ $currentSection }}
@@ -320,7 +388,7 @@
                                 {{ auth()->user()->name }}
                             </span>
                             <span class="text-[10px] text-slate-400 font-medium">
-                                {{ auth()->user()->company?->name ?? 'Administrator' }}
+                                {{ auth()->user()->company?->name ?? ($isAdmin ? 'Administrator' : 'Team Member') }}
                             </span>
                         </div>
                     </a>
@@ -387,7 +455,7 @@
                 {{ $slot }}
             </main>
 
-            <!-- Admin Footer -->
+            <!-- Authenticated Footer -->
             <footer class="bg-white border-t border-slate-200 mt-auto py-5 px-4 sm:px-6 lg:px-8">
                 <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
                     <span>&copy; {{ date('Y') }} Personality 360 Assessment System. All rights reserved.</span>
@@ -405,15 +473,14 @@
 
     @else
         <!-- ========================================== -->
-        <!-- PARTICIPANT / GUEST LAYOUT: TOP NAVBAR     -->
+        <!-- GUEST LAYOUT: CLEAN MINIMAL HEADER         -->
         <!-- ========================================== -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
                     <!-- Brand / Logo -->
-                    <div class="flex items-center gap-6">
-                        <a href="{{ auth()->check() ? route('participant.assessments.index') : url('/') }}" 
-                           class="flex items-center gap-2.5 font-bold text-lg text-slate-900 group">
+                    <div class="flex items-center gap-3">
+                        <a href="{{ url('/') }}" class="flex items-center gap-2.5 font-bold text-lg text-slate-900 group">
                             <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-sm group-hover:bg-indigo-700 transition">
                                 <i data-lucide="compass" class="w-5 h-5"></i>
                             </div>
@@ -422,53 +489,19 @@
                                 <span class="text-[10px] font-semibold tracking-wider uppercase text-slate-400">Enterprise Feedback</span>
                             </div>
                         </a>
-
-                        @if(auth()->check())
-                            <nav class="hidden md:flex items-center space-x-1 pl-4 border-l border-slate-200">
-                                <a href="{{ route('participant.assessments.index') }}" 
-                                   class="px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
-                                    My Assessments
-                                </a>
-                            </nav>
-                        @endif
                     </div>
 
-                    @if(auth()->check())
-                        <!-- User Profile & Logout -->
-                        <div class="flex items-center gap-3">
-                            <a href="{{ route('profile.show') }}" 
-                               class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition {{ request()->routeIs('profile.*') ? 'bg-indigo-50 ring-1 ring-indigo-200' : '' }}"
-                               title="View Profile & Security">
-                                <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-100">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
-                                </div>
-                                <div class="hidden sm:flex flex-col text-left">
-                                    <span class="text-xs font-semibold text-slate-800 leading-tight flex items-center gap-1">
-                                        {{ auth()->user()->name }}
-                                        <i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>
-                                    </span>
-                                    <span class="text-[10px] text-slate-400 capitalize font-medium">
-                                        {{ auth()->user()->company?->name ?? ucfirst(auth()->user()->role) }}
-                                    </span>
-                                </div>
-                            </a>
-
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" 
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition cursor-pointer"
-                                        title="Sign out">
-                                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                                    <span class="hidden sm:inline">Logout</span>
-                                </button>
-                            </form>
-                        </div>
-                    @endif
+                    <div>
+                        <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition">
+                            <span>Sign In</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Flash Messages & Global Errors -->
+        <!-- Flash Messages & Global Errors for Guests -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
             @if($errors->any())
                 <div class="mb-4 p-4 text-sm text-rose-800 rounded-2xl bg-rose-50 border border-rose-200 shadow-xs" role="alert">
@@ -491,45 +524,23 @@
                 </div>
             @endif
 
-            @if(session('warning'))
-                <div class="mb-4 flex items-center gap-3 p-4 text-sm text-amber-800 rounded-xl bg-amber-50 border border-amber-200 shadow-xs" role="alert">
-                    <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0"></i>
-                    <div class="font-medium">{{ session('warning') }}</div>
-                </div>
-            @endif
-
             @if(session('error'))
                 <div class="mb-4 flex items-center gap-3 p-4 text-sm text-rose-800 rounded-xl bg-rose-50 border border-rose-200 shadow-xs" role="alert">
                     <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600 shrink-0"></i>
                     <div class="font-medium">{{ session('error') }}</div>
                 </div>
             @endif
-
-            @if(session('info'))
-                <div class="mb-4 flex items-center gap-3 p-4 text-sm text-sky-800 rounded-xl bg-sky-50 border border-sky-200 shadow-xs" role="alert">
-                    <i data-lucide="info" class="w-5 h-5 text-sky-600 shrink-0"></i>
-                    <div class="font-medium">{{ session('info') }}</div>
-                </div>
-            @endif
         </div>
 
-        <!-- Main Page Content -->
+        <!-- Main Page Content for Guests -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {{ $slot }}
         </main>
 
-        <!-- Footer -->
+        <!-- Guest Footer -->
         <footer class="bg-white border-t border-slate-200 mt-auto py-6">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
                 <span>&copy; {{ date('Y') }} Personality 360 Assessment System. All rights reserved.</span>
-                <span class="flex items-center gap-2">
-                    <span>Categories:</span>
-                    <span class="inline-flex items-center gap-1 font-medium">🍏 Apple (0-20%)</span>
-                    <span class="inline-flex items-center gap-1 font-medium">🍊 Orange (>20-40%)</span>
-                    <span class="inline-flex items-center gap-1 font-medium">🍅 Tomato (>40-60%)</span>
-                    <span class="inline-flex items-center gap-1 font-medium">🍋 Lemon (>60-80%)</span>
-                    <span class="inline-flex items-center gap-1 font-medium">🥒 Cucumber (>80-100%)</span>
-                </span>
             </div>
         </footer>
     @endif

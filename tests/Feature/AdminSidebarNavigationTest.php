@@ -45,7 +45,7 @@ class AdminSidebarNavigationTest extends TestCase
         $response->assertSee('Categories');
     }
 
-    public function test_participant_does_not_see_admin_sidebar_navigation(): void
+    public function test_participant_sees_participant_sidebar_and_mobile_menu(): void
     {
         $company = Company::factory()->create();
         $participant = User::factory()->create([
@@ -56,9 +56,22 @@ class AdminSidebarNavigationTest extends TestCase
         $response = $this->actingAs($participant)->get(route('participant.assessments.index'));
         $response->assertOk();
 
+        // Check Brand & Participant Portal
+        $response->assertSee('Participant Portal');
+        $response->assertSee('Personality 360');
+
+        // Check Mobile Menu Toggle Button
+        $response->assertSee('Open sidebar menu');
+
+        // Check Navigation Links
+        $response->assertSee(route('participant.assessments.index'));
+        $response->assertSee(route('profile.show'));
+        $response->assertSee('My Assessments');
+        $response->assertSee('My Profile');
+
+        // Ensure Admin items are not rendered
         $response->assertDontSee('Admin Console');
         $response->assertDontSee(route('admin.companies.index'));
         $response->assertDontSee(route('admin.categories.index'));
-        $response->assertSee('My Assessments');
     }
 }
