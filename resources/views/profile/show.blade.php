@@ -120,7 +120,7 @@
                                                 Meter 1: Normalised
                                             </span>
                                             <h4 class="text-sm font-black text-slate-900 mt-1">Normalised Score</h4>
-                                            <p class="text-[10px] text-slate-400">40% Self + 60% Peer Consensus</p>
+                                            <p class="text-[10px] text-slate-400">Moderated: (Self + Peer Average) / 2</p>
                                         </div>
                                         <span class="text-xl">{{ $norm['emoji'] }}</span>
                                     </div>

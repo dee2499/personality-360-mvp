@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Assessment;
 use App\Models\Company;
+use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
