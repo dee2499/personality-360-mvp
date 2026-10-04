@@ -430,6 +430,36 @@ class AssessmentController extends Controller
     }
 
     /**
+     * Entry point for the "CQ Report" user tab.
+     * Automatically resolves the requested or active survey for the logged-in user.
+     */
+    public function showReport(Request $request): View|RedirectResponse
+    {
+        $user = $request->user();
+        $surveyId = $request->query('survey_id');
+
+        $survey = null;
+        if ($surveyId) {
+            $survey = Survey::find($surveyId);
+        }
+
+        if (! $survey) {
+            $survey = $user->surveys()->where('status', 'published')->latest('published_at')->first()
+                ?? Survey::whereHas('assessments', function ($q) use ($user) {
+                    $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+                })->latest()->first()
+                ?? Survey::where('status', 'published')->latest()->first();
+        }
+
+        if (! $survey) {
+            return redirect()->route('participant.assessments.index')
+                ->with('info', 'No active surveys assigned to generate a CQ Report.');
+        }
+
+        return $this->report($request, $survey);
+    }
+
+    /**
      * Display the confidential individual Change Quotient (CQ 1-3, CQ Sync) report.
      * Strictly confidential for the authenticated user's self-introspection.
      */
@@ -449,10 +479,18 @@ class AssessmentController extends Controller
 
         $cq = $this->scoreService->calculateChangeQuotientReport($user, $survey);
 
+        $availableSurveys = $user->surveys()->where('status', 'published')->get();
+        if ($availableSurveys->isEmpty()) {
+            $availableSurveys = Survey::whereHas('assessments', function ($q) use ($user) {
+                $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+            })->get();
+        }
+
         return view('participant.assessments.report', [
             'survey' => $survey,
             'user' => $user,
             'cq' => $cq,
+            'availableSurveys' => $availableSurveys,
         ]);
     }
 

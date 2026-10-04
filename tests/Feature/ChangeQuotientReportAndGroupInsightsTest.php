@@ -275,4 +275,133 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $response->assertSee(route('admin.surveys.group-insights', $data['survey']));
         $response->assertSee('Group Insights & Sign-Off', false);
     }
+
+    public function test_participant_can_access_cq_report_via_user_tab_route(): void
+    {
+        $data = $this->setupSurveyWithParticipants();
+
+        $response = $this->actingAs($data['alice'])->get(route('participant.cq-report'));
+        $response->assertOk();
+
+        // 1. Navigation sidebar and brand
+        $response->assertSee('CQ Report');
+        $response->assertSee('My Assessments');
+        $response->assertSee('changequo', false);
+        $response->assertSee('INDIVIDUAL CQ REPORT');
+
+        // 2. Profile Speedometer & Categories
+        $response->assertSee('Your ChangeQuo Profile');
+        $response->assertSee('Score is on a scale of 1 – 10');
+        $response->assertSee('Resistant');
+        $response->assertSee('Follower');
+        $response->assertSee('Supporter');
+        $response->assertSee('Driver');
+        $response->assertSee('Champion');
+
+        // 3. Two confidential score cards
+        $response->assertSee('Your Self Score');
+        $response->assertSee('Peer Score (Average)');
+        $response->assertSee('Confidential');
+
+        // 4. Self vs Peer Insight 2x2 Matrix & Quadrants
+        $response->assertSee('Self vs Peer Insight');
+        $response->assertSee('Undervalued Potential');
+        $response->assertSee('Aligned Strength');
+        $response->assertSee('Key Development Area');
+        $response->assertSee('Perception Gap');
+
+        // 5. Key Insights & Top 3 Recommended Actions
+        $response->assertSee('Key Insights');
+        $response->assertSee('Your Strengths');
+        $response->assertSee('Development Areas');
+        $response->assertSee('Your Top 3 Recommended Actions');
+        $response->assertSee('Increase Visibility and Communication');
+        $response->assertSee('Seek and Leverage Support');
+        $response->assertSee('Enable and Develop Others');
+    }
+
+    public function test_cq_report_renders_driver_profile_and_perception_gap_for_self_8_1_and_peer_6_4(): void
+    {
+        $company = Company::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin', 'company_id' => $company->id]);
+        $alex = User::factory()->create(['name' => 'Alex Driver', 'role' => 'participant', 'company_id' => $company->id]);
+        $peer1 = User::factory()->create(['role' => 'participant', 'company_id' => $company->id]);
+
+        $survey = Survey::create([
+            'company_id' => $company->id,
+            'title' => 'Alex CQ Evaluation Survey',
+            'status' => 'published',
+            'published_at' => now(),
+            'created_by' => $admin->id,
+        ]);
+        $survey->participants()->attach([$alex->id, $peer1->id]);
+
+        // 10 questions with 8 and 1 with 9 (average = 8.1)
+        // Peer ratings: 9 with 6 and 2 with 8 (average = 6.4)
+        // Moderated scores: (8+6)/2 = 7.0 for 9 questions, (8+8)/2 = 8.0, (9+8)/2 = 8.5
+        // Total moderated avg = 6.9 -> Driver category (6.1 - 8.0)
+        $questions = [];
+        for ($i = 1; $i <= 11; $i++) {
+            $questions[] = Question::create([
+                'survey_id' => $survey->id,
+                'question_text' => "Question {$i}",
+                'sort_order' => $i,
+                'is_active' => true,
+            ]);
+        }
+
+        // Alex self ratings: 10 x 8, 1 x 9 -> Avg = 8.1
+        $selfAssessment = Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $alex->id,
+            'subject_id' => $alex->id,
+            'status' => 'completed',
+            'started_at' => now(),
+            'completed_at' => now(),
+            'total_score' => 89,
+            'max_score' => 110,
+            'percentage' => 80.9,
+            'category' => 'Initiator',
+        ]);
+        for ($i = 0; $i < 11; $i++) {
+            $score = ($i === 0) ? 9 : 8;
+            AssessmentAnswer::create(['assessment_id' => $selfAssessment->id, 'question_id' => $questions[$i]->id, 'score' => $score]);
+        }
+
+        // Peer ratings: 9 x 6, 2 x 8 -> 54 + 16 = 70 / 11 = 6.4
+        $peerAssessment = Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $peer1->id,
+            'subject_id' => $alex->id,
+            'status' => 'completed',
+            'started_at' => now(),
+            'completed_at' => now(),
+            'total_score' => 70,
+            'max_score' => 110,
+            'percentage' => 63.6,
+            'category' => 'Initiator',
+        ]);
+        for ($i = 0; $i < 11; $i++) {
+            $score = ($i < 2) ? 8 : 6;
+            AssessmentAnswer::create(['assessment_id' => $peerAssessment->id, 'question_id' => $questions[$i]->id, 'score' => $score]);
+        }
+
+        $response = $this->actingAs($alex)->get(route('participant.assessments.report', $survey));
+        $response->assertOk();
+
+        // Check Change Driver profile details
+        $response->assertSee('Alex Driver');
+        $response->assertSee('Change Driver');
+        $response->assertSee('Driver');
+        $response->assertSee('6.1 – 8.0');
+        $response->assertSee('6.9'); // Overall CQ score
+
+        // Check Self and Peer score donut cards
+        $response->assertSee('8.1');
+        $response->assertSee('6.4');
+
+        // Check Perception Gap diagnosis
+        $response->assertSee('Perception Gap');
+        $response->assertSee('You see yourself stronger than others currently experience');
+    }
 }

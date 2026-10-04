@@ -50,6 +50,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-assessments', [ParticipantAssessmentController::class, 'index'])
         ->name('participant.assessments.index');
 
+    // Direct CQ Report User Tab
+    Route::get('/my-cq-report', [ParticipantAssessmentController::class, 'showReport'])
+        ->name('participant.cq-report');
+
     // Confidential Individual Change Quotient (CQ 1-3, CQ Sync) Report
     Route::get('/my-assessments/reports/{survey}', [ParticipantAssessmentController::class, 'report'])
         ->name('participant.assessments.report');

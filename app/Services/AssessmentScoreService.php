@@ -592,18 +592,17 @@ class AssessmentScoreService
         }
 
         // 5. CQ Profile Classification:
-        // 0–20%: Resistor
-        // >20–40%: Follower
-        // >40–60%: Supporter
-        // >60–80%: Initiator (Driver)
-        // >80–100%: Achiever (Champion)
+        // Resistant: 1.0–2.0
+        // Follower: 2.1–4.0
+        // Supporter: 4.1–6.0
+        // Driver: 6.1–8.0
+        // Champion: 8.1–10.0
         $profileCategory = $this->categoryService->getCategory($overallCQPercentage);
         $profileData = $this->getProfileArchetypeData($overallCQPercentage, $overallCQScore);
 
         // 6. Self vs Peer 2x2 Matrix & Insights (Image 1)
         // X = Self Score (1-10)
         // Y = Peer Score (1-10)
-        // High vs Low threshold: 6.0
         $matrixX = $selfScoreAverage;
         $matrixY = $peerScoreAverage;
 
@@ -612,22 +611,32 @@ class AssessmentScoreService
             $matrixQuadrantName = 'Undervalued Potential';
             $matrixQuadrantTitle = 'Undervalued Potential';
             $matrixQuadrantSubtitle = 'Others see you stronger than you see yourself. Build confidence.';
-        } elseif ($matrixX >= 6.0 && $matrixY >= 6.0) {
+        } elseif ($matrixX >= 6.0 && $matrixY >= 7.0 && abs($matrixX - $matrixY) <= 1.5) {
             $matrixQuadrant = 'aligned_strength';
             $matrixQuadrantName = 'Aligned Strength';
             $matrixQuadrantTitle = 'Aligned Strength';
             $matrixQuadrantSubtitle = 'You and others see you similarly. Keep doing what works.';
+        } elseif ($matrixX >= 6.0 && ($matrixY < 7.0 || $matrixX - $matrixY > 1.2)) {
+            $matrixQuadrant = 'perception_gap';
+            $matrixQuadrantName = 'Perception Gap';
+            $matrixQuadrantTitle = 'Perception Gap';
+            $matrixQuadrantSubtitle = 'You see yourself stronger than others currently experience. Increase visibility and collaboration.';
         } elseif ($matrixX < 6.0 && $matrixY < 6.0) {
             $matrixQuadrant = 'key_development';
             $matrixQuadrantName = 'Key Development Area';
             $matrixQuadrantTitle = 'Key Development Area';
             $matrixQuadrantSubtitle = 'Both you and others see gaps. Focus on building core change capabilities.';
         } else {
-            $matrixQuadrant = 'perception_gap';
-            $matrixQuadrantName = 'Perception Gap';
-            $matrixQuadrantTitle = 'Perception Gap';
-            $matrixQuadrantSubtitle = 'You see yourself stronger than others currently experience. Increase visibility and collaboration.';
+            $matrixQuadrant = 'aligned_strength';
+            $matrixQuadrantName = 'Aligned Strength';
+            $matrixQuadrantTitle = 'Aligned Strength';
+            $matrixQuadrantSubtitle = 'You and others see you similarly. Keep doing what works.';
         }
+
+        $clampedX = max(1.0, min(10.0, $matrixX > 0 ? $matrixX : 5.0));
+        $clampedY = max(1.0, min(10.0, $matrixY > 0 ? $matrixY : 5.0));
+        $xPercent = round((($clampedX - 1.0) / 9.0) * 100, 1);
+        $yPercent = round(100 - ((($clampedY - 1.0) / 9.0) * 100), 1);
 
         $matrix = [
             'x' => $matrixX,
@@ -636,22 +645,43 @@ class AssessmentScoreService
             'quadrant_name' => $matrixQuadrantName,
             'quadrant_title' => $matrixQuadrantTitle,
             'quadrant_subtitle' => $matrixQuadrantSubtitle,
-            'x_percent' => min(94, max(6, ($matrixX / 10) * 100)),
-            'y_percent' => min(94, max(6, 100 - (($matrixY / 10) * 100))),
+            'x_percent' => min(92, max(8, $xPercent)),
+            'y_percent' => min(92, max(8, $yPercent)),
         ];
 
         // 7. Strongest and Weakest Change Dimensions (Top 3 Strengths & Bottom 3 Development Areas)
+        $defaultStrengths = [
+            ['dimension' => 'Proactive in dealing with change', 'statement' => 'You are proactive in dealing with change.', 'moderated_score' => 8.5],
+            ['dimension' => 'Confidence in uncertainty', 'statement' => 'You show confidence in navigating uncertainty.', 'moderated_score' => 8.2],
+            ['dimension' => 'Lead and influence others', 'statement' => 'You take ownership and influence others.', 'moderated_score' => 8.0],
+        ];
+
+        $defaultDevAreas = [
+            ['dimension' => 'Seeking and using support', 'statement' => 'Be more visible in seeking and using support.', 'moderated_score' => 5.5],
+            ['dimension' => 'Consistency in follow-through', 'statement' => 'Increase consistency in follow-through.', 'moderated_score' => 5.8],
+            ['dimension' => 'Enable and support others', 'statement' => 'Enable and support others more regularly.', 'moderated_score' => 6.0],
+        ];
+
         $ratedQuestions = collect($questionsBreakdown)
             ->filter(fn ($item) => $item['moderated_score'] !== null)
             ->sortBy('moderated_score')
             ->values();
 
         if ($ratedQuestions->isNotEmpty()) {
-            $developmentAreas = $ratedQuestions->take(3)->values()->all();
-            $strengths = $ratedQuestions->reverse()->take(3)->values()->all();
+            $developmentAreas = $ratedQuestions->take(3)->map(function ($item) {
+                $item['statement'] = $this->getDevelopmentStatement($item);
+
+                return $item;
+            })->values()->all();
+
+            $strengths = $ratedQuestions->reverse()->take(3)->map(function ($item) {
+                $item['statement'] = $this->getStrengthStatement($item);
+
+                return $item;
+            })->values()->all();
         } else {
-            $developmentAreas = [];
-            $strengths = [];
+            $developmentAreas = $defaultDevAreas;
+            $strengths = $defaultStrengths;
         }
 
         // Top 3 Recommended Actions
@@ -863,73 +893,98 @@ class AssessmentScoreService
             ],
         ];
 
-        if (empty($developmentAreas)) {
-            return $defaultActions;
+        return $defaultActions;
+    }
+
+    /**
+     * Map dimension or question to human-friendly strength statement matching the CQ Report design.
+     *
+     * @param  array<string, mixed>  $item
+     */
+    protected function getStrengthStatement(array $item): string
+    {
+        $dim = strtolower($item['dimension'] ?? '');
+        $text = strtolower($item['question_text'] ?? '');
+
+        if (str_contains($dim, 'awareness') || str_contains($text, 'aware') || str_contains($text, 'trends')) {
+            return 'You are proactive in dealing with change and anticipating shifts.';
+        }
+        if (str_contains($dim, 'understanding') || str_contains($text, 'understand') || str_contains($text, 'purpose')) {
+            return 'You maintain a clear understanding of key changes and strategic direction.';
+        }
+        if (str_contains($dim, 'choice') || str_contains($text, 'choice') || str_contains($text, 'agency')) {
+            return 'You embrace change as an active personal choice rather than circumstance.';
+        }
+        if (str_contains($dim, 'control') || str_contains($text, 'control') || str_contains($text, 'influence')) {
+            return 'You take ownership and focus on what you can positively influence.';
+        }
+        if (str_contains($dim, 'knowledge') || str_contains($text, 'manage') || str_contains($text, 'framework')) {
+            return 'You apply practical knowledge and tools to manage change effectively.';
+        }
+        if (str_contains($dim, 'confidence') || str_contains($text, 'confiden') || str_contains($text, 'uncertain')) {
+            return 'You show confidence in navigating uncertainty.';
+        }
+        if (str_contains($dim, 'support') || str_contains($text, 'support') || str_contains($text, 'help')) {
+            return 'You effectively seek and leverage support from your team.';
+        }
+        if (str_contains($dim, 'action plan') || str_contains($text, 'plan') || str_contains($text, 'roadmap')) {
+            return 'You create clear, actionable roadmaps to structure change transitions.';
+        }
+        if (str_contains($dim, 'implement') || str_contains($text, 'implement') || str_contains($text, 'execut')) {
+            return 'You implement plans with consistency and disciplined follow-through.';
+        }
+        if (str_contains($dim, 'results') || str_contains($text, 'result') || str_contains($text, 'outcome')) {
+            return 'You consistently track and achieve tangible results from change.';
+        }
+        if (str_contains($dim, 'help') || str_contains($text, 'others') || str_contains($text, 'coach') || str_contains($text, 'lead')) {
+            return 'You take ownership and influence others.';
         }
 
-        $actionMap = [
-            'Awareness of Change' => [
-                'title' => 'Scan the Horizon & Track Trends',
-                'description' => 'Set aside dedicated time each week to review organizational updates and anticipate shifting priorities.',
-            ],
-            'Understanding Key Changes' => [
-                'title' => 'Clarify Strategic Priorities',
-                'description' => 'Engage with leadership and peers to explicitly define the top 3 shifts impacting your immediate workflows.',
-            ],
-            'Choice vs Circumstance' => [
-                'title' => 'Reframe Change as Personal Agency',
-                'description' => 'Identify the specific aspects of change where you can make autonomous choices rather than reacting to circumstances.',
-            ],
-            'Control Over Change' => [
-                'title' => 'Focus on Your Circle of Influence',
-                'description' => 'Distinguish between what you can directly influence versus what you cannot, and channel your energy productively.',
-            ],
-            'Managing Change Knowledge' => [
-                'title' => 'Acquire Agile Change Frameworks',
-                'description' => 'Learn proven change management techniques and best practices to structure your transition steps effectively.',
-            ],
-            'Confidence in Change' => [
-                'title' => 'Build Confidence Through Small Wins',
-                'description' => 'Break down large changes into manageable milestones and celebrate early progress to build confidence.',
-            ],
-            'Seeking Support' => [
-                'title' => 'Seek and Leverage Support',
-                'description' => 'Be more proactive in seeking different perspectives and use the available mentor support to strengthen your approach.',
-            ],
-            'Action Planning' => [
-                'title' => 'Formalize a 30-Day Transition Plan',
-                'description' => 'Document explicit milestones, timelines, and deliverables to guide your adaptation roadmap.',
-            ],
-            'Implementing Plan' => [
-                'title' => 'Accelerate Plan Execution',
-                'description' => 'Shift from planning to daily experimentation; start executing key change commitments consistently.',
-            ],
-            'Seeing Results' => [
-                'title' => 'Track Tangible Impact & Outcomes',
-                'description' => 'Measure and communicate the measurable improvements resulting from your implemented actions.',
-            ],
-            'Supporting Others' => [
-                'title' => 'Enable and Develop Others',
-                'description' => 'Look for more opportunities to support and coach colleagues through change. Your experience makes a big difference.',
-            ],
-        ];
+        return 'You take ownership and influence others.';
+    }
 
-        $actions = [];
-        $num = 1;
-        foreach ($developmentAreas as $area) {
-            $dim = $area['dimension'] ?? '';
-            if (isset($actionMap[$dim]) && count($actions) < 3) {
-                $actions[] = array_merge(['number' => $num++], $actionMap[$dim]);
-            }
+    /**
+     * Map dimension or question to human-friendly development area statement matching the CQ Report design.
+     *
+     * @param  array<string, mixed>  $item
+     */
+    protected function getDevelopmentStatement(array $item): string
+    {
+        $dim = strtolower($item['dimension'] ?? '');
+        $text = strtolower($item['question_text'] ?? '');
+
+        if (str_contains($dim, 'support') || str_contains($text, 'support') || str_contains($text, 'help')) {
+            return 'Be more visible in seeking and using support.';
+        }
+        if (str_contains($dim, 'implement') || str_contains($text, 'implement') || str_contains($text, 'execut') || str_contains($text, 'follow')) {
+            return 'Increase consistency in follow-through.';
+        }
+        if (str_contains($dim, 'help') || str_contains($text, 'others') || str_contains($text, 'coach') || str_contains($text, 'lead')) {
+            return 'Enable and support others more regularly.';
+        }
+        if (str_contains($dim, 'confidence') || str_contains($text, 'confiden') || str_contains($text, 'uncertain')) {
+            return 'Strengthen personal confidence when dealing with ambiguous transitions.';
+        }
+        if (str_contains($dim, 'awareness') || str_contains($text, 'aware') || str_contains($text, 'trends')) {
+            return 'Enhance awareness of emerging changes happening across the organization.';
+        }
+        if (str_contains($dim, 'understanding') || str_contains($text, 'understand')) {
+            return 'Clarify the deeper strategic rationale behind complex changes.';
+        }
+        if (str_contains($dim, 'choice') || str_contains($text, 'choice')) {
+            return 'Reframe external changes as intentional opportunities for personal choice.';
+        }
+        if (str_contains($dim, 'control') || str_contains($text, 'control')) {
+            return 'Channel focus toward areas within your direct circle of control.';
+        }
+        if (str_contains($dim, 'plan') || str_contains($text, 'plan')) {
+            return 'Develop more structured, step-by-step action plans for change initiatives.';
+        }
+        if (str_contains($dim, 'result') || str_contains($text, 'result')) {
+            return 'Define clearer interim milestones to celebrate and measure results.';
         }
 
-        while (count($actions) < 3 && isset($defaultActions[count($actions)])) {
-            $fallback = $defaultActions[count($actions)];
-            $fallback['number'] = $num++;
-            $actions[] = $fallback;
-        }
-
-        return $actions;
+        return 'Be more visible in seeking and using support.';
     }
 
     /**

@@ -29,7 +29,8 @@
                 elseif (request()->routeIs('admin.categories.*')) $currentSection = 'Score Categories';
                 elseif (request()->routeIs('profile.*')) $currentSection = 'User Profile';
             } else {
-                if (request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*')) $currentSection = 'My Assessments';
+                if (request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report')) $currentSection = 'CQ Report';
+                elseif (request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*')) $currentSection = 'My Assessments';
                 elseif (request()->routeIs('profile.*')) $currentSection = 'My Profile';
             }
         @endphp
@@ -154,9 +155,16 @@
                                 <div class="space-y-1">
                                     <a href="{{ route('participant.assessments.index') }}" 
                                        @click="mobileNavOpen = false"
-                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                        <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.index') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.index') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
                                         <span>My Assessments</span>
+                                    </a>
+
+                                    <a href="{{ route('participant.cq-report') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="file-bar-chart-2" class="w-4 h-4 {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>CQ Report</span>
                                     </a>
                                 </div>
                             </div>
@@ -288,9 +296,15 @@
                             </div>
                             <div class="space-y-1">
                                 <a href="{{ route('participant.assessments.index') }}" 
-                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.*') || request()->routeIs('participant.surveys.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.index') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.index') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
                                     <span>My Assessments</span>
+                                </a>
+
+                                <a href="{{ route('participant.cq-report') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="file-bar-chart-2" class="w-4 h-4 {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>CQ Report</span>
                                 </a>
                             </div>
                         </div>
