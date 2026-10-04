@@ -82,8 +82,34 @@ class AssessmentController extends Controller
             $completed = $surveyAssessments->where('status', 'completed')->count();
             $total = $surveyAssessments->count();
 
-            // Dual Meters (Self vs Peer) for this survey
+            // Three Score Meters (Normalised, Self, Peer)
             $dualMeters = $this->scoreService->calculateSelfAndPeerScores($user, $survey);
+            $selfPct = (float) ($dualMeters['self']['percentage'] ?? 0.0);
+            $peerPct = (float) ($dualMeters['peer']['percentage'] ?? 0.0);
+            $hasBoth = $dualMeters['self']['is_completed'] && (($dualMeters['peer']['completed_count'] ?? 0) > 0);
+
+            if ($hasBoth) {
+                $normPct = round(($selfPct + $peerPct) / 2, 2);
+            } elseif ($dualMeters['self']['is_completed']) {
+                $normPct = $selfPct;
+            } elseif (($dualMeters['peer']['completed_count'] ?? 0) > 0) {
+                $normPct = $peerPct;
+            } else {
+                $normPct = 0.0;
+            }
+
+            $normCategory = $this->categoryService->getCategory($normPct);
+            $normalised = [
+                'name' => 'CQ 3 (Normalised)',
+                'label' => 'Calibrated Change Quotient',
+                'percentage' => $normPct,
+                'score' => round($normPct / 10, 1),
+                'category' => $normCategory,
+                'emoji' => $this->categoryService->getEmoji($normCategory),
+                'color' => $this->categoryService->getColorHex($normCategory),
+                'badge' => $this->categoryService->getBadgeClass($normCategory),
+                'gap' => $dualMeters['comparison']['gap'] ?? 0.0,
+            ];
 
             // Subjects list (self first, then colleagues)
             $cohortMembers = $survey->participants()
@@ -99,6 +125,7 @@ class AssessmentController extends Controller
                 'isCompleted' => $isCompleted,
                 'completedCount' => $completed,
                 'totalCount' => $total,
+                'normalised' => $normalised,
                 'self' => $dualMeters['self'],
                 'peer' => $dualMeters['peer'],
                 'comparison' => $dualMeters['comparison'],

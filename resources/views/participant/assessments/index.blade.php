@@ -196,6 +196,7 @@
                 @php
                     $survey = $selectedGroup['survey'];
                     $isCompleted = $selectedGroup['isCompleted'];
+                    $norm = $selectedGroup['normalised'] ?? ($selectedGroup['cq']['cq3'] ?? null);
                     $self = $selectedGroup['self'];
                     $peer = $selectedGroup['peer'];
                     $comparison = $selectedGroup['comparison'];
@@ -266,50 +267,83 @@
                         </div>
                     </div>
 
-                    <!-- TWO METERS SECTION (Self-Assessment Meter vs Peer-Assessment Meter) -->
+                    <!-- THREE SCORE METERS (Normalised, Self, Peer) -->
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div>
                                 <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
-                                    Dual-Meter Benchmark
+                                    360° Assessment Performance
                                 </span>
-                                <h3 class="text-lg font-black text-slate-900 mt-1">
-                                    Self-Assessment Meter vs. Peer-Assessment Meter
+                                <h3 class="text-xl font-black text-slate-900 mt-1">
+                                    Three Score Meters (Normalised, Self, Peer)
                                 </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">
+                                    Your calibrated benchmark alongside personal and observer consensus ratings.
+                                </p>
                             </div>
-                            <span class="text-xs text-slate-400">Scale: 0% to 100%</span>
+                            <span class="text-xs text-slate-400 font-medium">Scale: 0% to 100%</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                            <!-- Meter 1: Self Assessed Meter -->
-                            <div class="bg-gradient-to-b from-indigo-50/40 to-white rounded-3xl border border-indigo-100 p-6 flex flex-col justify-between items-center text-center shadow-xs">
-                                <div class="w-full text-left flex items-start justify-between gap-2 mb-2">
-                                    <div>
-                                        <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/80 px-2.5 py-0.5 rounded-md">
-                                            Meter 1: Self Evaluation
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                            <!-- Meter 1: Normalised Meter -->
+                            <div class="bg-gradient-to-b from-indigo-50/40 via-white to-white rounded-3xl border-2 border-indigo-200 p-5 flex flex-col justify-between items-center text-center space-y-4 shadow-2xs relative">
+                                <div class="w-full flex items-center justify-between">
+                                    <div class="text-left">
+                                        <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-md">
+                                            Meter 1: Normalised
                                         </span>
-                                        <h4 class="text-base font-black text-slate-900 mt-1.5">
-                                            Personal Assessment
-                                        </h4>
-                                        <p class="text-xs text-slate-400">
-                                            How you rated your own competencies in this survey
-                                        </p>
+                                        <h4 class="text-base font-black text-slate-900 mt-1.5">Normalised Score</h4>
+                                        <p class="text-[10px] text-slate-400">Moderated: (Self + Peer Average) / 2</p>
                                     </div>
-
-                                    @if($self['is_completed'])
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-                                            <i data-lucide="check" class="w-3 h-3 text-emerald-600"></i>
-                                            Rated
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
-                                            Pending
-                                        </span>
-                                    @endif
+                                    <span class="text-2xl">{{ $norm['emoji'] ?? '🎯' }}</span>
                                 </div>
 
-                                <!-- Visual Gauge Needle -->
-                                <div class="w-full my-auto py-2">
+                                <!-- Gauge -->
+                                <div class="w-full max-w-[200px] my-auto py-2">
+                                    <x-score-meter 
+                                        :percentage="$norm['percentage'] ?? 0" 
+                                        :category="$norm['category'] ?? 'Supporter'" 
+                                        :only-gauge="true"
+                                    />
+                                </div>
+
+                                <!-- Score Numbers Box -->
+                                <div class="w-full pt-4 border-t border-indigo-100/70 space-y-2">
+                                    <div class="flex items-baseline justify-center gap-1">
+                                        <span class="text-3xl sm:text-4xl font-black tracking-tight text-indigo-950 leading-none">
+                                            {{ number_format($norm['percentage'] ?? 0, 2) }}
+                                        </span>
+                                        <span class="text-lg font-bold text-slate-400">%</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-center gap-2 flex-wrap">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-2xs {{ $norm['badge'] ?? 'bg-indigo-50 text-indigo-700 border-indigo-200' }}">
+                                            <span>{{ $norm['category'] ?? 'Supporter' }}</span>
+                                        </span>
+                                        @if(isset($norm['gap']))
+                                            <span class="text-[10px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                                                Gap: {{ $norm['gap'] > 0 ? '+' : '' }}{{ $norm['gap'] }}%
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Meter 2: Self Meter -->
+                            <div class="bg-gradient-to-b from-slate-50/80 via-white to-white rounded-3xl border border-slate-200 p-5 flex flex-col justify-between items-center text-center space-y-4 shadow-2xs">
+                                <div class="w-full flex items-center justify-between">
+                                    <div class="text-left">
+                                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                                            Meter 2: Self
+                                        </span>
+                                        <h4 class="text-base font-black text-slate-900 mt-1.5">Self Score</h4>
+                                        <p class="text-[10px] text-slate-400">Meter 1: Self Evaluation</p>
+                                    </div>
+                                    <span class="text-2xl">{{ $self['category_emoji'] ?? $self['emoji'] ?? '👤' }}</span>
+                                </div>
+
+                                <!-- Gauge -->
+                                <div class="w-full max-w-[200px] my-auto py-2">
                                     <x-score-meter 
                                         :percentage="$self['percentage']" 
                                         :category="$self['category']" 
@@ -318,49 +352,42 @@
                                 </div>
 
                                 <!-- Score Numbers Box -->
-                                <div class="w-full pt-4 border-t border-indigo-100/70 space-y-3">
+                                <div class="w-full pt-4 border-t border-slate-100 space-y-2">
                                     <div class="flex items-baseline justify-center gap-1">
-                                        <span class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                                        <span class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 leading-none">
                                             {{ number_format($self['percentage'], 2) }}
                                         </span>
-                                        <span class="text-xl font-bold text-slate-400">%</span>
+                                        <span class="text-lg font-bold text-slate-400">%</span>
                                     </div>
 
                                     <div class="flex items-center justify-center gap-2 flex-wrap">
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs {{ $self['category_badge'] }}">
-                                            <span class="text-sm">{{ $self['category_emoji'] }}</span>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-2xs {{ $self['category_badge'] ?? $self['badge'] }}">
                                             <span>{{ $self['category'] }}</span>
                                         </span>
-
-                                        <span class="text-xs font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                                            {{ $self['score'] }} / {{ $self['max_score'] }} pts
-                                        </span>
+                                        @if($self['is_completed'] && isset($self['score']))
+                                            <span class="text-[10px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                                                {{ $self['score'] }} / {{ $self['max_score'] }} pts
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Meter 2: Peer Assessed Meter -->
-                            <div class="bg-gradient-to-b from-teal-50/40 to-white rounded-3xl border border-teal-100 p-6 flex flex-col justify-between items-center text-center shadow-xs">
-                                <div class="w-full text-left flex items-start justify-between gap-2 mb-2">
-                                    <div>
-                                        <span class="text-[10px] font-black uppercase tracking-wider text-teal-800 bg-teal-100/80 px-2.5 py-0.5 rounded-md">
-                                            Meter 2: Peer Feedback
+                            <!-- Meter 3: Peer Meter -->
+                            <div class="bg-gradient-to-b from-emerald-50/30 via-white to-white rounded-2xl border border-emerald-200/80 p-5 flex flex-col justify-between items-center text-center space-y-4 shadow-2xs">
+                                <div class="w-full flex items-center justify-between">
+                                    <div class="text-left">
+                                        <span class="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                            Meter 3: Peer
                                         </span>
-                                        <h4 class="text-base font-black text-slate-900 mt-1.5">
-                                            Peer-Assessed Rating
-                                        </h4>
-                                        <p class="text-xs text-slate-400">
-                                            Average score evaluated by {{ $peer['completed_count'] }} colleagues
-                                        </p>
+                                        <h4 class="text-base font-black text-slate-900 mt-1.5">Peer Score</h4>
+                                        <p class="text-[10px] text-slate-400">Meter 2: Peer Feedback</p>
                                     </div>
-
-                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 shrink-0">
-                                        {{ $peer['completed_count'] }} of {{ $peer['total_count'] }} Peers
-                                    </span>
+                                    <span class="text-2xl">{{ $peer['category_emoji'] ?? $peer['emoji'] ?? '👥' }}</span>
                                 </div>
 
-                                <!-- Visual Gauge Needle -->
-                                <div class="w-full my-auto py-2">
+                                <!-- Gauge -->
+                                <div class="w-full max-w-[200px] my-auto py-2">
                                     <x-score-meter 
                                         :percentage="$peer['percentage']" 
                                         :category="$peer['category']" 
@@ -369,22 +396,20 @@
                                 </div>
 
                                 <!-- Score Numbers Box -->
-                                <div class="w-full pt-4 border-t border-teal-100/70 space-y-3">
+                                <div class="w-full pt-4 border-t border-emerald-100 space-y-2">
                                     <div class="flex items-baseline justify-center gap-1">
-                                        <span class="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 leading-none">
+                                        <span class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 leading-none">
                                             {{ number_format($peer['percentage'], 2) }}
                                         </span>
-                                        <span class="text-xl font-bold text-slate-400">%</span>
+                                        <span class="text-lg font-bold text-slate-400">%</span>
                                     </div>
 
                                     <div class="flex items-center justify-center gap-2 flex-wrap">
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border shadow-2xs {{ $peer['category_badge'] }}">
-                                            <span class="text-sm">{{ $peer['category_emoji'] }}</span>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border shadow-2xs {{ $peer['category_badge'] ?? $peer['badge'] }}">
                                             <span>{{ $peer['category'] }}</span>
                                         </span>
-
-                                        <span class="text-xs font-extrabold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                                            {{ $peer['average_score'] }} / 110 avg pts
+                                        <span class="text-[10px] font-bold text-slate-600 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                                            {{ $peer['completed_count'] }} of {{ $peer['total_count'] }} Peers
                                         </span>
                                     </div>
                                 </div>

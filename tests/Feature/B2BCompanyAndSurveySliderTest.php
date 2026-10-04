@@ -263,24 +263,29 @@ class B2BCompanyAndSurveySliderTest extends TestCase
             'category' => 'Lemon',
         ]);
 
-        // Visit Alice's profile
+        // 1. Visit Alice's profile: only name, email, company, and change password form
         $response = $this->actingAs($alice)->get(route('profile.show'));
         $response->assertOk();
         $response->assertSee('Alice');
         $response->assertSee('Acme Labs');
         $response->assertSee('Change Password');
+        $response->assertSee('Current Password');
+        $response->assertSee('New Password');
+        $response->assertDontSee('Three Score Meters (Normalised, Self, Peer)');
 
-        // Check the 3 Meters: Normalised, Self, Peer
-        $response->assertSee('Three Score Meters (Normalised, Self, Peer)');
-        $response->assertSee('Meter 1: Normalised');
-        $response->assertSee('Normalised Score');
-        $response->assertSee('83.18'); // Moderated: (86.36 + 80.00) / 2
-        $response->assertSee('Meter 2: Self');
-        $response->assertSee('Self Score');
-        $response->assertSee('86.36');
-        $response->assertSee('Meter 3: Peer');
-        $response->assertSee('Peer Score');
-        $response->assertSee('80.00');
+        // 2. Visit Alice's user home page (dashboard): displays the 3 Meters (Normalised, Self, Peer)
+        $homeResponse = $this->actingAs($alice)->get(route('participant.assessments.index'));
+        $homeResponse->assertOk();
+        $homeResponse->assertSee('Three Score Meters (Normalised, Self, Peer)');
+        $homeResponse->assertSee('Meter 1: Normalised');
+        $homeResponse->assertSee('Normalised Score');
+        $homeResponse->assertSee('83.18'); // Moderated: (86.36 + 80.00) / 2
+        $homeResponse->assertSee('Meter 2: Self');
+        $homeResponse->assertSee('Self Score');
+        $homeResponse->assertSee('86.36');
+        $homeResponse->assertSee('Meter 3: Peer');
+        $homeResponse->assertSee('Peer Score');
+        $homeResponse->assertSee('80.00');
     }
 
     public function test_user_dashboard_displays_dual_meters_and_switches_between_two_surveys(): void
