@@ -8,11 +8,18 @@
         $profileRange = $cq['profile_range'] ?? '6.1 – 8.0';
         $profileColor = $cq['profile_color'] ?? '#F59E0B';
         $matrix = $cq['matrix'] ?? [];
+        $hasData = ($cqScore > 0 || $selfScore > 0 || $peerScore > 0);
 
-        // Needle rotation angle for 1.0 to 10.0 scale:
-        // Angle spans 180 degrees (-90deg at 1.0, 0deg at 5.5, +90deg at 10.0)
-        $clampedScore = max(1.0, min(10.0, $cqScore > 0 ? $cqScore : 5.0));
-        $needleAngle = -90 + (($clampedScore - 1.0) / 9.0) * 180;
+        // Needle rotation angle for 0 to 10 scale (functioning the same as Normalised Score on my-assessments):
+        // 0.0 (no data) => -90 deg (needle stays at 0 on far left)
+        // 5.0 => 0 deg (straight up)
+        // 10.0 => +90 deg (far right)
+        if (! $hasData || $cqScore <= 0) {
+            $needleAngle = -90;
+        } else {
+            $needleAngle = round(-90 + (($cqScore / 10.0) * 180), 2);
+            $needleAngle = max(-90, min(90, $needleAngle));
+        }
 
         // Circular donut stroke dash for Self and Peer rings (r=42, circumference ~ 263.89)
         $circumference = 2 * 3.14159 * 42;
@@ -171,7 +178,9 @@
                 </div>
 
                 <!-- Semicircular Speedometer Gauge Canvas -->
-                <div class="bg-gradient-to-b from-slate-50/70 via-white to-white rounded-3xl p-6 sm:p-8 border border-slate-100 flex flex-col items-center relative overflow-hidden">
+                <div class="bg-gradient-to-b from-slate-50/70 via-white to-white rounded-3xl p-6 sm:p-8 border border-slate-100 flex flex-col items-center relative overflow-hidden"
+                     x-data="{ mounted: false }"
+                     x-init="setTimeout(() => mounted = true, 50)">
                     <div class="w-full max-w-[500px] aspect-[2/1] relative flex items-end justify-center">
                         <svg viewBox="0 0 400 220" class="w-full h-full overflow-visible">
                             <defs>
@@ -274,19 +283,23 @@
                             <!-- ============================================================== -->
                             <!-- The Speedometer Needle (Pivot at 200, 210)                     -->
                             <!-- ============================================================== -->
-                            <g transform="translate(200, 210) rotate({{ $needleAngle }})" filter="url(#needle-shadow)">
-                                <polygon points="-5,0 -1,-130 0,-138 1,-130 5,0" fill="#1E293B"/>
-                                <polygon points="0,0 0,-138 1,-130 5,0" fill="#0F172A"/>
-                                <circle cx="0" cy="0" r="10" fill="#0F172A"/>
-                                <circle cx="0" cy="0" r="4" fill="#FFFFFF"/>
+                            <g transform="translate(200, 210)">
+                                <g :style="`transform: rotate(${mounted ? {{ $needleAngle }} : -90}deg); transform-origin: 0 0; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
+                                   style="transform: rotate({{ $needleAngle }}deg); transform-origin: 0 0;"
+                                   filter="url(#needle-shadow)">
+                                    <polygon points="-5,0 -1,-130 0,-138 1,-130 5,0" fill="#1E293B"/>
+                                    <polygon points="0,0 0,-138 1,-130 5,0" fill="#0F172A"/>
+                                    <circle cx="0" cy="0" r="10" fill="#0F172A"/>
+                                    <circle cx="0" cy="0" r="4" fill="#FFFFFF"/>
+                                </g>
                             </g>
 
                             <!-- ============================================================== -->
                             <!-- Center Score Readout Inside Gauge                              -->
                             <!-- ============================================================== -->
                             <text x="200" y="150" text-anchor="middle" font-size="9" font-weight="700" fill="#64748B" letter-spacing="0.3">Your ChangeQuo Score</text>
-                            <text x="200" y="186" text-anchor="middle" font-size="36" font-weight="900" fill="#0F172A">{{ number_format($cqScore, 1) }}</text>
-                            <text x="200" y="204" text-anchor="middle" font-size="14" font-weight="800" fill="#0F172A">{{ $profileName }}</text>
+                            <text x="200" y="186" text-anchor="middle" font-size="36" font-weight="900" fill="#0F172A">{{ $hasData && $cqScore > 0 ? number_format($cqScore, 1) : '0' }}</text>
+                            <text x="200" y="204" text-anchor="middle" font-size="14" font-weight="800" fill="#0F172A">{{ $hasData && $cqScore > 0 ? $profileName : 'Pending' }}</text>
                         </svg>
                     </div>
 
