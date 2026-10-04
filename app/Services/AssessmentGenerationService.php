@@ -17,7 +17,7 @@ class AssessmentGenerationService
      */
     public function generateForSurvey(Survey $survey): int
     {
-        $participants = $survey->participants()->get();
+        $participants = $survey->participants()->where('users.role', '!=', 'admin')->get();
         $createdCount = 0;
 
         foreach ($participants as $assessor) {
@@ -49,6 +49,7 @@ class AssessmentGenerationService
      */
     public function generateForParticipants(Survey $survey, Collection|array $participants): int
     {
+        $participants = collect($participants)->filter(fn ($u) => $u->role !== 'admin');
         $createdCount = 0;
 
         foreach ($participants as $assessor) {

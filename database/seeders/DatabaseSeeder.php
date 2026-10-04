@@ -142,11 +142,10 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 7. Attach all 21 users (Admin + 20 employees) to the survey
-        $allUsers = $employees->concat([$admin]);
-        $survey->participants()->attach($allUsers->pluck('id'));
+        // 7. Attach all 20 employees to the survey (Admin can never be part of any survey)
+        $survey->participants()->attach($employees->pluck('id'));
 
-        // 8. Generate all 360 assessment pairings (21 x 21 = 441 assessments)
+        // 8. Generate all 360 assessment pairings (20 x 20 = 400 assessments)
         app(AssessmentGenerationService::class)->generateForSurvey($survey);
 
         // 9. Rate all assessments for all users with realistic ratings and completed status
@@ -185,7 +184,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $survey2->participants()->attach($allUsers->pluck('id'));
+        $survey2->participants()->attach($employees->pluck('id'));
         app(AssessmentGenerationService::class)->generateForSurvey($survey2);
         Artisan::call('assessment:rate-all', ['--survey' => $survey2->id]);
     }

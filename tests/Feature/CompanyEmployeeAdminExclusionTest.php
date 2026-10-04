@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Company;
 use App\Models\Survey;
 use App\Models\User;
+use App\Services\AssessmentGenerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class CompanyEmployeeAdminExclusionTest extends TestCase
@@ -136,5 +138,41 @@ class CompanyEmployeeAdminExclusionTest extends TestCase
 
         $this->assertTrue($survey->participants->contains($employee));
         $this->assertFalse($survey->participants->contains($adminInCompany));
+    }
+
+    public function test_survey_participants_relation_and_assessment_generation_strictly_exclude_admins(): void
+    {
+        $company = Company::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin', 'company_id' => $company->id]);
+        $employee1 = User::factory()->create(['role' => 'participant', 'company_id' => $company->id]);
+        $employee2 = User::factory()->create(['role' => 'participant', 'company_id' => $company->id]);
+
+        $survey = Survey::create([
+            'company_id' => $company->id,
+            'title' => 'Leadership Survey',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+
+        // Even if an admin is manually attached in survey_participants pivot
+        DB::table('survey_participants')->insert([
+            ['survey_id' => $survey->id, 'user_id' => $admin->id],
+            ['survey_id' => $survey->id, 'user_id' => $employee1->id],
+            ['survey_id' => $survey->id, 'user_id' => $employee2->id],
+        ]);
+
+        // Survey participants relationship must strictly exclude admin
+        $this->assertCount(2, $survey->participants);
+        $this->assertFalse($survey->participants->contains($admin));
+        $this->assertTrue($survey->participants->contains($employee1));
+        $this->assertTrue($survey->participants->contains($employee2));
+
+        // AssessmentGenerationService must only generate pairings for employees (2 x 2 = 4)
+        $created = app(AssessmentGenerationService::class)->generateForSurvey($survey);
+        $this->assertEquals(4, $created);
+
+        // Assert NO assessments exist with admin as assessor or subject
+        $this->assertDatabaseMissing('assessments', ['survey_id' => $survey->id, 'assessor_id' => $admin->id]);
+        $this->assertDatabaseMissing('assessments', ['survey_id' => $survey->id, 'subject_id' => $admin->id]);
     }
 }

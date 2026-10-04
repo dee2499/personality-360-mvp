@@ -36,7 +36,14 @@ class SurveyParticipantController extends Controller
         }
 
         if (! empty($validated['user_ids'])) {
-            $survey->participants()->syncWithoutDetaching($validated['user_ids']);
+            $nonAdminIds = User::whereIn('id', $validated['user_ids'])
+                ->where('role', '!=', 'admin')
+                ->pluck('id')
+                ->all();
+
+            if (! empty($nonAdminIds)) {
+                $survey->participants()->syncWithoutDetaching($nonAdminIds);
+            }
         }
 
         // Always generate/synchronize assessments for the entire group

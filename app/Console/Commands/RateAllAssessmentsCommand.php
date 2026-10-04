@@ -217,15 +217,6 @@ class RateAllAssessmentsCommand extends Command
             'quadrant' => 'Key Development Area',
             'description' => '1.3 CQ Score, Minimum Resistor, Key Development Area (Self 1.2, Peer 1.4)',
         ],
-
-        // System Admin benchmark
-        'System Admin' => [
-            'self' => 8.5,
-            'peer' => 8.5,
-            'archetype' => 'Champion',
-            'quadrant' => 'Aligned Strength',
-            'description' => '8.5 CQ Score, Admin benchmark',
-        ],
     ];
 
     /**
@@ -271,7 +262,9 @@ class RateAllAssessmentsCommand extends Command
                 ->orderBy('sort_order')
                 ->get();
 
-            $participants = $survey->participants()->get();
+            $participants = $survey->participants()
+                ->where('users.role', '!=', 'admin')
+                ->get();
             if ($participants->isEmpty()) {
                 $this->warn("Survey #{$survey->id} has no attached participants. Skipping.");
 
@@ -280,7 +273,10 @@ class RateAllAssessmentsCommand extends Command
 
             $this->info("=== Rating all {$participants->count()} employees for Survey: '{$survey->title}' (#{$survey->id}) ===");
 
-            $assessments = Assessment::where('survey_id', $survey->id)->get();
+            $assessments = Assessment::where('survey_id', $survey->id)
+                ->whereHas('assessor', fn ($q) => $q->where('role', '!=', 'admin'))
+                ->whereHas('subject', fn ($q) => $q->where('role', '!=', 'admin'))
+                ->get();
             $totalAnswersCount = 0;
             $totalAssessmentsRated = 0;
 

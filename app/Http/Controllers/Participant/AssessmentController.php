@@ -44,12 +44,14 @@ class AssessmentController extends Controller
             ->with(['questions', 'participants', 'company'])
             ->get();
 
-        // 2. Auto-enroll user into their company surveys and sync assessments
-        foreach ($surveys as $s) {
-            if (! $s->participants()->where('users.id', $user->id)->exists()) {
-                $s->participants()->syncWithoutDetaching([$user->id]);
+        // 2. Auto-enroll user into their company surveys and sync assessments (Admins are strictly excluded)
+        if (! $user->isAdmin()) {
+            foreach ($surveys as $s) {
+                if (! $s->participants()->where('users.id', $user->id)->exists()) {
+                    $s->participants()->syncWithoutDetaching([$user->id]);
+                }
+                app(AssessmentGenerationService::class)->generateForSurvey($s);
             }
-            app(AssessmentGenerationService::class)->generateForSurvey($s);
         }
 
         // 3. Load all given assessments
@@ -279,8 +281,8 @@ class AssessmentController extends Controller
     {
         $user = $request->user();
 
-        // 1. If survey belongs to user's company, auto-enroll user if not yet attached
-        if ($survey->company_id && $user->company_id === $survey->company_id && ! $survey->participants()->where('users.id', $user->id)->exists()) {
+        // 1. If survey belongs to user's company, auto-enroll participant user if not yet attached (Admins are strictly excluded)
+        if (! $user->isAdmin() && $survey->company_id && $user->company_id === $survey->company_id && ! $survey->participants()->where('users.id', $user->id)->exists()) {
             $survey->participants()->syncWithoutDetaching([$user->id]);
         }
 

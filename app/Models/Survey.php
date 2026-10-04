@@ -100,7 +100,8 @@ class Survey extends Model
 
     public function participants(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'survey_participants');
+        return $this->belongsToMany(User::class, 'survey_participants')
+            ->where('users.role', '!=', 'admin');
     }
 
     public function assessments(): HasMany
