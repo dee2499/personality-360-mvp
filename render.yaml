@@ -4,6 +4,7 @@ services:
     runtime: docker
     plan: free
     region: oregon
+    healthCheckPath: /up
     envVars:
       - key: APP_NAME
         value: "Personality 360"
@@ -15,9 +16,13 @@ services:
         value: "base64:1wWf5KHtdnNCU3beG42ECrqpZJHGTjZbPPWpYWyDkvg="
       - key: DB_CONNECTION
         value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE
         value: database
       - key: QUEUE_CONNECTION
         value: sync
+      - key: LOG_CHANNEL
+        value: stderr
