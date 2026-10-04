@@ -8,6 +8,7 @@ use App\Models\Assessment;
 use App\Models\AssessmentAnswer;
 use App\Models\GroupSyncAnswer;
 use App\Models\Survey;
+use App\Models\User;
 use App\Services\AssessmentCategoryService;
 use App\Services\AssessmentGenerationService;
 use App\Services\AssessmentScoreService;
@@ -436,6 +437,10 @@ class AssessmentController extends Controller
     public function showReport(Request $request): View|RedirectResponse
     {
         $user = $request->user();
+        $targetUser = ($user->isAdmin() && $request->filled('user_id'))
+            ? (User::find($request->query('user_id')) ?? $user)
+            : $user;
+
         $surveyId = $request->query('survey_id');
 
         $survey = null;
@@ -444,9 +449,9 @@ class AssessmentController extends Controller
         }
 
         if (! $survey) {
-            $survey = $user->surveys()->where('status', 'published')->latest('published_at')->first()
-                ?? Survey::whereHas('assessments', function ($q) use ($user) {
-                    $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+            $survey = $targetUser->surveys()->where('status', 'published')->latest('published_at')->first()
+                ?? Survey::whereHas('assessments', function ($q) use ($targetUser) {
+                    $q->where('subject_id', $targetUser->id)->orWhere('assessor_id', $targetUser->id);
                 })->latest()->first()
                 ?? Survey::where('status', 'published')->latest()->first();
         }
@@ -466,29 +471,32 @@ class AssessmentController extends Controller
     public function report(Request $request, Survey $survey): View
     {
         $user = $request->user();
+        $targetUser = ($user->isAdmin() && $request->filled('user_id'))
+            ? (User::find($request->query('user_id')) ?? $user)
+            : $user;
 
-        // Check if user is a participant or has an assessment record in this survey
-        $isCohortMember = $survey->participants()->where('users.id', $user->id)->exists()
-            || Assessment::where('survey_id', $survey->id)->where(function ($q) use ($user) {
-                $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+        // Check if target user is a participant or has an assessment record in this survey
+        $isCohortMember = $survey->participants()->where('users.id', $targetUser->id)->exists()
+            || Assessment::where('survey_id', $survey->id)->where(function ($q) use ($targetUser) {
+                $q->where('subject_id', $targetUser->id)->orWhere('assessor_id', $targetUser->id);
             })->exists();
 
         if (! $isCohortMember && ! $user->isAdmin()) {
             abort(403, 'Unauthorized. This individual CQ report is confidential.');
         }
 
-        $cq = $this->scoreService->calculateChangeQuotientReport($user, $survey);
+        $cq = $this->scoreService->calculateChangeQuotientReport($targetUser, $survey);
 
-        $availableSurveys = $user->surveys()->where('status', 'published')->get();
+        $availableSurveys = $targetUser->surveys()->where('status', 'published')->get();
         if ($availableSurveys->isEmpty()) {
-            $availableSurveys = Survey::whereHas('assessments', function ($q) use ($user) {
-                $q->where('subject_id', $user->id)->orWhere('assessor_id', $user->id);
+            $availableSurveys = Survey::whereHas('assessments', function ($q) use ($targetUser) {
+                $q->where('subject_id', $targetUser->id)->orWhere('assessor_id', $targetUser->id);
             })->get();
         }
 
         return view('participant.assessments.report', [
             'survey' => $survey,
-            'user' => $user,
+            'user' => $targetUser,
             'cq' => $cq,
             'availableSurveys' => $availableSurveys,
         ]);

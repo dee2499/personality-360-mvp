@@ -8,12 +8,20 @@ use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
+use App\Services\AssessmentCategoryService;
+use App\Services\AssessmentScoreService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ChangeQuotientReportAndGroupInsightsTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        AssessmentCategoryService::clearCache();
+    }
 
     protected function setupSurveyWithParticipants(): array
     {
@@ -403,5 +411,87 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         // Check Perception Gap diagnosis
         $response->assertSee('Perception Gap');
         $response->assertSee('You see yourself stronger than others currently experience');
+    }
+
+    public function test_assessment_max_score_excludes_group_sync_questions_and_admin_people_profile_aligns_with_cq_report(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $alex = User::factory()->create(['name' => 'Alex Person', 'role' => 'participant']);
+        $bob = User::factory()->create(['name' => 'Bob Colleague', 'role' => 'participant']);
+
+        $survey = Survey::create([
+            'title' => 'Leadership CQ Survey',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+        $survey->participants()->attach([$alex->id, $bob->id]);
+
+        // 11 individual questions + 3 group sync questions
+        for ($i = 1; $i <= 11; $i++) {
+            Question::create([
+                'survey_id' => $survey->id,
+                'question_text' => "Individual Question {$i}",
+                'type' => 'individual',
+                'sort_order' => $i,
+                'is_active' => true,
+            ]);
+        }
+        for ($i = 1; $i <= 3; $i++) {
+            Question::create([
+                'survey_id' => $survey->id,
+                'question_text' => "Group Sync Question {$i}",
+                'type' => 'group_sync',
+                'sort_order' => 11 + $i,
+                'is_active' => true,
+            ]);
+        }
+
+        $this->assertEquals(14, $survey->questions()->count());
+
+        // Alex Self Assessment (ratings of 9: total = 99)
+        $selfAssessment = Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $alex->id,
+            'subject_id' => $alex->id,
+            'status' => 'completed',
+        ]);
+        $indQuestions = $survey->questions()->where('type', 'individual')->get();
+        foreach ($indQuestions as $q) {
+            AssessmentAnswer::create(['assessment_id' => $selfAssessment->id, 'question_id' => $q->id, 'score' => 9]);
+        }
+
+        // Bob Peer Assessment of Alex (ratings of 9: total = 99)
+        $peerAssessment = Assessment::create([
+            'survey_id' => $survey->id,
+            'assessor_id' => $bob->id,
+            'subject_id' => $alex->id,
+            'status' => 'completed',
+        ]);
+        foreach ($indQuestions as $q) {
+            AssessmentAnswer::create(['assessment_id' => $peerAssessment->id, 'question_id' => $q->id, 'score' => 9]);
+        }
+
+        $scoreService = app(AssessmentScoreService::class);
+        $selfResult = $scoreService->calculateAssessmentScore($selfAssessment);
+        $peerResult = $scoreService->calculateAssessmentScore($peerAssessment);
+
+        // Crucial: max_score must be 110, NOT 140!
+        $this->assertEquals(110, $selfResult['max_score']);
+        $this->assertEquals(110, $peerResult['max_score']);
+        $this->assertEquals(90.0, $selfResult['percentage']); // 99 / 110 * 100 = 90%
+        $this->assertEquals('Achiever', $selfResult['category']);
+
+        // Admin visiting Alex profile should see Achiever and CQ Executive Synthesis
+        $response = $this->actingAs($admin)->get(route('admin.people.show', $alex));
+        $response->assertOk();
+        $response->assertSee('Change Quotient (CQ) Executive Synthesis');
+        $response->assertSee('Achiever');
+        $response->assertSee('Inspect Full CQ Report');
+
+        // Admin can inspect Alex CQ report via user_id
+        $reportResponse = $this->actingAs($admin)->get(route('participant.assessments.report', [$survey, 'user_id' => $alex->id]));
+        $reportResponse->assertOk();
+        $reportResponse->assertSee('Alex Person');
+        $reportResponse->assertSee('Achiever');
     }
 }

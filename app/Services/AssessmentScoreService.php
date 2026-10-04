@@ -25,8 +25,20 @@ class AssessmentScoreService
         $answers = $assessment->answers()->get();
         $totalScore = (int) $answers->sum('score');
 
-        // Dynamic max score based on survey question count or answers count (each rated 1-10)
-        $questionCount = $assessment->survey?->questions()->count() ?? $answers->count();
+        // Dynamic max score based on individual survey question count or answers count (each rated 1-10).
+        // Group sync questions are answered separately at the cohort level and must NOT be included in individual assessment max_score.
+        $survey = $assessment->survey;
+        if ($survey) {
+            $individualQuestionsCount = $survey->questions()
+                ->where(function ($q) {
+                    $q->where('type', 'individual')
+                        ->orWhereNull('type');
+                })
+                ->count();
+            $questionCount = $individualQuestionsCount > 0 ? $individualQuestionsCount : $answers->count();
+        } else {
+            $questionCount = $answers->count();
+        }
         $maxScore = max(10, $questionCount * 10);
 
         $percentage = $this->calculatePercentage($totalScore, $maxScore);
@@ -118,7 +130,8 @@ class AssessmentScoreService
 
         // Fallback for max score if not pre-calculated
         if ($combinedMaxScore === 0) {
-            $questionCount = $survey?->questions()->count() ?? 11;
+            $individualQuestionsCount = $survey?->questions()->where(fn ($q) => $q->where('type', 'individual')->orWhereNull('type'))->count();
+            $questionCount = $individualQuestionsCount ?: 11;
             $combinedMaxScore = $completedCount * ($questionCount * 10);
         }
 
@@ -126,6 +139,16 @@ class AssessmentScoreService
         $category = $this->categoryService->getCategory($percentage);
 
         $selfAndPeer = $this->calculateSelfAndPeerScores($subject, $survey);
+
+        $cqReport = null;
+        if ($survey !== null) {
+            $cqReport = $this->calculateChangeQuotientReport($subject, $survey);
+        } elseif ($completedAssessments->isNotEmpty()) {
+            $firstSurvey = $completedAssessments->first()?->survey;
+            if ($firstSurvey) {
+                $cqReport = $this->calculateChangeQuotientReport($subject, $firstSurvey);
+            }
+        }
 
         return [
             'completed_count' => $completedCount,
@@ -143,6 +166,7 @@ class AssessmentScoreService
             'self_metrics' => $selfAndPeer['self'],
             'peer_metrics' => $selfAndPeer['peer'],
             'comparison' => $selfAndPeer['comparison'],
+            'cq_report' => $cqReport,
         ];
     }
 

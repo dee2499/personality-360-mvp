@@ -348,6 +348,87 @@
             </div>
         @endif
 
+        @if(!empty($metrics['cq_report']) && $metrics['completed_count'] > 0)
+            @php
+                $cqRep = $metrics['cq_report'];
+                $activeSurveyObj = $selectedSurvey ?? ($userSurveys->first()['survey'] ?? null);
+            @endphp
+            <div class="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-lg space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-white/10 pb-5">
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-purple-200 border border-white/10">
+                            <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+                            <span>Change Quotient (CQ) Executive Synthesis</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white mt-1">
+                            {{ $person->name }}'s ChangeQuo Profile: <span class="text-amber-300">{{ $cqRep['profile_name'] }}</span>
+                        </h2>
+                        <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                            {{ $cqRep['profile_description'] }}
+                        </p>
+                    </div>
+
+                    @if($activeSurveyObj)
+                        <div class="shrink-0 flex items-center gap-3">
+                            <a href="{{ route('participant.assessments.report', [$activeSurveyObj, 'user_id' => $person->id]) }}" 
+                               target="_blank"
+                               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black bg-white text-slate-900 hover:bg-slate-100 shadow-md transition">
+                                <i data-lucide="file-text" class="w-4 h-4 text-purple-600"></i>
+                                <span>Inspect Full CQ Report</span>
+                                <i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i>
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- 4 Key CQ Metric Pills -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-200">Overall CQ Score</span>
+                        <div class="flex items-baseline gap-1.5 mt-1">
+                            <span class="text-3xl font-black text-white">{{ number_format($cqRep['overall_cq_score'], 1) }}</span>
+                            <span class="text-xs text-purple-300 font-bold">/ 10</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-emerald-400 mt-0.5 block">
+                            {{ number_format($cqRep['overall_cq_percentage'], 1) }}% ({{ $cqRep['profile_name'] }})
+                        </span>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-200">Self Score</span>
+                        <div class="flex items-baseline gap-1.5 mt-1">
+                            <span class="text-3xl font-black text-white">{{ number_format($cqRep['self_score'], 1) }}</span>
+                            <span class="text-xs text-purple-300 font-bold">/ 10</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-purple-200 mt-0.5 block">
+                            {{ number_format($cqRep['self_percentage'], 1) }}% internal
+                        </span>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-200">Peer Consensus</span>
+                        <div class="flex items-baseline gap-1.5 mt-1">
+                            <span class="text-3xl font-black text-white">{{ number_format($cqRep['peer_score'], 1) }}</span>
+                            <span class="text-xs text-purple-300 font-bold">/ 10</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-purple-200 mt-0.5 block">
+                            {{ number_format($cqRep['peer_percentage'], 1) }}% observer
+                        </span>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-purple-200">Perception Alignment</span>
+                        <div class="mt-1">
+                            <span class="text-sm font-black text-white block leading-tight">{{ $cqRep['matrix']['quadrant_name'] }}</span>
+                            <span class="text-[10px] text-purple-200 mt-0.5 block leading-tight truncate">
+                                {{ $cqRep['matrix']['quadrant_subtitle'] }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Centerpiece: 3-Section Combined Result -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             
@@ -454,28 +535,28 @@
                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Category Scale Guide</span>
                     <div class="grid grid-cols-5 gap-1 text-center">
                         <div class="flex flex-col items-center">
-                            <span class="text-xs">🍏</span>
-                            <span class="text-[10px] font-bold text-slate-700">Apple</span>
+                            <span class="text-xs">🛡️</span>
+                            <span class="text-[10px] font-bold text-slate-700">Resistor</span>
                             <span class="text-[8px] text-slate-400">0–20%</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-xs">🍊</span>
-                            <span class="text-[10px] font-bold text-slate-700">Orange</span>
+                            <span class="text-xs">👥</span>
+                            <span class="text-[10px] font-bold text-slate-700">Follower</span>
                             <span class="text-[8px] text-slate-400">>20–40%</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-xs">🍅</span>
-                            <span class="text-[10px] font-bold text-slate-700">Tomato</span>
+                            <span class="text-xs">🌱</span>
+                            <span class="text-[10px] font-bold text-slate-700">Supporter</span>
                             <span class="text-[8px] text-slate-400">>40–60%</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-xs">🍋</span>
-                            <span class="text-[10px] font-bold text-slate-700">Lemon</span>
+                            <span class="text-xs">🚀</span>
+                            <span class="text-[10px] font-bold text-slate-700">Initiator</span>
                             <span class="text-[8px] text-slate-400">>60–80%</span>
                         </div>
                         <div class="flex flex-col items-center">
-                            <span class="text-xs">🥒</span>
-                            <span class="text-[10px] font-bold text-slate-700">Cucum.</span>
+                            <span class="text-xs">🏆</span>
+                            <span class="text-[10px] font-bold text-slate-700">Achiever</span>
                             <span class="text-[8px] text-slate-400">>80–100%</span>
                         </div>
                     </div>
