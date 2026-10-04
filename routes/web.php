@@ -83,11 +83,13 @@ Route::prefix('admin')
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Companies Management (B2B)
+        Route::get('companies/{company}/team-sync', [AdminCompanyController::class, 'teamSyncReport'])->name('companies.team-sync');
         Route::resource('companies', AdminCompanyController::class);
         Route::post('companies/{company}/invite', [AdminCompanyController::class, 'inviteEmployee'])->name('companies.invite');
         Route::delete('companies/{company}/employees/{employee}', [AdminCompanyController::class, 'destroyEmployee'])->name('companies.employees.destroy');
 
         // Surveys
+        Route::get('surveys/{survey}/team-sync', [AdminSurveyController::class, 'teamSyncReport'])->name('surveys.team-sync');
         Route::get('surveys/{survey}/group-insights', [AdminSurveyController::class, 'groupInsights'])->name('surveys.group-insights');
         Route::post('surveys/{survey}/sign-off', [AdminSurveyController::class, 'signOff'])->name('surveys.sign-off');
         Route::resource('surveys', AdminSurveyController::class);

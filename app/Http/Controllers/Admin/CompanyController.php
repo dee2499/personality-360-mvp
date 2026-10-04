@@ -75,8 +75,31 @@ class CompanyController extends Controller
         $surveys = $company->surveys;
 
         $metrics = $this->scoreService->calculateCompanyMetrics($company, $selectedSurvey);
+        $targetSurvey = $selectedSurvey ?: $surveys->first();
+        $groupInsights = $targetSurvey ? $this->scoreService->calculateGroupInsights($targetSurvey) : null;
 
-        return view('admin.companies.show', compact('company', 'metrics', 'surveys', 'selectedSurvey'));
+        return view('admin.companies.show', compact('company', 'metrics', 'surveys', 'selectedSurvey', 'targetSurvey', 'groupInsights'));
+    }
+
+    /**
+     * Display the dedicated full Team CQ Sync executive report for a company.
+     */
+    public function teamSyncReport(Company $company, Request $request): View
+    {
+        $selectedSurveyId = $request->query('survey_id');
+        $survey = $selectedSurveyId ? Survey::find($selectedSurveyId) : $company->surveys()->first();
+
+        if (! $survey) {
+            abort(404, 'No surveys found for this organization.');
+        }
+
+        $insights = $this->scoreService->calculateGroupInsights($survey);
+
+        return view('admin.surveys.team-sync-report', [
+            'survey' => $survey,
+            'company' => $company,
+            'insights' => $insights,
+        ]);
     }
 
     /**

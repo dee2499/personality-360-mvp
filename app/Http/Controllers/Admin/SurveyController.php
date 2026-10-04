@@ -221,6 +221,17 @@ class SurveyController extends Controller
     }
 
     /**
+     * Display the dedicated full Team CQ Sync executive report for a survey.
+     */
+    public function teamSyncReport(Survey $survey, AssessmentScoreService $scoreService): View
+    {
+        $insights = $scoreService->calculateGroupInsights($survey);
+        $company = $survey->company;
+
+        return view('admin.surveys.team-sync-report', compact('survey', 'company', 'insights'));
+    }
+
+    /**
      * Display group analytics, intent-level recommendations, and leadership sign-off panel.
      * Note: Zero individual names are exposed in this report.
      */

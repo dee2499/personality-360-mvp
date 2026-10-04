@@ -29,7 +29,7 @@
         $cqNeedleAngle = -90 + (($clampedCQ - 1.0) / 9.0) * 180;
     @endphp
 
-    <div class="space-y-6 sm:space-y-8" x-data="{ activeTab: 'summary' }">
+    <div class="space-y-6 sm:space-y-8" x-data="{ activeTab: '{{ request()->query('tab', 'summary') }}' }">
         <!-- Top Back Link & Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <a href="{{ route('admin.surveys.show', $survey) }}" 
@@ -39,6 +39,12 @@
             </a>
 
             <div class="flex items-center gap-3">
+                <a href="{{ route('admin.surveys.team-sync', $survey) }}" 
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 shadow-2xs transition">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600"></i>
+                    <span>Team CQ Sync Executive Report</span>
+                </a>
+
                 <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                     <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
                     <span>Confidential • Zero Names Exposed</span>

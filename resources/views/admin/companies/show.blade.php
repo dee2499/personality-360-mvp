@@ -114,6 +114,219 @@
             </div>
         @endif
 
+        <!-- Team CQ Sync & Cohort Intelligence Hub -->
+        @if($targetSurvey && $groupInsights)
+            @php
+                $hubSync = $groupInsights['cq_sync'] ?? [];
+                $hubSyncScore = (float) ($hubSync['score'] ?? $groupInsights['team_cq_sync_score'] ?? 0.0);
+                $hubMaturity = $hubSync['maturity_level'] ?? 'Aligned';
+                $hubBadge = $hubSync['badge'] ?? 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+                $hubDims = $hubSync['dimensions'] ?? [];
+                $hubSee = (float) ($hubDims['see_together']['score'] ?? 0.0);
+                $hubAgree = (float) ($hubDims['agree_together']['score'] ?? 0.0);
+                $hubAct = (float) ($hubDims['act_together']['score'] ?? 0.0);
+                $hubGap = (float) ($hubSync['gap_to_benchmark'] ?? ($hubSyncScore - 8.0));
+                
+                // Needle angle for mini gauge
+                $clampedHubSync = max(1.0, min(10.0, $hubSyncScore > 0 ? $hubSyncScore : 5.0));
+                $hubNeedleAngle = -90 + (($clampedHubSync - 1.0) / 9.0) * 180;
+            @endphp
+
+            <div class="bg-gradient-to-br from-white via-purple-50/20 to-indigo-50/30 rounded-3xl border border-purple-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Section Header & Buttons Ribbon -->
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-5 border-b border-purple-100">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="p-2 rounded-xl bg-purple-100 text-purple-700 border border-purple-200">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            </span>
+                            <span class="text-xs font-black uppercase tracking-wider text-purple-700">Team Intelligence</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-purple-100 text-purple-800">
+                                {{ $targetSurvey->title }}
+                            </span>
+                        </div>
+                        <h2 class="text-xl font-black text-slate-900 tracking-tight mt-1.5">
+                            Team CQ Sync & Cohort Intelligence
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Alignment to see, agree, and act on change together across {{ $groupInsights['cohort_size'] }} assessed team members.
+                        </p>
+                    </div>
+
+                    <!-- All Team Action Buttons Requested by User -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Button 1: Team CQ Sync Report -->
+                        <a href="{{ route('admin.companies.team-sync', ['company' => $company, 'survey_id' => $targetSurvey->id]) }}" 
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md shadow-purple-200 transition cursor-pointer">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>Team CQ Sync Report</span>
+                        </a>
+
+                        <!-- Button 2: Position Matrix & Strategy -->
+                        <a href="{{ route('admin.surveys.group-insights', ['survey' => $targetSurvey, 'tab' => 'summary']) }}" 
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-2xs transition">
+                            <i data-lucide="compass" class="w-3.5 h-3.5 text-indigo-600"></i>
+                            <span>Position Matrix & Strategy</span>
+                        </a>
+
+                        <!-- Button 3: Competency Distribution -->
+                        <a href="{{ route('admin.surveys.group-insights', ['survey' => $targetSurvey, 'tab' => 'capability']) }}" 
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-2xs transition">
+                            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-purple-600"></i>
+                            <span>Cohort Distribution</span>
+                        </a>
+
+                        <!-- Button 4: Leadership Sign-Off -->
+                        <a href="{{ route('admin.surveys.group-insights', ['survey' => $targetSurvey]) }}#sign-off-panel" 
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-2xs transition">
+                            <i data-lucide="check-square" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            <span>Leadership Sign-Off</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3-Column Team Live Metrics Snapshot -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+                    
+                    <!-- Col 1: Overall Team CQ Sync Gauge Snapshot -->
+                    <div class="bg-white rounded-2xl border border-purple-100 p-5 shadow-2xs flex flex-col justify-between items-center text-center">
+                        <div class="w-full flex items-center justify-between">
+                            <span class="text-[10px] font-black uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
+                                Group Alignment
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ $hubBadge }}">
+                                <span>{{ $hubMaturity }}</span>
+                            </span>
+                        </div>
+
+                        <!-- Mini Gauge Arc -->
+                        <div class="w-full max-w-[220px] aspect-[2/1] relative flex items-end justify-center my-3">
+                            <svg viewBox="0 0 300 170" class="w-full h-full overflow-visible">
+                                <path d="M 30,150 A 120,120 0 0,1 67.08,52.92" fill="none" stroke="#EF4444" stroke-width="26" stroke-linecap="round"/>
+                                <path d="M 68,52 A 120,120 0 0,1 118.89,31.7" fill="none" stroke="#FB923C" stroke-width="26"/>
+                                <path d="M 120,31.5 A 120,120 0 0,1 180,31.5" fill="none" stroke="#10B981" stroke-width="26"/>
+                                <path d="M 181.11,31.7 A 120,120 0 0,1 232,52" fill="none" stroke="#F59E0B" stroke-width="26"/>
+                                <path d="M 232.92,52.92 A 120,120 0 0,1 270,150" fill="none" stroke="#3B82F6" stroke-width="26" stroke-linecap="round"/>
+
+                                <g transform="translate(150, 150) rotate({{ $hubNeedleAngle }})">
+                                    <path d="M -4,0 L -1.5,-105 L 0,-115 L 1.5,-105 L 4,0 Z" fill="#1E293B"/>
+                                    <circle cx="0" cy="0" r="7" fill="#0F172A"/>
+                                    <circle cx="0" cy="0" r="3" fill="#FFFFFF"/>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div class="w-full pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase block">Overall CQ Sync</span>
+                                <span class="text-2xl font-black text-slate-900 leading-tight">
+                                    {{ number_format($hubSyncScore, 1) }} <span class="text-xs font-normal text-slate-400">/ 10</span>
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-slate-400 font-bold uppercase block">Benchmark (8.0)</span>
+                                <span class="text-xs font-extrabold {{ $hubGap < 0 ? 'text-rose-600' : 'text-emerald-600' }}">
+                                    Gap: {{ $hubGap > 0 ? '+'.$hubGap : $hubGap }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Col 2: 3 Sync Dimensions Live Bars -->
+                    <div class="bg-white rounded-2xl border border-purple-100 p-5 shadow-2xs flex flex-col justify-between space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span class="text-[11px] font-black uppercase tracking-wider text-slate-700">The 3 CQ Sync Dimensions</span>
+                            <span class="text-[10px] font-bold text-slate-400">Benchmark: 8.0</span>
+                        </div>
+
+                        <div class="space-y-3 my-auto">
+                            <!-- See Together -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="flex items-center gap-1.5 text-slate-800">
+                                        <i data-lucide="glasses" class="w-3.5 h-3.5 text-purple-600"></i>
+                                        <span>See Together</span>
+                                    </span>
+                                    <span class="text-purple-700 font-black">{{ number_format($hubSee, 1) }} / 10</span>
+                                </div>
+                                <div class="relative w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                                    <div class="h-full rounded-full bg-purple-600 transition-all duration-500"
+                                         style="width: {{ max(10, min(100, $hubSee * 10)) }}%"></div>
+                                    <div class="absolute top-0 bottom-0 w-0.5 bg-slate-800 opacity-60 z-10" style="left: 80%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Agree Together -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="flex items-center gap-1.5 text-slate-800">
+                                        <i data-lucide="handshake" class="w-3.5 h-3.5 text-sky-600"></i>
+                                        <span>Agree Together</span>
+                                    </span>
+                                    <span class="text-sky-700 font-black">{{ number_format($hubAgree, 1) }} / 10</span>
+                                </div>
+                                <div class="relative w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                                    <div class="h-full rounded-full bg-sky-500 transition-all duration-500"
+                                         style="width: {{ max(10, min(100, $hubAgree * 10)) }}%"></div>
+                                    <div class="absolute top-0 bottom-0 w-0.5 bg-slate-800 opacity-60 z-10" style="left: 80%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Act Together -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span class="flex items-center gap-1.5 text-slate-800">
+                                        <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                        <span>Act Together</span>
+                                    </span>
+                                    <span class="text-emerald-700 font-black">{{ number_format($hubAct, 1) }} / 10</span>
+                                </div>
+                                <div class="relative w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                                    <div class="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                                         style="width: {{ max(10, min(100, $hubAct * 10)) }}%"></div>
+                                    <div class="absolute top-0 bottom-0 w-0.5 bg-slate-800 opacity-60 z-10" style="left: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                            <span>Target threshold: 8.0 (Unified)</span>
+                            <span class="text-indigo-600 font-bold">All 3 dimensions scored</span>
+                        </div>
+                    </div>
+
+                    <!-- Col 3: Strategic Action Callout -->
+                    <div class="bg-white rounded-2xl border border-purple-100 p-5 shadow-2xs flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                                Executive Path
+                            </span>
+                            <h4 class="text-sm font-black text-slate-900 mt-2">Team Growth & Synchronization</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed mt-1">
+                                {{ $hubSync['key_insights'][0] ?? 'The team has a positive foundation for change alignment.' }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <a href="{{ route('admin.companies.team-sync', ['company' => $company, 'survey_id' => $targetSurvey->id]) }}" 
+                               class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-black text-white bg-purple-700 hover:bg-purple-800 shadow-xs transition">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                                <span>Open Full Team CQ Sync Report</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </a>
+
+                            <a href="{{ route('admin.surveys.group-insights', ['survey' => $targetSurvey, 'tab' => 'summary']) }}" 
+                               class="w-full inline-flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                                <i data-lucide="compass" class="w-3.5 h-3.5 text-slate-500"></i>
+                                <span>View 30–60–90 Day Roadmap</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        @endif
+
         <!-- Company 360° Benchmark Bar & Survey Filter -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-2.5 flex-wrap">
@@ -564,12 +777,26 @@
                                     <span>{{ $survey->assessments_count }} Evaluations</span>
                                 </div>
                             </div>
-                            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                                <span class="font-bold text-slate-700">Completion: {{ $survey->completionPercentage() }}%</span>
-                                <a href="{{ route('admin.surveys.show', $survey) }}" class="font-bold text-indigo-600 hover:underline flex items-center gap-1">
-                                    <span>Manage</span>
-                                    <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                                </a>
+                            <div class="pt-2.5 border-t border-slate-100 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-bold text-slate-700">Completion: {{ $survey->completionPercentage() }}%</span>
+                                    <a href="{{ route('admin.surveys.show', $survey) }}" class="font-bold text-slate-500 hover:text-slate-900 transition flex items-center gap-1 text-[11px]">
+                                        <span>Manage Survey</span>
+                                        <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                    </a>
+                                </div>
+                                <div class="grid grid-cols-2 gap-1.5 pt-1">
+                                    <a href="{{ route('admin.surveys.team-sync', $survey) }}" 
+                                       class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 transition">
+                                        <i data-lucide="sparkles" class="w-3 h-3 text-purple-600"></i>
+                                        <span>Team CQ Sync</span>
+                                    </a>
+                                    <a href="{{ route('admin.surveys.group-insights', $survey) }}" 
+                                       class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition">
+                                        <i data-lucide="layout-grid" class="w-3 h-3 text-indigo-600"></i>
+                                        <span>Group Insights</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @empty
