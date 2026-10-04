@@ -107,6 +107,7 @@ class AssessmentScoreService
         $completedCount = $completedAssessments->count();
 
         $completionRate = $totalCount > 0 ? round(($completedCount / $totalCount) * 100, 2) : 0.0;
+        $selfAndPeer = $this->calculateSelfAndPeerScores($subject, $survey);
 
         if ($completedCount === 0) {
             return [
@@ -122,6 +123,10 @@ class AssessmentScoreService
                 'category_badge' => 'bg-gray-100 text-gray-700 border-gray-200',
                 'completed_assessments' => $completedAssessments,
                 'all_assessments' => $allAssessments,
+                'self_metrics' => $selfAndPeer['self'],
+                'peer_metrics' => $selfAndPeer['peer'],
+                'comparison' => $selfAndPeer['comparison'],
+                'cq_report' => null,
             ];
         }
 
