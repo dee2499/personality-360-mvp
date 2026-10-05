@@ -21,9 +21,51 @@
     $bmX = round(max(230, min(840, 230 + ($bmCq * 61))), 2);
     $bmY = round(max(40, min(500, 500 - ($bmSync * 46))), 2);
 
-    // Tooltip position relative to current position dot
-    $tooltipX = $curX > 680 ? ($curX - 148) : ($curX + 16);
-    $tooltipY = $curY < 90 ? ($curY + 12) : ($curY - 24);
+    // Intelligent tooltip positioning with collision avoidance for the Goal/Benchmark (bmX, bmY)
+    $tooltipW = 142;
+    $tooltipH = 50;
+
+    $candidates = [
+        // 1. Right of point
+        ['x' => $curX + 18, 'y' => $curY - 24],
+        // 2. Left of point
+        ['x' => $curX - $tooltipW - 18, 'y' => $curY - 24],
+        // 3. Below point
+        ['x' => $curX - ($tooltipW / 2), 'y' => $curY + 22],
+        // 4. Above point
+        ['x' => $curX - ($tooltipW / 2), 'y' => $curY - $tooltipH - 22],
+        // 5. Bottom-Left
+        ['x' => $curX - $tooltipW - 18, 'y' => $curY + 16],
+        // 6. Top-Left
+        ['x' => $curX - $tooltipW - 18, 'y' => $curY - $tooltipH - 10],
+    ];
+
+    $tooltipX = $curX - $tooltipW - 18; // safe default
+    $tooltipY = $curY - 24;
+
+    foreach ($candidates as $cand) {
+        $tx = $cand['x'];
+        $ty = $cand['y'];
+
+        // Check grid boundary constraints (Grid: X 230-840, Y 40-500)
+        if ($tx < 232 || ($tx + $tooltipW) > 838 || $ty < 42 || ($ty + $tooltipH) > 498) {
+            continue;
+        }
+
+        // Check collision with Benchmark / Goal star circle (bmX, bmY with 28px buffer)
+        $collidesWithGoal = !(
+            ($tx + $tooltipW) < ($bmX - 28) ||
+            $tx > ($bmX + 28) ||
+            ($ty + $tooltipH) < ($bmY - 28) ||
+            $ty > ($bmY + 28)
+        );
+
+        if (! $collidesWithGoal) {
+            $tooltipX = $tx;
+            $tooltipY = $ty;
+            break;
+        }
+    }
 @endphp
 
 <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4">

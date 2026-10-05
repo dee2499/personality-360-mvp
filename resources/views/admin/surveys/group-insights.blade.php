@@ -225,71 +225,71 @@
                 </div>
             </div>
 
-            <!-- Middle Row: Team Position Matrix (Image 2) -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- 2x2 Team Position Matrix (7 cols) -->
-                <div class="lg:col-span-7">
-                    <x-team-position-matrix :cq-score="$cqScore" :sync-score="$syncScore" :benchmark-cq="$benchmarkCQ" :benchmark-sync="$benchmarkSync" />
-                </div>
+            <!-- Section: Team Position Matrix (Full Row) -->
+            <div class="w-full">
+                <x-team-position-matrix :cq-score="$cqScore" :sync-score="$syncScore" :benchmark-cq="$benchmarkCQ" :benchmark-sync="$benchmarkSync" />
+            </div>
 
-                <!-- Right Side: What This Means & Path to Opportunity Zone (5 cols) -->
-                <div class="lg:col-span-5 space-y-4">
-                    <!-- What This Means Card -->
-                    <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i>
-                            <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">What This Means</h3>
-                        </div>
-
-                        <div class="space-y-3 text-xs">
-                            <div class="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1">
-                                <div class="font-extrabold text-amber-950 flex items-center gap-1.5">
-                                    <i data-lucide="compass" class="w-3.5 h-3.5 text-amber-600"></i>
-                                    <span>Current: {{ $insights['matrix_zone_name'] }} ({{ number_format($cqScore, 1) }}, {{ number_format($syncScore, 1) }})</span>
-                                </div>
-                                <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_zone_subtitle'] }}</p>
-                            </div>
-
-                            <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-200/70 space-y-1">
-                                <div class="font-extrabold text-rose-950 flex items-center gap-1.5">
-                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i>
-                                    <span>Key Blind Spot</span>
-                                </div>
-                                <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_blind_spot'] }}</p>
-                            </div>
-
-                            <div class="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200/70 space-y-1">
-                                <div class="font-extrabold text-emerald-950 flex items-center gap-1.5">
-                                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-emerald-600"></i>
-                                    <span>Opportunity</span>
-                                </div>
-                                <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_opportunity'] }}</p>
-                            </div>
-                        </div>
+            <!-- Section: What This Means & Path to Opportunity Zone (2-Column Row) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- What This Means Card -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i>
+                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">What This Means</h3>
                     </div>
 
-                    <!-- Path to Opportunity Zone Trajectory Card -->
-                    <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-3">
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1">
+                            <div class="font-extrabold text-amber-950 flex items-center gap-1.5">
+                                <i data-lucide="compass" class="w-3.5 h-3.5 text-amber-600"></i>
+                                <span>Current: {{ $insights['matrix_zone_name'] }} ({{ number_format($cqScore, 1) }}, {{ number_format($syncScore, 1) }})</span>
+                            </div>
+                            <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_zone_subtitle'] }}</p>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-200/70 space-y-1">
+                            <div class="font-extrabold text-rose-950 flex items-center gap-1.5">
+                                <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i>
+                                <span>Key Blind Spot</span>
+                            </div>
+                            <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_blind_spot'] }}</p>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200/70 space-y-1">
+                            <div class="font-extrabold text-emerald-950 flex items-center gap-1.5">
+                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                <span>Opportunity</span>
+                            </div>
+                            <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_opportunity'] }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Path to Opportunity Zone Trajectory Card -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4 flex flex-col justify-between">
+                    <div>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <i data-lucide="navigation" class="w-5 h-5 text-indigo-600"></i>
                                 <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Path to Opportunity Zone</h4>
                             </div>
-                            <span class="text-[10px] font-bold text-emerald-700">Target (8.0, 8.0)</span>
+                            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Target (8.0, 8.0)</span>
                         </div>
 
-                        <div class="grid grid-cols-4 gap-2 pt-2 text-center text-xs">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 text-center text-xs">
                             @foreach(['Current' => [$cqScore, $syncScore], '30 Days' => [round($cqScore + 0.3, 1), round($syncScore + 0.6, 1)], '60 Days' => [round($cqScore + 0.8, 1), round($syncScore + 1.2, 1)], '90 Days' => [8.0, 8.0]] as $label => $pts)
-                                <div class="p-2.5 rounded-xl border {{ $loop->last ? 'bg-emerald-50 border-emerald-300 font-extrabold text-emerald-900' : 'bg-slate-50 border-slate-200' }}">
-                                    <span class="block text-[10px] text-slate-400 font-bold uppercase">{{ $label }}</span>
-                                    <span class="font-black text-xs mt-0.5 block">({{ $pts[0] }}, {{ $pts[1] }})</span>
+                                <div class="p-3 rounded-2xl border {{ $loop->last ? 'bg-emerald-50/80 border-emerald-300 font-extrabold text-emerald-900 shadow-2xs' : 'bg-slate-50 border-slate-200' }}">
+                                    <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ $label }}</span>
+                                    <span class="font-black text-xs sm:text-sm mt-1 block">({{ $pts[0] }}, {{ $pts[1] }})</span>
                                 </div>
                             @endforeach
                         </div>
-                        <p class="text-[11px] text-slate-500 pt-1 leading-relaxed">
-                            Focus on targeted actions to improve synchronisation while continuing to build capability.
-                        </p>
                     </div>
+
+                    <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-100 leading-relaxed">
+                        Focus on targeted actions to improve synchronisation while continuing to build capability.
+                    </p>
                 </div>
             </div>
 
