@@ -143,114 +143,8 @@
         <!-- TAB 1: SUMMARY REPORT & TEAM POSITION MATRIX (MATCHING IMAGE 2) -->
         <!-- ============================================================= -->
         <div x-show="activeTab === 'summary'" class="space-y-4 sm:space-y-5" x-transition>
-            <!-- 4 Top Cards (Matching Reference Photo) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <!-- 1. Team CQ (Group Score) -->
-                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #eef7fe !important; border: 1px solid #d7ebfc !important;">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #d0e5ff !important;">
-                        <svg class="w-5 h-5 text-[#0f78ec]" viewBox="0 0 24 24" fill="currentColor">
-                            <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
-                            <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
-                            <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Team CQ</div>
-                        <div class="text-[10px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Group Score)</div>
-                        <div class="mt-1 flex items-baseline gap-1">
-                            <span class="text-xl font-black text-[#0a0f37] tracking-tight">{{ number_format($cqScore, 1) }}</span>
-                            <span class="text-[11px] font-semibold text-slate-500">/ 10</span>
-                        </div>
-                        <div class="mt-1">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #fef08a !important; color: #0a0f37 !important;">
-                                {{ $insights['group_transition_label'] ?? 'Change Supporter → Driver' }}
-                            </span>
-                        </div>
-                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">Capability to navigate change</p>
-                    </div>
-                </div>
-
-                <!-- 2. Team CQ Sync -->
-                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #f4f2fd !important; border: 1px solid #e7ddfb !important;">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #e4d5ff !important;">
-                        <svg class="w-5 h-5 text-[#6f01d2]" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                            <path d="M4.5 10.5c1.38 0 2.5-1.12 2.5-2.5S5.88 5.5 4.5 5.5 2 6.62 2 8s1.12 2.5 2.5 2.5zm0 1.5C2.83 12 0 12.83 0 14.5V17h5v-1.5c0-.98.39-1.87 1.03-2.56C5.41 12.35 4.88 12 4.5 12z" opacity="0.85"/>
-                            <path d="M19.5 10.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5-2.5 1.12-2.5 2.5 1.12 2.5 2.5 2.5zm0 1.5c-.38 0-.91.35-1.53.94.64.69 1.03 1.58 1.03 2.56V17h5v-2.5c0-1.67-2.83-2.5-4.5-2.5z" opacity="0.85"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
-                        <div class="mt-1 flex items-baseline gap-1">
-                            <span class="text-xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
-                            <span class="text-[11px] font-semibold text-slate-500">/ 10</span>
-                        </div>
-                        <div class="mt-1">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #d4fce6 !important; color: #0a0f37 !important;">
-                                {{ $sync['maturity_level'] ?? 'Aligned' }}
-                            </span>
-                        </div>
-                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">How well we see, agree and act together</p>
-                    </div>
-                </div>
-
-                <!-- 3. Expected / Benchmark -->
-                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #f2fbf6 !important; border: 1px solid #daf5e6 !important;">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #d4fce6 !important;">
-                        <svg class="w-5 h-5 text-[#047857]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="9"/>
-                            <circle cx="12" cy="12" r="5"/>
-                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
-                            <path d="M19 5l-5 5"/>
-                            <path d="M15 5h4v4"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
-                        <div class="mt-1 flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ:</span>
-                            <span class="text-base font-black tracking-tight" style="color: #047857 !important;">{{ number_format($benchmarkCQ, 1) }}</span>
-                            <span class="text-slate-300 mx-1 text-xs font-light">|</span>
-                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ Sync:</span>
-                            <span class="text-base font-black tracking-tight" style="color: #047857 !important;">{{ number_format($benchmarkSync, 1) }}</span>
-                        </div>
-                        <div class="mt-1">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #d4fce6 !important; color: #0a0f37 !important;">
-                                Change Champion & Unified
-                            </span>
-                        </div>
-                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">High capability with strong synchronisation</p>
-                    </div>
-                </div>
-
-                <!-- 4. Gaps to Benchmark -->
-                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #fef2f2 !important; border: 1px solid #fcd5dc !important;">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #ffd2dc !important;">
-                        <svg class="w-5 h-5 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
-                            <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
-                            <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
-                            <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
-                        </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
-                        <div class="mt-1 flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ:</span>
-                            <span class="text-base font-black tracking-tight" style="color: {{ $gapCQ < 0 ? '#ed082d' : '#047857' }} !important;">
-                                {{ $gapCQ > 0 ? '+'.number_format($gapCQ, 1) : number_format($gapCQ, 1) }}
-                            </span>
-                            <span class="text-slate-300 mx-1 text-xs font-light">|</span>
-                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ Sync:</span>
-                            <span class="text-base font-black tracking-tight" style="color: {{ $gapSync < 0 ? '#ed082d' : '#047857' }} !important;">
-                                {{ $gapSync > 0 ? '+'.number_format($gapSync, 1) : number_format($gapSync, 1) }}
-                            </span>
-                        </div>
-                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">
-                            {{ $gapDescription }}
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <!-- Top 5 Metric Cards (Matching Theme Template) -->
+            <x-team-insights-metric-cards :insights="$insights" />
 
             <!-- Section: Team Position Matrix (Full Row) -->
             <div class="w-full">
@@ -506,38 +400,8 @@
         <!-- TAB 3: CAPABILITY & DISTRIBUTION REPORT (MATCHING IMAGE 4)     -->
         <!-- ============================================================= -->
         <div x-show="activeTab === 'capability'" class="space-y-6 sm:space-y-8" x-transition>
-            <!-- Top 5 Metric Cards (Image 4) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                    <span class="text-[11px] font-bold text-slate-400">Team Size</span>
-                    <div class="text-2xl font-black text-slate-900 mt-1">{{ $insights['cohort_size'] }}</div>
-                    <span class="text-[10px] text-slate-400">Employees assessed</span>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                    <span class="text-[11px] font-bold text-slate-400">Average (Mean)</span>
-                    <div class="text-2xl font-black text-slate-900 mt-1">{{ number_format($stats['mean'] ?? $cqScore, 1) }} <span class="text-xs text-slate-400">/ 10</span></div>
-                    <span class="text-[10px] font-bold text-indigo-700">{{ $insights['group_display_name'] ?? 'Supporter' }}</span>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                    <span class="text-[11px] font-bold text-slate-400">Median CQ Score</span>
-                    <div class="text-2xl font-black text-slate-900 mt-1">{{ number_format($stats['median'] ?? $cqScore, 1) }} <span class="text-xs text-slate-400">/ 10</span></div>
-                    <span class="text-[10px] font-bold text-indigo-700">Supporter</span>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                    <span class="text-[11px] font-bold text-slate-400">Benchmark Target</span>
-                    <div class="text-2xl font-black text-emerald-700 mt-1">8.0 <span class="text-xs text-slate-400">/ 10</span></div>
-                    <span class="text-[10px] font-bold text-emerald-700">Champion Level</span>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
-                    <span class="text-[11px] font-bold text-slate-400">Gap to Benchmark</span>
-                    <div class="text-2xl font-black text-rose-600 mt-1">{{ $gapCQ }}</div>
-                    <span class="text-[10px] text-slate-400">Needs strengthening</span>
-                </div>
-            </div>
+            <!-- Top 5 Metric Cards (Matching Theme Template) -->
+            <x-team-insights-metric-cards :insights="$insights" />
 
             <!-- Middle Row: Distribution Histogram & Key Statistics (Image 4) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
