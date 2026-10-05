@@ -1321,6 +1321,18 @@ class AssessmentScoreService
         $groupCategory = $this->categoryService->getCategory($teamCQPercentage);
         $groupProfile = $this->getProfileArchetypeData($teamCQPercentage, $teamCQScore);
 
+        if ($teamCQScore <= 2.0) {
+            $groupTransitionLabel = 'Change Resistor';
+        } elseif ($teamCQScore <= 4.0) {
+            $groupTransitionLabel = 'Change Resistor → Follower';
+        } elseif ($teamCQScore <= 6.0) {
+            $groupTransitionLabel = 'Change Follower → Supporter';
+        } elseif ($teamCQScore <= 8.0) {
+            $groupTransitionLabel = 'Change Supporter → Driver';
+        } else {
+            $groupTransitionLabel = 'Change Driver → Champion';
+        }
+
         // 2. Team CQ Sync Score
         $syncReport = $this->calculateGroupSyncScore($survey);
         $teamSyncScore = $syncReport['score'];
@@ -1572,6 +1584,7 @@ class AssessmentScoreService
             'average_cq3_normalised' => $teamCQPercentage,
             'group_category' => $groupCategory,
             'group_display_name' => $groupProfile['display_name'],
+            'group_transition_label' => $groupTransitionLabel,
             'group_emoji' => $groupProfile['emoji'],
             'group_color' => $groupProfile['color'],
             'group_badge' => $this->categoryService->getBadgeClass($groupCategory),

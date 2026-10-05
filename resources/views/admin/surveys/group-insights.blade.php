@@ -135,93 +135,93 @@
             <!-- 4 Top Cards (Image 2) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- 1. Team CQ (Group Score) -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <span class="text-[11px] font-black uppercase tracking-wider text-indigo-600">Team CQ</span>
-                            <span class="block text-xs font-bold text-slate-400">(Group Score)</span>
-                        </div>
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                            <i data-lucide="trending-up" class="w-4 h-4"></i>
-                        </div>
+                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-blue-100/70 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-7 h-7 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
+                            <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
+                            <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
+                        </svg>
                     </div>
-                    <div class="my-3">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-3xl font-black text-slate-900">{{ number_format($cqScore, 1) }}</span>
-                            <span class="text-sm font-bold text-slate-400">/ 10</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Team CQ</div>
+                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Group Score)</div>
+                        <div class="mt-1.5 flex items-baseline gap-1.5">
+                            <span class="text-3xl font-black text-[#0a0f37] tracking-tight">{{ number_format($cqScore, 1) }}</span>
+                            <span class="text-xl font-medium text-slate-500">/ 10</span>
                         </div>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 mt-2">
-                            {{ $insights['group_display_name'] ?? 'Change Supporter' }}
-                        </span>
+                        <div class="mt-2.5">
+                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-[#fef08a] text-slate-900 shadow-2xs">
+                                {{ $insights['group_transition_label'] ?? 'Change Supporter → Driver' }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 font-normal">Capability to navigate change</p>
                     </div>
-                    <p class="text-[11px] text-slate-400 pt-2 border-t border-slate-100">Capability to navigate change</p>
                 </div>
 
                 <!-- 2. Team CQ Sync -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <span class="text-[11px] font-black uppercase tracking-wider text-purple-600">Team CQ Sync</span>
-                            <span class="block text-xs font-bold text-slate-400">(Alignment Index)</span>
-                        </div>
-                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                        </div>
+                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-purple-100/70 flex items-center justify-center shrink-0 mt-0.5">
+                        <i data-lucide="users" class="w-7 h-7 text-purple-600"></i>
                     </div>
-                    <div class="my-3">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-3xl font-black text-slate-900">{{ number_format($syncScore, 1) }}</span>
-                            <span class="text-sm font-bold text-slate-400">/ 10</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
+                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Alignment Index)</div>
+                        <div class="mt-1.5 flex items-baseline gap-1.5">
+                            <span class="text-3xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
+                            <span class="text-xl font-medium text-slate-500">/ 10</span>
                         </div>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 mt-2">
-                            {{ $sync['maturity_level'] ?? 'Aligned' }}
-                        </span>
+                        <div class="mt-2.5">
+                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-950 shadow-2xs">
+                                {{ $sync['maturity_level'] ?? 'Aligned' }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 font-normal">How well we see, agree and act together</p>
                     </div>
-                    <p class="text-[11px] text-slate-400 pt-2 border-t border-slate-100">How well we see, agree and act together</p>
                 </div>
 
                 <!-- 3. Expected / Benchmark -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <span class="text-[11px] font-black uppercase tracking-wider text-emerald-600">Expected / Benchmark</span>
-                            <span class="block text-xs font-bold text-slate-400">Target Standard</span>
-                        </div>
-                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <i data-lucide="target" class="w-4 h-4"></i>
-                        </div>
+                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-emerald-100/70 flex items-center justify-center shrink-0 mt-0.5">
+                        <i data-lucide="target" class="w-7 h-7 text-emerald-600"></i>
                     </div>
-                    <div class="my-3">
-                        <div class="text-lg font-black text-slate-800">
-                            CQ: <span class="text-slate-900">8.0</span> <span class="text-slate-300 mx-1">|</span> CQ Sync: <span class="text-slate-900">8.0</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
+                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">Target Standard</div>
+                        <div class="mt-2 text-sm font-extrabold text-[#0a0f37]">
+                            CQ: <span class="font-black">8.0</span> <span class="text-slate-300 mx-1">|</span> CQ Sync: <span class="font-black">8.0</span>
                         </div>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 mt-2">
-                            Change Champion & Unified
-                        </span>
+                        <div class="mt-2.5">
+                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-950 shadow-2xs">
+                                Change Champion & Unified
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 font-normal">High capability with strong synchronisation</p>
                     </div>
-                    <p class="text-[11px] text-slate-400 pt-2 border-t border-slate-100">High capability with strong synchronisation</p>
                 </div>
 
                 <!-- 4. Gaps to Benchmark -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <span class="text-[11px] font-black uppercase tracking-wider text-rose-600">Gaps to Benchmark</span>
-                            <span class="block text-xs font-bold text-slate-400">Distance to Target</span>
-                        </div>
-                        <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                            <i data-lucide="trending-down" class="w-4 h-4"></i>
-                        </div>
+                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-rose-100/70 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-7 h-7 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
+                            <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
+                            <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
+                        </svg>
                     </div>
-                    <div class="my-3">
-                        <div class="text-lg font-black text-rose-700">
-                            CQ: <span class="text-rose-600">{{ $gapCQ }}</span> <span class="text-slate-300 mx-1">|</span> CQ Sync: <span class="text-rose-600">{{ $gapSync }}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
+                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">Distance to Target</div>
+                        <div class="mt-2 text-sm font-extrabold text-rose-700">
+                            CQ: <span class="font-black">{{ $gapCQ > 0 ? '+'.$gapCQ : $gapCQ }}</span> <span class="text-slate-300 mx-1">|</span> CQ Sync: <span class="font-black">{{ $gapSync > 0 ? '+'.$gapSync : $gapSync }}</span>
                         </div>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 mt-2">
-                            Capability & Sync Deficits
-                        </span>
+                        <div class="mt-2.5">
+                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-rose-100 text-rose-950 shadow-2xs">
+                                {{ abs($gapCQ) > 1.5 || abs($gapSync) > 1.5 ? 'Capability & Sync Deficits' : 'Minor Gaps' }}
+                            </span>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-500 font-normal">Need to strengthen capability & synchronisation</p>
                     </div>
-                    <p class="text-[11px] text-slate-400 pt-2 border-t border-slate-100">Need to strengthen capability & synchronisation</p>
                 </div>
             </div>
 
