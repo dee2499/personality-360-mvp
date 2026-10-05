@@ -76,10 +76,10 @@
     </div>
 
     <!-- Semicircular Speedometer Arc Gauge (Floating Needle design matching template image) -->
-    <div class="w-full max-w-[390px] mx-auto aspect-[400/235] relative flex items-end justify-center select-none pt-2"
+    <div class="w-full max-w-[390px] mx-auto aspect-[400/205] relative flex items-end justify-center select-none overflow-hidden"
          x-data="{ mounted: false }"
          x-init="setTimeout(() => mounted = true, 50)">
-        <svg viewBox="0 0 400 230" class="w-full h-full overflow-visible select-none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 15 400 190" class="w-full h-full select-none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <!-- Needle Drop Shadow -->
                 <filter id="{{ $filterId }}" x="-50%" y="-50%" width="200%" height="200%">
@@ -123,8 +123,8 @@
             <!-- Inner Light Grey Arched Track (Ro 108, Ri 94) -->
             <path d="M 92,200 A 108,108 0 0,1 308,200 L 294,200 A 94,94 0 0,0 106,200 Z" fill="#edf0f5" />
 
-            <!-- Inner White Hub Dome (Clean canvas for numeric score) -->
-            <circle cx="200" cy="200" r="93" fill="#ffffff" />
+            <!-- Inner White Hub Dome (Clean semicircle canvas for numeric score, flat at y=200) -->
+            <path d="M 106,200 A 94,94 0 0,1 294,200 Z" fill="#ffffff" />
 
             <!-- ============================================================== -->
             <!-- Dynamic Floating Needle (Base floats on track, NEVER blocks score) -->
@@ -153,7 +153,7 @@
     </div>
 
     <!-- Bottom Insight Box (Matching Template Design) -->
-    <div class="mt-2 p-4 sm:p-5 rounded-2xl text-center space-y-2 border transition-colors shadow-2xs"
+    <div class="mt-4 sm:mt-5 p-4 sm:p-5 rounded-2xl text-center space-y-2 border transition-colors shadow-2xs"
          style="background-color: {{ $tierBg }} !important; border-color: {{ $tierBorder }} !important;">
         <div>
             <p class="text-xs sm:text-sm font-black text-[#0a0f37]">Your team is at the</p>
