@@ -15,9 +15,19 @@ services:
       - key: APP_KEY
         value: "base64:1wWf5KHtdnNCU3beG42ECrqpZJHGTjZbPPWpYWyDkvg="
       - key: DB_CONNECTION
-        value: sqlite
+        value: mysql
+      - key: DB_HOST
+        value: mysql-12f1b6fc-change-quo.f.aivencloud.com
+      - key: DB_PORT
+        value: "26704"
       - key: DB_DATABASE
-        value: /var/www/html/database/database.sqlite
+        value: defaultdb
+      - key: DB_USERNAME
+        value: avnadmin
+      - key: DB_PASSWORD
+        sync: false
+      - key: MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
+        value: "false"
       - key: SESSION_DRIVER
         value: database
       - key: CACHE_STORE
