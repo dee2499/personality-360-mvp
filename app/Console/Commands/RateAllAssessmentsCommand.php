@@ -12,6 +12,7 @@ use App\Services\AssessmentCategoryService;
 use App\Services\AssessmentScoreService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class RateAllAssessmentsCommand extends Command
 {
@@ -20,7 +21,7 @@ class RateAllAssessmentsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'assessment:rate-all {--survey= : Optional Survey ID to rate} {--all : Rate all published surveys}';
+    protected $signature = 'assessment:rate-all {--survey= : Optional Survey ID to rate} {--all : Rate all published surveys} {--negative : Rate all assessments with negative feedback for weak performance} {--weak : Alias for --negative}';
 
     /**
      * The console command description.
@@ -226,6 +227,7 @@ class RateAllAssessmentsCommand extends Command
         AssessmentCategoryService $categoryService,
         AssessmentScoreService $scoreService
     ): int {
+        $isNegative = (bool) ($this->option('negative') || $this->option('weak'));
         $surveyId = $this->option('survey');
         $surveys = $surveyId
             ? Survey::where('id', $surveyId)->get()
@@ -235,6 +237,10 @@ class RateAllAssessmentsCommand extends Command
             $this->error('No published surveys found to rate.');
 
             return self::FAILURE;
+        }
+
+        if ($isNegative) {
+            $this->warn('>>> Running in NEGATIVE FEEDBACK MODE (Weak Performance / Resistant / Divergent) <<<');
         }
 
         foreach ($surveys as $survey) {
@@ -280,70 +286,109 @@ class RateAllAssessmentsCommand extends Command
             $totalAnswersCount = 0;
             $totalAssessmentsRated = 0;
 
-            foreach ($assessments as $assessment) {
-                $isSelf = ($assessment->assessor_id === $assessment->subject_id);
-                $subjectName = $assessment->subject?->name ?? '';
+            DB::transaction(function () use (
+                $assessments,
+                $individualQuestions,
+                $groupSyncQuestions,
+                $participants,
+                $survey,
+                $scoreService,
+                $isNegative,
+                &$totalAnswersCount,
+                &$totalAssessmentsRated
+            ) {
+                foreach ($assessments as $assessment) {
+                    $isSelf = ($assessment->assessor_id === $assessment->subject_id);
+                    $subjectName = $assessment->subject?->name ?? '';
 
-                $profile = $this->profiles[$subjectName] ?? ['self' => 7.0, 'peer' => 7.0];
+                    if ($isNegative) {
+                        // Negative ratings in 1.0–2.0 bracket (Resistor archetype, Key Development Area)
+                        // Target averages realistically vary between 1.2 and 1.8 across participants
+                        $selfTarget = round(1.2 + (($assessment->subject_id * 3) % 6) * 0.1, 1);
+                        $peerBase = round(1.2 + (($assessment->subject_id * 7) % 6) * 0.1, 1);
+                        $offset = ((($assessment->assessor_id * 7 + $assessment->subject_id) % 3) - 1) * 0.1;
+                        $peerTarget = max(1.0, min(2.0, $peerBase + $offset));
 
-                if ($isSelf) {
-                    $scores = $this->generateQuestionScores(
-                        $profile['self'],
-                        $individualQuestions->count(),
-                        (int) $assessment->subject_id * 3
-                    );
-                } else {
-                    // Slight rater offset (-0.2, 0, +0.2) to simulate natural reviewer differences while maintaining target mean
-                    $offset = ((($assessment->assessor_id * 7 + $assessment->subject_id) % 3) - 1) * 0.2;
-                    $peerTarget = max(1.0, min(10.0, $profile['peer'] + $offset));
+                        $targetAvg = $isSelf ? $selfTarget : $peerTarget;
+                        $seed = $isSelf
+                            ? (int) $assessment->subject_id * 3
+                            : (int) ($assessment->assessor_id * 11 + $assessment->subject_id * 5);
 
-                    $scores = $this->generateQuestionScores(
-                        $peerTarget,
-                        $individualQuestions->count(),
-                        (int) ($assessment->assessor_id * 11 + $assessment->subject_id * 5)
-                    );
-                }
+                        $scores = $this->generateQuestionScores(
+                            $targetAvg,
+                            $individualQuestions->count(),
+                            $seed,
+                            2
+                        );
+                    } else {
+                        $profile = $this->profiles[$subjectName] ?? ['self' => 7.0, 'peer' => 7.0];
 
-                // Clean old assessment answers
-                $assessment->answers()->delete();
+                        if ($isSelf) {
+                            $scores = $this->generateQuestionScores(
+                                $profile['self'],
+                                $individualQuestions->count(),
+                                (int) $assessment->subject_id * 3
+                            );
+                        } else {
+                            // Slight rater offset (-0.2, 0, +0.2) to simulate natural reviewer differences while maintaining target mean
+                            $offset = ((($assessment->assessor_id * 7 + $assessment->subject_id) % 3) - 1) * 0.2;
+                            $peerTarget = max(1.0, min(10.0, $profile['peer'] + $offset));
 
-                foreach ($individualQuestions as $qIndex => $question) {
-                    AssessmentAnswer::create([
-                        'assessment_id' => $assessment->id,
-                        'question_id' => $question->id,
-                        'score' => $scores[$qIndex],
+                            $scores = $this->generateQuestionScores(
+                                $peerTarget,
+                                $individualQuestions->count(),
+                                (int) ($assessment->assessor_id * 11 + $assessment->subject_id * 5)
+                            );
+                        }
+                    }
+
+                    // Clean old assessment answers
+                    $assessment->answers()->delete();
+
+                    foreach ($individualQuestions as $qIndex => $question) {
+                        AssessmentAnswer::create([
+                            'assessment_id' => $assessment->id,
+                            'question_id' => $question->id,
+                            'score' => $scores[$qIndex],
+                        ]);
+
+                        $totalAnswersCount++;
+                    }
+
+                    $assessment->update([
+                        'status' => 'completed',
+                        'completed_at' => now(),
                     ]);
 
-                    $totalAnswersCount++;
+                    $scoreService->calculateAssessmentScore($assessment);
+                    $totalAssessmentsRated++;
                 }
 
-                $assessment->update([
-                    'status' => 'completed',
-                    'completed_at' => now(),
-                ]);
+                // Populate Group Sync ratings for all participants
+                if ($groupSyncQuestions->isNotEmpty()) {
+                    foreach ($participants as $participant) {
+                        foreach ($groupSyncQuestions as $gIndex => $gQuestion) {
+                            if ($isNegative) {
+                                // Negative ratings (1s and 2s) so overall sync score is ~1.3-1.4 (Divergent)
+                                $syncScore = (($participant->id * 2 + $gIndex) % 3 === 0) ? 2 : 1;
+                            } else {
+                                $syncScore = max(1, min(10, (int) round(7.0 + sin($participant->id * 1.5 + $gIndex) * 1.8)));
+                            }
 
-                $scoreService->calculateAssessmentScore($assessment);
-                $totalAssessmentsRated++;
-            }
-
-            // Populate Group Sync ratings for all participants
-            if ($groupSyncQuestions->isNotEmpty()) {
-                foreach ($participants as $participant) {
-                    foreach ($groupSyncQuestions as $gIndex => $gQuestion) {
-                        $syncScore = max(1, min(10, (int) round(7.0 + sin($participant->id * 1.5 + $gIndex) * 1.8)));
-                        GroupSyncAnswer::updateOrCreate(
-                            [
-                                'survey_id' => $survey->id,
-                                'user_id' => $participant->id,
-                                'question_id' => $gQuestion->id,
-                            ],
-                            [
-                                'score' => $syncScore,
-                            ]
-                        );
+                            GroupSyncAnswer::updateOrCreate(
+                                [
+                                    'survey_id' => $survey->id,
+                                    'user_id' => $participant->id,
+                                    'question_id' => $gQuestion->id,
+                                ],
+                                [
+                                    'score' => $syncScore,
+                                ]
+                            );
+                        }
                     }
                 }
-            }
+            });
 
             $this->info("Completed {$totalAssessmentsRated} assessments with {$totalAnswersCount} question answers for Survey #{$survey->id}!");
 
@@ -359,9 +404,13 @@ class RateAllAssessmentsCommand extends Command
      *
      * @return array<int, int>
      */
-    protected function generateQuestionScores(float $targetAverage, int $questionCount = 11, int $seed = 0): array
-    {
-        $targetAverage = max(1.0, min(10.0, $targetAverage));
+    protected function generateQuestionScores(
+        float $targetAverage,
+        int $questionCount = 11,
+        int $seed = 0,
+        int $maxAllowed = 10
+    ): array {
+        $targetAverage = max(1.0, min((float) $maxAllowed, $targetAverage));
         $targetSum = (int) round($targetAverage * $questionCount);
         $base = (int) floor($targetAverage);
 
@@ -371,7 +420,7 @@ class RateAllAssessmentsCommand extends Command
         $pattern = [-1, 0, 1, 0, 1, -1, 0, 1, -1, 1, 0];
         for ($i = 0; $i < $questionCount; $i++) {
             $offset = $pattern[($i + $seed) % count($pattern)];
-            $scores[$i] = max(1, min(10, $scores[$i] + $offset));
+            $scores[$i] = max(1, min($maxAllowed, $scores[$i] + $offset));
         }
 
         // Adjust to match exact targetSum
@@ -384,7 +433,7 @@ class RateAllAssessmentsCommand extends Command
         while ($rem > 0 && $attempt < 120) {
             $idx = ($attempt * 3 + $seed) % $questionCount;
             $newVal = $scores[$idx] + $step;
-            if ($newVal >= 1 && $newVal <= 10) {
+            if ($newVal >= 1 && $newVal <= $maxAllowed) {
                 $scores[$idx] = $newVal;
                 $rem--;
             }
@@ -421,5 +470,8 @@ class RateAllAssessmentsCommand extends Command
             ['ID', 'Employee Name', 'Self Score', 'Peer Score', 'CQ Score', 'Archetype', 'Matrix Quadrant'],
             $rows
         );
+
+        $sync = $scoreService->calculateGroupSyncScore($survey);
+        $this->info("Team CQ Sync Score: {$sync['score']} / 10 | Maturity Level: {$sync['maturity_level']} ({$sync['subtitle']})");
     }
 }
