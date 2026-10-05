@@ -63,28 +63,44 @@
                     @enderror
                 </div>
 
-                <div class="pt-4 flex items-center justify-between border-t border-slate-100">
-                    <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" 
-                          data-confirm="true"
-                          data-confirm-title="Delete Company"
-                          data-confirm-message="Are you sure you want to delete this company? All associated employees, surveys, and assessments will be permanently removed."
-                          data-confirm-btn="Delete Company"
-                          data-confirm-type="danger">
-                        @csrf
-                        @method('DELETE')
-                        <!-- separate delete action -->
-                    </form>
+                <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
                     <a href="{{ route('admin.companies.show', $company) }}" 
                        class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
                         Cancel
                     </a>
                     <button type="submit" 
-                            class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition">
+                            class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
                         <i data-lucide="check" class="w-4 h-4"></i>
                         <span>Save Changes</span>
                     </button>
                 </div>
             </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="bg-rose-50/50 rounded-3xl border border-rose-200 p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h3 class="text-sm font-bold text-rose-900">Delete Company</h3>
+                    <p class="text-xs text-rose-700/80 mt-1 max-w-md">
+                        Permanently delete <span class="font-bold">{{ $company->name }}</span> along with all its employee accounts, surveys, and evaluation data. This action cannot be undone.
+                    </p>
+                </div>
+                <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" 
+                      data-confirm="true"
+                      data-confirm-title="Delete Company"
+                      data-confirm-message="Are you sure you want to delete '{{ $company->name }}'? All associated employees, surveys, and assessments will be permanently removed."
+                      data-confirm-btn="Delete Company"
+                      data-confirm-type="danger">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-xs shadow-rose-200 transition cursor-pointer">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Delete Company</span>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </x-layouts.app>

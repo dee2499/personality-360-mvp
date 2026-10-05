@@ -82,12 +82,33 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                        <div class="flex items-center justify-end gap-1.5">
                                             <a href="{{ route('admin.companies.show', $company) }}" 
-                                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition">
-                                                <span>Manage & Invite</span>
+                                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition"
+                                               title="Manage Company">
+                                                <span>Manage</span>
                                                 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                                             </a>
+                                            <a href="{{ route('admin.companies.edit', $company) }}" 
+                                               class="inline-flex items-center justify-center p-1.5 rounded-xl text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 transition"
+                                               title="Edit Company">
+                                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                                            </a>
+                                            <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" 
+                                                  data-confirm="true"
+                                                  data-confirm-title="Delete Company"
+                                                  data-confirm-message="Are you sure you want to delete '{{ $company->name }}'? All associated employees, surveys, and assessments will be permanently removed."
+                                                  data-confirm-btn="Delete Company"
+                                                  data-confirm-type="danger"
+                                                  class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="inline-flex items-center justify-center p-1.5 rounded-xl text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer"
+                                                        title="Delete Company">
+                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

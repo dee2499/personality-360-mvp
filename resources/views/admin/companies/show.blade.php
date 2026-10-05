@@ -63,7 +63,7 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-4 flex items-center gap-2">
+                    <div class="border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-4 flex items-center gap-2 flex-wrap">
                         <a href="{{ route('admin.companies.edit', $company) }}" 
                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
                             <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
@@ -74,6 +74,22 @@
                             <i data-lucide="user-plus" class="w-4 h-4"></i>
                             <span>Add Employee</span>
                         </button>
+                        <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" 
+                              data-confirm="true"
+                              data-confirm-title="Delete Company"
+                              data-confirm-message="Are you sure you want to delete '{{ $company->name }}'? All associated employees, surveys, and assessments will be permanently removed."
+                              data-confirm-btn="Delete Company"
+                              data-confirm-type="danger"
+                              class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition cursor-pointer"
+                                    title="Delete Company">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                <span>Delete</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -11,6 +11,7 @@ use App\Services\AssessmentGenerationService;
 use App\Services\AssessmentScoreService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -133,10 +134,27 @@ class CompanyController extends Controller
     public function destroy(Company $company): RedirectResponse
     {
         $companyName = $company->name;
-        $company->delete();
+
+        DB::transaction(function () use ($company) {
+            // Delete all surveys belonging to this company (questions, assessments, responses cascade)
+            foreach ($company->surveys as $survey) {
+                $survey->forceDelete();
+            }
+
+            // Delete all non-admin employees associated with this company
+            $company->employees()->where('role', '!=', 'admin')->each(function (User $employee) {
+                $employee->delete();
+            });
+
+            // Disassociate any admin users who might have company_id pointing to this company
+            User::where('company_id', $company->id)->where('role', 'admin')->update(['company_id' => null]);
+
+            // Delete the company record
+            $company->delete();
+        });
 
         return redirect()->route('admin.companies.index')
-            ->with('success', "Company '{$companyName}' deleted successfully.");
+            ->with('success', "Company '{$companyName}' and its associated records were deleted successfully.");
     }
 
     /**
