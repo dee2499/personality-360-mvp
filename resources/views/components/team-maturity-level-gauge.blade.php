@@ -82,8 +82,8 @@
         <svg viewBox="0 0 400 230" class="w-full h-full overflow-visible select-none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <!-- Needle Drop Shadow -->
-                <filter id="{{ $filterId }}" x="-30%" y="-30%" width="160%" height="160%">
-                    <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.25"/>
+                <filter id="{{ $filterId }}" x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.25"/>
                 </filter>
             </defs>
 
@@ -129,13 +129,17 @@
             <!-- ============================================================== -->
             <!-- Dynamic Floating Needle (Base floats on track, NEVER blocks score) -->
             <!-- ============================================================== -->
-            <g :style="mounted ? 'transform: rotate({{ $needleAngle }}deg); transition: transform 1.2s cubic-bezier(0.34, 1.4, 0.64, 1);' : 'transform: rotate(-90deg);'"
-               style="transform-origin: 200px 200px; transform: rotate({{ $needleAngle }}deg);"
-               filter="url(#{{ $filterId }})">
-                <!-- Floating needle body starting from hub at track radius ~100 to tip at radius 176 -->
-                <path d="M 191.5 100 L 198.5 24 A 1.5 1.5 0 0 1 201.5 24 L 208.5 100 A 8.5 8.5 0 1 1 191.5 100 Z" fill="#001452" />
-                <!-- White circular hole inside the hub -->
-                <circle cx="200" cy="100" r="3.5" fill="#ffffff" />
+            <g transform="translate(200, 200)">
+                <g transform="rotate({{ $needleAngle }})"
+                   :style="`transform: rotate(${mounted ? {{ $needleAngle }} : -90}deg); transform-origin: 0px 0px; -webkit-transform-origin: 0px 0px; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
+                   style="transform: rotate({{ $needleAngle }}deg); transform-origin: 0px 0px; -webkit-transform-origin: 0px 0px;"
+                   filter="url(#{{ $filterId }})">
+                    <!-- Tapered Sharp Needle extending to outer rim -->
+                    <polygon points="-6.5,-98 -1.5,-172 0,-176 1.5,-172 6.5,-98" fill="#001452"/>
+                    <!-- Base circular hub with white center hole matching template -->
+                    <circle cx="0" cy="-98" r="9" fill="#001452"/>
+                    <circle cx="0" cy="-98" r="3.8" fill="#FFFFFF"/>
+                </g>
             </g>
 
             <!-- Central Numeric Score Display (Unobstructed & 100% visible) -->
