@@ -127,9 +127,21 @@
                 $hubAct = (float) ($hubDims['act_together']['score'] ?? 0.0);
                 $hubGap = (float) ($hubSync['gap_to_benchmark'] ?? ($hubSyncScore - 8.0));
                 
-                // Needle angle for mini gauge
-                $clampedHubSync = max(1.0, min(10.0, $hubSyncScore > 0 ? $hubSyncScore : 5.0));
-                $hubNeedleAngle = -90 + (($clampedHubSync - 1.0) / 9.0) * 180;
+                // Needle angle for mini gauge (piecewise mapping)
+                if ($hubSyncScore <= 0) {
+                    $hubNeedleAngle = -90;
+                } elseif ($hubSyncScore <= 2.0) {
+                    $hubNeedleAngle = -90 + (max(0, $hubSyncScore - 1.0) / 1.0) * 36;
+                } elseif ($hubSyncScore <= 4.0) {
+                    $hubNeedleAngle = -54 + (($hubSyncScore - 2.0) / 2.0) * 36;
+                } elseif ($hubSyncScore <= 6.0) {
+                    $hubNeedleAngle = -18 + (($hubSyncScore - 4.0) / 2.0) * 36;
+                } elseif ($hubSyncScore <= 8.0) {
+                    $hubNeedleAngle = 18 + (($hubSyncScore - 6.0) / 2.0) * 36;
+                } else {
+                    $hubNeedleAngle = 54 + (min(2.0, $hubSyncScore - 8.0) / 2.0) * 36;
+                }
+                $hubNeedleAngle = round(max(-90, min(90, $hubNeedleAngle)), 2);
             @endphp
 
             <div class="bg-gradient-to-br from-white via-purple-50/20 to-indigo-50/30 rounded-3xl border border-purple-200/80 shadow-sm p-6 sm:p-8 space-y-6">
@@ -200,18 +212,23 @@
                         </div>
 
                         <!-- Mini Gauge Arc -->
-                        <div class="w-full max-w-[220px] aspect-[2/1] relative flex items-end justify-center my-3">
-                            <svg viewBox="0 0 300 170" class="w-full h-full overflow-visible">
-                                <path d="M 30,150 A 120,120 0 0,1 67.08,52.92" fill="none" stroke="#EF4444" stroke-width="26" stroke-linecap="round"/>
-                                <path d="M 68,52 A 120,120 0 0,1 118.89,31.7" fill="none" stroke="#FB923C" stroke-width="26"/>
-                                <path d="M 120,31.5 A 120,120 0 0,1 180,31.5" fill="none" stroke="#10B981" stroke-width="26"/>
-                                <path d="M 181.11,31.7 A 120,120 0 0,1 232,52" fill="none" stroke="#F59E0B" stroke-width="26"/>
-                                <path d="M 232.92,52.92 A 120,120 0 0,1 270,150" fill="none" stroke="#3B82F6" stroke-width="26" stroke-linecap="round"/>
+                        <div class="w-full max-w-[220px] aspect-[300/165] relative flex items-end justify-center my-3"
+                             x-data="{ mounted: false }"
+                             x-init="setTimeout(() => mounted = true, 50)">
+                            <svg viewBox="0 0 300 165" class="w-full h-full overflow-visible select-none">
+                                <path d="M 15,150 A 135,135 0 0,1 42.64,70.64 L 81.33,100.16 A 85,85 0 0,0 65,150 Z" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+                                <path d="M 42.64,70.64 A 135,135 0 0,1 110.15,21.61 L 123.72,69.16 A 85,85 0 0,0 81.33,100.16 Z" fill="#FB923C" stroke="#FFFFFF" stroke-width="2"/>
+                                <path d="M 110.15,21.61 A 135,135 0 0,1 189.85,21.61 L 176.28,69.16 A 85,85 0 0,0 123.72,69.16 Z" fill="#34D399" stroke="#FFFFFF" stroke-width="2"/>
+                                <path d="M 189.85,21.61 A 135,135 0 0,1 257.36,70.64 L 218.67,100.16 A 85,85 0 0,0 176.28,69.16 Z" fill="#FBBF24" stroke="#FFFFFF" stroke-width="2"/>
+                                <path d="M 257.36,70.64 A 135,135 0 0,1 285,150 L 235,150 A 85,85 0 0,0 218.67,100.16 Z" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2"/>
 
-                                <g transform="translate(150, 150) rotate({{ $hubNeedleAngle }})">
-                                    <path d="M -4,0 L -1.5,-105 L 0,-115 L 1.5,-105 L 4,0 Z" fill="#1E293B"/>
-                                    <circle cx="0" cy="0" r="7" fill="#0F172A"/>
-                                    <circle cx="0" cy="0" r="3" fill="#FFFFFF"/>
+                                <g transform="translate(150, 150)">
+                                    <g :style="`transform: rotate(${mounted ? {{ $hubNeedleAngle }} : -90}deg); transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`">
+                                        <polygon points="-3.5,0 0,-104 3.5,0" fill="#1E293B"/>
+                                        <circle cx="0" cy="-104" r="2.5" fill="#3B82F6"/>
+                                        <circle cx="0" cy="0" r="7" fill="#1E293B"/>
+                                        <circle cx="0" cy="0" r="2.5" fill="#FFFFFF"/>
+                                    </g>
                                 </g>
                             </svg>
                         </div>
