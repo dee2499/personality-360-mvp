@@ -10,16 +10,80 @@
         $matrix = $cq['matrix'] ?? [];
         $hasData = ($cqScore > 0 || $selfScore > 0 || $peerScore > 0);
 
-        // Needle rotation angle for 0 to 10 scale (functioning the same as Normalised Score on my-assessments):
-        // 0.0 (no data) => -90 deg (needle stays at 0 on far left)
-        // 5.0 => 0 deg (straight up)
-        // 10.0 => +90 deg (far right)
+        $meterTierName = match($profileName) {
+            'Resistor', 'Resistant' => 'Resistant',
+            'Follower' => 'Follower',
+            'Supporter' => 'Supporter',
+            'Initiator', 'Driver' => 'Driver',
+            'Achiever', 'Champion' => 'Champion',
+            default => $profileName,
+        };
+
+        // Calibrated Needle rotation angle on a 1.0 – 10.0 scale (matching theme template gauge):
+        // 1.0 (minimum / start of Resistant) => -90 deg
+        // 5.5 (center of Supporter) => 0 deg (straight up)
+        // 6.9 (Driver) => +28 deg
+        // 10.0 (end of Champion) => +90 deg (far right)
         if (! $hasData || $cqScore <= 0) {
             $needleAngle = -90;
         } else {
-            $needleAngle = round(-90 + (($cqScore / 10.0) * 180), 2);
+            $clampedScore = max(1.0, min(10.0, (float) $cqScore));
+            $needleAngle = round(-90 + ((($clampedScore - 1.0) / 9.0) * 180), 2);
             $needleAngle = max(-90, min(90, $needleAngle));
         }
+
+        $tierTheme = match($meterTierName) {
+            'Resistant' => [
+                'bg' => 'bg-rose-50/80',
+                'border' => 'border-rose-200/90',
+                'text' => 'text-rose-950',
+                'accent' => 'text-rose-600',
+                'badgeBg' => 'bg-rose-100',
+                'badgeText' => 'text-rose-600',
+                'badgeBorder' => 'border-rose-200',
+                'icon' => 'shield',
+            ],
+            'Follower' => [
+                'bg' => 'bg-orange-50/80',
+                'border' => 'border-orange-200/90',
+                'text' => 'text-orange-950',
+                'accent' => 'text-orange-600',
+                'badgeBg' => 'bg-orange-100',
+                'badgeText' => 'text-orange-600',
+                'badgeBorder' => 'border-orange-200',
+                'icon' => 'users',
+            ],
+            'Supporter' => [
+                'bg' => 'bg-emerald-50/80',
+                'border' => 'border-emerald-200/90',
+                'text' => 'text-emerald-950',
+                'accent' => 'text-emerald-600',
+                'badgeBg' => 'bg-emerald-100',
+                'badgeText' => 'text-emerald-600',
+                'badgeBorder' => 'border-emerald-200',
+                'icon' => 'sprout',
+            ],
+            'Champion' => [
+                'bg' => 'bg-sky-50/80',
+                'border' => 'border-sky-200/90',
+                'text' => 'text-sky-950',
+                'accent' => 'text-sky-600',
+                'badgeBg' => 'bg-sky-100',
+                'badgeText' => 'text-sky-600',
+                'badgeBorder' => 'border-sky-200',
+                'icon' => 'trophy',
+            ],
+            default => [ // Driver
+                'bg' => 'bg-amber-50/80',
+                'border' => 'border-amber-200/90',
+                'text' => 'text-amber-950',
+                'accent' => 'text-amber-600',
+                'badgeBg' => 'bg-amber-100',
+                'badgeText' => 'text-amber-600',
+                'badgeBorder' => 'border-amber-200',
+                'icon' => 'rocket',
+            ],
+        };
 
         // Circular donut stroke dash for Self and Peer rings (r=42, circumference ~ 263.89)
         $circumference = 2 * 3.14159 * 42;
@@ -162,171 +226,176 @@
             <!-- ========================================================================= -->
             <!-- 2. Your ChangeQuo Profile (Speedometer Gauge Section)                      -->
             <!-- ========================================================================= -->
-            <div class="space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-7 shadow-xs space-y-4">
                 <!-- Section Header -->
-                <div class="flex items-center justify-between">
+                <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h2 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                            Your <span class="text-purple-700">ChangeQuo</span> Profile
+                        <h2 class="text-lg sm:text-xl font-black tracking-tight text-[#0a0f37]">
+                            Your <span class="text-[#6f01d2]">ChangeQuo</span> Profile
                         </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Your current position in the change journey</p>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">Your current position in the change journey</p>
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium shrink-0 pt-0.5">
                         <span>Score is on a scale of 1 – 10</span>
-                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <i data-lucide="info" class="w-4 h-4 text-[#0284c7]"></i>
                     </div>
                 </div>
 
                 <!-- Semicircular Speedometer Gauge Canvas -->
-                <div class="bg-gradient-to-b from-slate-50/70 via-white to-white rounded-3xl p-6 sm:p-8 border border-slate-100 flex flex-col items-center relative overflow-hidden"
+                <div class="w-full max-w-[480px] mx-auto aspect-[2/1.05] relative flex items-end justify-center select-none pt-2"
                      x-data="{ mounted: false }"
                      x-init="setTimeout(() => mounted = true, 50)">
-                    <div class="w-full max-w-[500px] aspect-[2/1] relative flex items-end justify-center">
-                        <svg viewBox="0 0 400 220" class="w-full h-full overflow-visible">
-                            <defs>
-                                <filter id="needle-shadow" x="-30%" y="-30%" width="160%" height="160%">
-                                    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.3"/>
-                                </filter>
-                            </defs>
+                    <svg viewBox="0 0 400 215" class="w-full h-full overflow-visible select-none">
+                        <defs>
+                            <!-- Needle Drop Shadow -->
+                            <filter id="gaugeNeedleShadow" x="-30%" y="-30%" width="160%" height="160%">
+                                <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-opacity="0.25"/>
+                            </filter>
+                            <!-- Inner Dome Elevation Shadow -->
+                            <filter id="hubElevationShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="-2" stdDeviation="4" flood-opacity="0.08"/>
+                            </filter>
+                        </defs>
 
-                            <!-- ============================================================== -->
-                            <!-- 5 Speedometer Segment Wedges (Center 200, 210 | Ro 190, Ri 95) -->
-                            <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- 5 Speedometer Segment Wedges (Center 200, 200 | Ro 180, Ri 92) -->
+                        <!-- ============================================================== -->
 
-                            <!-- Sector 1: Resistant (Solid Red #EF4444) -->
-                            <path d="M 105.0,210.0 L 10.0,210.0 A 190,190 0 0,1 45.32,99.67 L 122.66,154.83 A 95,95 0 0,0 105.0,210.0 Z" 
-                                  fill="#EF4444"/>
+                        <!-- Sector 1: Resistant (Solid Crimson Red #e11d48) -->
+                        <path d="M 108.0,200.0 L 20.0,200.0 A 180,180 0 0,1 54.38,94.20 L 127.19,147.10 A 92,92 0 0,0 108.0,200.0 Z" 
+                              fill="#e11d48" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-                            <!-- Sector 2: Follower (Soft Peach #FFEDD5 + Orange Outer Rim #F97316) -->
-                            <path d="M 123.63,153.49 L 47.27,96.98 A 190,190 0 0,1 139.71,29.82 L 169.86,119.91 A 95,95 0 0,0 123.63,153.49 Z" 
-                                  fill="#FFEDD5"/>
-                            <path d="M 53.7,101.74 L 47.27,96.98 A 190,190 0 0,1 139.71,29.82 L 142.25,37.41 A 182,182 0 0,0 53.7,101.74 Z" 
-                                  fill="#F97316"/>
+                        <!-- Sector 2: Follower (Soft Peach/Coral #fed7aa) -->
+                        <path d="M 127.19,147.10 L 54.38,94.20 A 180,180 0 0,1 144.38,28.80 L 172.19,114.40 A 92,92 0 0,0 127.19,147.10 Z" 
+                              fill="#fed7aa" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-                            <!-- Sector 3: Supporter (Soft Mint #DCFCE7 + Green Outer Rim #10B981) -->
-                            <path d="M 171.43,119.4 L 142.87,28.79 A 190,190 0 0,1 257.13,28.79 L 228.57,119.4 A 95,95 0 0,0 171.43,119.4 Z" 
-                                  fill="#DCFCE7"/>
-                            <path d="M 145.27,36.42 L 142.87,28.79 A 190,190 0 0,1 257.13,28.79 L 254.73,36.42 A 182,182 0 0,0 145.27,36.42 Z" 
-                                  fill="#10B981"/>
+                        <!-- Sector 3: Supporter (Soft Mint #bbf7d0) -->
+                        <path d="M 172.19,114.40 L 144.38,28.80 A 180,180 0 0,1 255.62,28.80 L 227.81,114.40 A 92,92 0 0,0 172.19,114.40 Z" 
+                              fill="#bbf7d0" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-                            <!-- Sector 4: Driver (Soft Yellow #FEF9C3 + Amber Outer Rim #F59E0B) -->
-                            <path d="M 230.14,119.91 L 260.29,29.82 A 190,190 0 0,1 352.73,96.98 L 276.37,153.49 A 95,95 0 0,0 230.14,119.91 Z" 
-                                  fill="#FEF9C3"/>
-                            <path d="M 257.75,37.41 L 260.29,29.82 A 190,190 0 0,1 352.73,96.98 L 346.3,101.74 A 182,182 0 0,0 257.75,37.41 Z" 
-                                  fill="#F59E0B"/>
+                        <!-- Sector 4: Driver (Warm Sunny Yellow #fde047) -->
+                        <path d="M 227.81,114.40 L 255.62,28.80 A 180,180 0 0,1 345.62,94.20 L 272.81,147.10 A 92,92 0 0,0 227.81,114.40 Z" 
+                              fill="#fde047" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-                            <!-- Sector 5: Champion (Solid Royal Blue #3B82F6) -->
-                            <path d="M 277.34,154.83 L 354.68,99.67 A 190,190 0 0,1 390.0,210.0 L 295.0,210.0 A 95,95 0 0,0 277.34,154.83 Z" 
-                                  fill="#3B82F6"/>
+                        <!-- Sector 5: Champion (Solid Royal Blue #0284c7) -->
+                        <path d="M 272.81,147.10 L 345.62,94.20 A 180,180 0 0,1 380.0,200.0 L 292.0,200.0 A 92,92 0 0,0 272.81,147.10 Z" 
+                              fill="#0284c7" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-                            <!-- ============================================================== -->
-                            <!-- Sector Icons & Horizontal Centered Typography                 -->
-                            <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- Sector 1: Resistant (Red) Content                              -->
+                        <!-- ============================================================== -->
+                        <!-- White Shield Icon with Check -->
+                        <g transform="translate(68, 140)">
+                            <path d="M 0,-11 L 8.5,-7 L 8.5,2 C 8.5,8 0,12.5 0,12.5 C 0,12.5 -8.5,8 -8.5,2 L -8.5,-7 Z" fill="#FFFFFF"/>
+                            <path d="M -3.5,1.5 L -1,4 L 4,-1.5" stroke="#e11d48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </g>
+                        <text x="68" y="165" text-anchor="middle" font-size="11" font-weight="900" fill="#FFFFFF">Resistant</text>
+                        <text x="68" y="179" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffe4e6">1.0 – 2.0</text>
 
-                            <!-- 1. Resistant (Red Sector) -->
-                            <!-- White Shield Icon with Red Check -->
-                            <g transform="translate(65, 142)">
-                                <path d="M 0,-11 L 9,-7 L 9,2 C 9,8.5 0,13 0,13 C 0,13 -9,8.5 -9,2 L -9,-7 Z" fill="#FFFFFF"/>
-                                <path d="M -3.5,1.5 L -1,4 L 4,-1.5" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <!-- ============================================================== -->
+                        <!-- Sector 2: Follower (Peach) Content                            -->
+                        <!-- ============================================================== -->
+                        <!-- Orange Two-People Group Icon -->
+                        <g transform="translate(122, 70)" fill="#ea580c">
+                            <circle cx="-4" cy="-4" r="3.2"/>
+                            <path d="M -8.5,4 C -8.5,0.5 -1.5,0.5 -1.5,4 Z"/>
+                            <circle cx="4" cy="-4" r="3.2"/>
+                            <path d="M -0.5,4 C -0.5,0.5 8.5,0.5 8.5,4 Z"/>
+                        </g>
+                        <text x="122" y="96" text-anchor="middle" font-size="11" font-weight="900" fill="#0a0f37">Follower</text>
+                        <text x="122" y="110" text-anchor="middle" font-size="9.5" font-weight="700" fill="#475569">2.1 – 4.0</text>
+
+                        <!-- ============================================================== -->
+                        <!-- Sector 3: Supporter (Mint Green) Content                       -->
+                        <!-- ============================================================== -->
+                        <!-- Green Plant Sprout Icon -->
+                        <g transform="translate(200, 42)" fill="#047857">
+                            <path d="M 0,10 L 0,0 C 0,-6.5 -8,-6.5 -8,-0.5 C -8,4.5 0,10 0,10 Z"/>
+                            <path d="M 0,10 L 0,0 C 0,-6.5 8,-6.5 8,-0.5 C 8,4.5 0,10 0,10 Z"/>
+                        </g>
+                        <text x="200" y="68" text-anchor="middle" font-size="11" font-weight="900" fill="#0a0f37">Supporter</text>
+                        <text x="200" y="82" text-anchor="middle" font-size="9.5" font-weight="700" fill="#475569">4.1 – 6.0</text>
+
+                        <!-- ============================================================== -->
+                        <!-- Sector 4: Driver (Yellow) Content                              -->
+                        <!-- ============================================================== -->
+                        <!-- Amber Angled Rocket Icon -->
+                        <g transform="translate(280, 70)">
+                            <g transform="rotate(45)" fill="#b45309">
+                                <path d="M 0,-10 C 4.5,-7 6.5,1 4.5,6.5 L -4.5,6.5 C -6.5,1 -4.5,-7 0,-10 Z"/>
+                                <path d="M -4.5,3 L -9,8 L -4,8 Z"/>
+                                <path d="M 4.5,3 L 9,8 L 4,8 Z"/>
+                                <circle cx="0" cy="0" r="1.8" fill="#FFFFFF"/>
                             </g>
-                            <text x="65" y="166" text-anchor="middle" font-size="9.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.2">Resistant</text>
-                            <text x="65" y="179" text-anchor="middle" font-size="8" font-weight="600" fill="#FEE2E2">1.0 – 2.0</text>
+                        </g>
+                        <text x="280" y="96" text-anchor="middle" font-size="11" font-weight="900" fill="#0a0f37">Driver</text>
+                        <text x="280" y="110" text-anchor="middle" font-size="9.5" font-weight="700" fill="#475569">6.1 – 8.0</text>
 
-                            <!-- 2. Follower (Orange Sector) -->
-                            <!-- Orange Two-People Group Icon -->
-                            <g transform="translate(118, 74)" fill="#F97316">
-                                <circle cx="-4" cy="-4" r="3"/>
-                                <path d="M -8.5,4 C -8.5,0.5 -1.5,0.5 -1.5,4 Z"/>
-                                <circle cx="4" cy="-4" r="3"/>
-                                <path d="M -0.5,4 C -0.5,0.5 8.5,0.5 8.5,4 Z"/>
+                        <!-- ============================================================== -->
+                        <!-- Sector 5: Champion (Royal Blue) Content                        -->
+                        <!-- ============================================================== -->
+                        <!-- White Mountain with Flag Icon -->
+                        <g transform="translate(332, 140)" fill="#FFFFFF">
+                            <path d="M -10,10 L 0,-3 L 10,10 Z"/>
+                            <line x1="0" y1="-3" x2="0" y2="-12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                            <polygon points="0,-12 8,-9 0,-6"/>
+                        </g>
+                        <text x="332" y="165" text-anchor="middle" font-size="11" font-weight="900" fill="#FFFFFF">Champion</text>
+                        <text x="332" y="179" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e0f2fe">8.1 – 10.0</text>
+
+                        <!-- ============================================================== -->
+                        <!-- Inner Elevated White Cutout Semicircle (Radius 90 at 200, 200) -->
+                        <!-- ============================================================== -->
+                        <path d="M 110,200 A 90,90 0 0,1 290,200 Z" fill="#FFFFFF" filter="url(#hubElevationShadow)"/>
+
+                        <!-- ============================================================== -->
+                        <!-- Center Readout Inside White Hub                                -->
+                        <!-- ============================================================== -->
+                        <text x="200" y="138" text-anchor="middle" font-size="10.5" font-weight="700" fill="#64748b" letter-spacing="0.2">Your</text>
+                        <text x="200" y="152" text-anchor="middle" font-size="11.5" font-weight="800" fill="#0a0f37">ChangeQuo Score</text>
+                        <text x="200" y="186" text-anchor="middle" font-size="36" font-weight="900" fill="#0a0f37">{{ $hasData && $cqScore > 0 ? number_format($cqScore, 1) : '0.0' }}</text>
+                        <text x="200" y="202" text-anchor="middle" font-size="13" font-weight="900" fill="#0a0f37">{{ $hasData && $cqScore > 0 ? $meterTierName : 'Pending' }}</text>
+
+                        <!-- ============================================================== -->
+                        <!-- The Speedometer Needle (Pivot at 200, 200)                     -->
+                        <!-- ============================================================== -->
+                        <g transform="translate(200, 200)">
+                            <g :style="`transform: rotate(${mounted ? {{ $needleAngle }} : -90}deg); transform-origin: 0 0; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
+                               style="transform: rotate({{ $needleAngle }}deg); transform-origin: 0 0;"
+                               filter="url(#gaugeNeedleShadow)">
+                                <polygon points="-4.5,0 -1,-126 0,-134 1,-126 4.5,0" fill="#0a0f37"/>
+                                <polygon points="0,0 0,-134 1,-126 4.5,0" fill="#1e293b"/>
+                                <circle cx="0" cy="0" r="9" fill="#0a0f37"/>
+                                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF"/>
                             </g>
-                            <text x="118" y="98" text-anchor="middle" font-size="9.5" font-weight="800" fill="#0F172A" letter-spacing="0.2">Follower</text>
-                            <text x="118" y="111" text-anchor="middle" font-size="8" font-weight="600" fill="#64748B">2.1 – 4.0</text>
+                        </g>
+                    </svg>
+                </div>
 
-                            <!-- 3. Supporter (Green Sector) -->
-                            <!-- Green Plant Sprout Icon -->
-                            <g transform="translate(200, 46)" fill="#10B981">
-                                <path d="M 0,9 L 0,0 C 0,-6.5 -8,-6.5 -8,-0.5 C -8,4 0,9 0,9 Z"/>
-                                <path d="M 0,9 L 0,0 C 0,-6.5 8,-6.5 8,-0.5 C 8,4 0,9 0,9 Z"/>
-                            </g>
-                            <text x="200" y="72" text-anchor="middle" font-size="9.5" font-weight="800" fill="#0F172A" letter-spacing="0.2">Supporter</text>
-                            <text x="200" y="85" text-anchor="middle" font-size="8" font-weight="600" fill="#64748B">4.1 – 6.0</text>
-
-                            <!-- 4. Driver (Yellow/Amber Sector) -->
-                            <!-- Amber Tilted Rocket Icon -->
-                            <g transform="translate(282, 74)">
-                                <g transform="rotate(45)" fill="#F59E0B">
-                                    <path d="M 0,-9 C 4.5,-6 6,1 4.5,6 L -4.5,6 C -6,1 -4.5,-6 0,-9 Z"/>
-                                    <path d="M -4.5,3 L -8.5,7.5 L -4,7.5 Z"/>
-                                    <path d="M 4.5,3 L 8.5,7.5 L 4,7.5 Z"/>
-                                    <circle cx="0" cy="0" r="1.8" fill="#FFFFFF"/>
-                                </g>
-                            </g>
-                            <text x="282" y="98" text-anchor="middle" font-size="9.5" font-weight="800" fill="#0F172A" letter-spacing="0.2">Driver</text>
-                            <text x="282" y="111" text-anchor="middle" font-size="8" font-weight="600" fill="#64748B">6.1 – 8.0</text>
-
-                            <!-- 5. Champion (Blue Sector) -->
-                            <!-- White Mountain with Flag Icon -->
-                            <g transform="translate(335, 142)" fill="#FFFFFF">
-                                <path d="M -9,9 L 0,-2 L 9,9 Z"/>
-                                <line x1="0" y1="-2" x2="0" y2="-10" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round"/>
-                                <polygon points="0,-10 7,-7.5 0,-5"/>
-                            </g>
-                            <text x="335" y="166" text-anchor="middle" font-size="9.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.2">Champion</text>
-                            <text x="335" y="179" text-anchor="middle" font-size="8" font-weight="600" fill="#DBEAFE">8.1 – 10.0</text>
-
-                            <!-- ============================================================== -->
-                            <!-- Inner White Cutout Semicircle (Radius 95 at center 200, 210)   -->
-                            <!-- ============================================================== -->
-                            <path d="M 105,210 A 95,95 0 0,1 295,210 Z" fill="#FFFFFF"/>
-
-                            <!-- ============================================================== -->
-                            <!-- The Speedometer Needle (Pivot at 200, 210)                     -->
-                            <!-- ============================================================== -->
-                            <g transform="translate(200, 210)">
-                                <g :style="`transform: rotate(${mounted ? {{ $needleAngle }} : -90}deg); transform-origin: 0 0; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
-                                   style="transform: rotate({{ $needleAngle }}deg); transform-origin: 0 0;"
-                                   filter="url(#needle-shadow)">
-                                    <polygon points="-5,0 -1,-130 0,-138 1,-130 5,0" fill="#1E293B"/>
-                                    <polygon points="0,0 0,-138 1,-130 5,0" fill="#0F172A"/>
-                                    <circle cx="0" cy="0" r="10" fill="#0F172A"/>
-                                    <circle cx="0" cy="0" r="4" fill="#FFFFFF"/>
-                                </g>
-                            </g>
-
-                            <!-- ============================================================== -->
-                            <!-- Center Score Readout Inside Gauge                              -->
-                            <!-- ============================================================== -->
-                            <text x="200" y="150" text-anchor="middle" font-size="9" font-weight="700" fill="#64748B" letter-spacing="0.3">Your ChangeQuo Score</text>
-                            <text x="200" y="186" text-anchor="middle" font-size="36" font-weight="900" fill="#0F172A">{{ $hasData && $cqScore > 0 ? number_format($cqScore, 1) : '0' }}</text>
-                            <text x="200" y="204" text-anchor="middle" font-size="14" font-weight="800" fill="#0F172A">{{ $hasData && $cqScore > 0 ? $profileName : 'Pending' }}</text>
-                        </svg>
+                <!-- Profile Explanation Banner (Matching Theme Template) -->
+                <div class="w-full mt-2 p-4 sm:p-5 rounded-2xl border flex flex-col md:flex-row md:items-center md:justify-between gap-4 {{ $tierTheme['bg'] }} {{ $tierTheme['border'] }} {{ $tierTheme['text'] }}">
+                    <div class="flex items-start gap-3.5">
+                        <!-- Icon Badge -->
+                        <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-2xs {{ $tierTheme['badgeBg'] }} {{ $tierTheme['badgeText'] }} border {{ $tierTheme['badgeBorder'] }}">
+                            <i data-lucide="{{ $tierTheme['icon'] }}" class="w-5 h-5"></i>
+                        </div>
+                        <div class="space-y-0.5">
+                            <h3 class="text-sm sm:text-base font-black">
+                                You are a <span class="{{ $tierTheme['accent'] }} font-black">{{ $profileDisplayName }}</span>
+                                <span class="sr-only">{{ $profileName }}</span>
+                            </h3>
+                            <p class="text-xs text-slate-700 leading-relaxed max-w-2xl">
+                                {{ $cq['profile_description'] }}
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- Profile Explanation Banner (Matching Image 1) -->
-                    <div class="w-full mt-4 p-5 sm:p-6 rounded-2xl border flex flex-col md:flex-row md:items-center md:justify-between gap-5 bg-amber-50/80 border-amber-200/90 text-amber-950">
-                        <div class="flex items-start gap-4">
-                            <!-- Circular Rocket Badge -->
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-xs bg-amber-100 text-amber-600 border border-amber-200">
-                                <i data-lucide="rocket" class="w-6 h-6"></i>
-                            </div>
-                            <div class="space-y-1">
-                                <h3 class="text-sm sm:text-base font-black">
-                                    You are a <span class="text-amber-600 font-black">{{ $profileDisplayName }}</span>
-                                </h3>
-                                <p class="text-xs text-slate-700 leading-relaxed max-w-2xl">
-                                    {{ $cq['profile_description'] }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Right CQ Range Box -->
-                        <div class="shrink-0 bg-white/95 px-5 py-3 rounded-2xl border border-amber-200/70 text-left md:text-right shadow-2xs">
-                            <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Your CQ Range</span>
-                            <span class="text-3xl font-black text-amber-600 tracking-tight leading-none mt-0.5 block">
-                                {{ $profileRange }}
-                            </span>
-                        </div>
+                    <!-- Right CQ Range Box -->
+                    <div class="shrink-0 bg-white/95 px-4 py-2.5 rounded-xl border {{ $tierTheme['border'] }} text-left md:text-right shadow-2xs">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Your CQ Range</span>
+                        <span class="text-2xl font-black {{ $tierTheme['accent'] }} tracking-tight leading-none mt-0.5 block">
+                            {{ $profileRange }}
+                        </span>
                     </div>
                 </div>
             </div>
