@@ -341,44 +341,33 @@
             <!-- Bottom Row: Strategic Recommendations & Expected Outcomes (2 Columns) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 1. Strategic Recommendations -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="check-circle" class="w-5 h-5 text-indigo-600"></i>
-                        <h4 class="text-sm font-black text-slate-900">Strategic Recommendations</h4>
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-6 flex flex-col justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">Strategic Recommendations</h3>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-4 sm:space-y-5 flex-1 flex flex-col justify-around py-1">
                         @foreach($insights['strategic_recommendations'] ?? [] as $rec)
-                            <div class="flex items-start gap-3">
-                                <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                            <div class="flex items-start gap-3.5">
+                                <span class="w-7 h-7 rounded-full text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #6f01d2 !important;">
                                     {{ $rec['number'] }}
                                 </span>
                                 <div>
-                                    <h5 class="text-xs font-bold text-slate-900">{{ $rec['title'] }}</h5>
-                                    <p class="text-[11px] text-slate-500 leading-relaxed mt-0.5">{{ $rec['description'] }}</p>
+                                    <h4 class="text-xs sm:text-[13.5px] font-bold text-[#0a0f37] leading-snug">{{ $rec['title'] }}</h4>
+                                    <p class="text-[11px] sm:text-xs text-[#4b5585] leading-relaxed mt-1">{{ $rec['description'] }}</p>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
 
-                <!-- 2. Expected Outcomes -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="award" class="w-5 h-5 text-emerald-600"></i>
-                        <h4 class="text-sm font-black text-slate-900">Expected Outcomes</h4>
-                    </div>
-
-                    <div class="space-y-3">
-                        @foreach($insights['expected_outcomes'] ?? [] as $outcome)
-                            <div class="flex items-start gap-3 p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
-                                <div class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                                    <i data-lucide="check" class="w-4 h-4"></i>
-                                </div>
-                                <span class="text-xs text-slate-700 font-semibold leading-snug mt-0.5">{{ $outcome['title'] }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                <!-- 2. Expected Outcomes (Matching Reference Design) -->
+                <x-expected-outcomes :outcomes="$insights['expected_outcomes'] ?? []" />
             </div>
         </div>
 
