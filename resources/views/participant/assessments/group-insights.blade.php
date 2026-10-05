@@ -409,41 +409,7 @@
             <!-- Middle Row: Maturity Gauge, Growth Journey, 3 Sync Dimensions (Image 3) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <!-- Maturity Gauge (4 cols) -->
-                <div class="lg:col-span-4 bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col items-center justify-between">
-                    <div class="text-center w-full">
-                        <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Team CQ Sync Maturity Level</h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Where does team stand on alignment to see, agree and act together?</p>
-                    </div>
-
-                    <div class="w-full max-w-[260px] aspect-[300/165] relative flex items-end justify-center my-4"
-                         x-data="{ mounted: false }"
-                         x-init="setTimeout(() => mounted = true, 50)">
-                        <svg viewBox="0 0 300 165" class="w-full h-full overflow-visible select-none">
-                            <path d="M 15,150 A 135,135 0 0,1 42.64,70.64 L 81.33,100.16 A 85,85 0 0,0 65,150 Z" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
-                            <path d="M 42.64,70.64 A 135,135 0 0,1 110.15,21.61 L 123.72,69.16 A 85,85 0 0,0 81.33,100.16 Z" fill="#FB923C" stroke="#FFFFFF" stroke-width="2"/>
-                            <path d="M 110.15,21.61 A 135,135 0 0,1 189.85,21.61 L 176.28,69.16 A 85,85 0 0,0 123.72,69.16 Z" fill="#34D399" stroke="#FFFFFF" stroke-width="2"/>
-                            <path d="M 189.85,21.61 A 135,135 0 0,1 257.36,70.64 L 218.67,100.16 A 85,85 0 0,0 176.28,69.16 Z" fill="#FBBF24" stroke="#FFFFFF" stroke-width="2"/>
-                            <path d="M 257.36,70.64 A 135,135 0 0,1 285,150 L 235,150 A 85,85 0 0,0 218.67,100.16 Z" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2"/>
-
-                            <g transform="translate(150, 150)">
-                                <g :style="`transform: rotate(${mounted ? {{ $syncNeedleAngle }} : -90}deg); transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`">
-                                    <polygon points="-3.5,0 0,-104 3.5,0" fill="#1E293B"/>
-                                    <circle cx="0" cy="-104" r="2.5" fill="#10B981"/>
-                                    <circle cx="0" cy="0" r="7" fill="#1E293B"/>
-                                    <circle cx="0" cy="0" r="2.5" fill="#FFFFFF"/>
-                                </g>
-                            </g>
-
-                            <circle cx="150" cy="142" r="42" fill="#FFFFFF" fill-opacity="0.95"/>
-                            <text x="150" y="126" text-anchor="middle" font-size="8" font-weight="800" fill="#64748B" letter-spacing="0.05em">TEAM CQ SYNC</text>
-                            <text x="150" y="148" text-anchor="middle" font-size="22" font-weight="900" fill="#0F172A">{{ number_format($syncScore, 1) }}</text>
-                        </svg>
-                    </div>
-
-                    <span class="inline-flex items-center gap-1 text-xs font-extrabold px-3 py-1 rounded-full {{ $sync['badge'] ?? 'bg-emerald-50 text-emerald-800' }}">
-                        {{ $sync['maturity_level'] ?? 'Aligned' }}
-                    </span>
-                </div>
+                <x-team-sync-maturity-gauge :score="$syncScore" :maturity-level="$sync['maturity_level'] ?? null" class="lg:col-span-4" />
 
                 <!-- 3 Sync Dimensions Horizontal Bars (8 cols) -->
                 <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-6">
