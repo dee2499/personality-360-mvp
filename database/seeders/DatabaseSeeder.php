@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
-        // 2. Ensure Admin user exists with password "password"
+        // 2. Ensure Admin users exist with password "password"
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
@@ -60,6 +60,18 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'company_id' => null,
         ]);
+
+        User::firstOrCreate(
+            ['email' => 'srini@saipio.com'],
+            [
+                'name' => 'Srinivas Patnaik',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'company_id' => null,
+                'email_verified_at' => now(),
+                'invitation_accepted_at' => now(),
+            ]
+        );
 
         // 3. Create 1 Company
         $company = Company::create([
