@@ -259,8 +259,8 @@
 
             <!-- Section: What This Means & Path to Opportunity Zone (2-Column Row) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- What This Means Card -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
+                <!-- What This Means Card (Matching Reference Design) -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-6">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
                             <svg class="w-5 h-5 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -272,29 +272,61 @@
                         <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">What This Means</h3>
                     </div>
 
-                    <div class="space-y-3 text-xs">
-                        <div class="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1">
-                            <div class="font-extrabold text-amber-950 flex items-center gap-1.5">
-                                <i data-lucide="compass" class="w-3.5 h-3.5 text-amber-600"></i>
-                                <span>Current: {{ $insights['matrix_zone_name'] }} ({{ number_format($cqScore, 1) }}, {{ number_format($syncScore, 1) }})</span>
+                    <div class="space-y-6 flex-1 flex flex-col justify-around py-1">
+                        <!-- 1. Current Position -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #fef08a !important;">
+                                <svg class="w-6 h-6 text-[#d97706]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="9"/>
+                                    <circle cx="12" cy="12" r="5"/>
+                                    <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                                    <path d="M19 5l-5 5"/>
+                                    <path d="M15 5h4v4"/>
+                                </svg>
                             </div>
-                            <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_zone_subtitle'] }}</p>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-black text-sm sm:text-base leading-tight tracking-tight text-[#d97706]">
+                                    Current Position: {{ $insights['matrix_zone_name'] }}
+                                    <span class="font-bold">({{ number_format($cqScore, 1) }}, {{ number_format($syncScore, 1) }})</span>
+                                </h4>
+                                <p class="mt-1.5 text-xs sm:text-[13px] text-[#4b5585] leading-relaxed">
+                                    {{ $insights['matrix_zone_subtitle'] }}
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-200/70 space-y-1">
-                            <div class="font-extrabold text-rose-950 flex items-center gap-1.5">
-                                <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600"></i>
-                                <span>Key Blind Spot</span>
+                        <!-- 2. Key Blind Spot -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #ffd2dc !important;">
+                                <svg class="w-6 h-6 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M10.75 4a1.25 1.25 0 0 1 2.5 0v8.5a1.25 1.25 0 0 1-2.5 0V4zM12 17.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+                                </svg>
                             </div>
-                            <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_blind_spot'] }}</p>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-black text-sm sm:text-base leading-tight tracking-tight text-[#b91c1c]">
+                                    Key Blind Spot
+                                </h4>
+                                <p class="mt-1.5 text-xs sm:text-[13px] text-[#4b5585] leading-relaxed">
+                                    {{ $insights['matrix_blind_spot'] }}
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200/70 space-y-1">
-                            <div class="font-extrabold text-emerald-950 flex items-center gap-1.5">
-                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-emerald-600"></i>
-                                <span>Opportunity</span>
+                        <!-- 3. Opportunity -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #d4fce6 !important;">
+                                <svg class="w-6 h-6 text-[#047857]" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 3.5l-6 6h3.5v9h5v-9H18l-6-6z" />
+                                </svg>
                             </div>
-                            <p class="text-slate-700 leading-relaxed">{{ $insights['matrix_opportunity'] }}</p>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-black text-sm sm:text-base leading-tight tracking-tight text-[#047857]">
+                                    Opportunity
+                                </h4>
+                                <p class="mt-1.5 text-xs sm:text-[13px] text-[#4b5585] leading-relaxed">
+                                    {{ $insights['matrix_opportunity'] }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
