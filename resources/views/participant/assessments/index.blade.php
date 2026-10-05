@@ -7,7 +7,7 @@
                     Participant Portal
                 </span>
                 <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-2">
-                    My 360° Assessment Dashboard
+                    My Dashboard
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
                     View your self-assessment meter, peer-assessment meter, and inspect full competency matrices across your submitted 360 surveys.
