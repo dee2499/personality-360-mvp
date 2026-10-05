@@ -1,0 +1,3522 @@
+[
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "gauri.rath@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "sailesh.patnaik@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "anjan.mohanty@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "swadesh.sarangi@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "kamala.dash@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "gaurav.kaushik@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "vikrant.gupta@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "jayanta.ghose@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "arun.mohanty@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "tapan.mohanty@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "tupakula.babu@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "ashutosh.das@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "snigdha.mohapatra@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "chirag.bansal@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "niranjan.mishra@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "biranchi.biswal@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "umesh.mohapatra@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "susmita.dutta@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "sunil.dora@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ranjan.behera@falcon.com",
+        "subject": "syed.ali@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "gauri.rath@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "sailesh.patnaik@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "anjan.mohanty@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "swadesh.sarangi@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "kamala.dash@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "gaurav.kaushik@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "vikrant.gupta@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "jayanta.ghose@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "arun.mohanty@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "tapan.mohanty@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "tupakula.babu@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "ashutosh.das@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "snigdha.mohapatra@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "chirag.bansal@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "niranjan.mishra@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "biranchi.biswal@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "umesh.mohapatra@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "susmita.dutta@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "sunil.dora@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "surajit.satpathy@falcon.com",
+        "subject": "syed.ali@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            8,
+            8,
+            7,
+            8,
+            8,
+            9,
+            8,
+            8,
+            8,
+            7,
+            9
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "gauri.rath@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "sailesh.patnaik@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "anjan.mohanty@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "swadesh.sarangi@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "kamala.dash@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "gaurav.kaushik@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "vikrant.gupta@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "jayanta.ghose@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "arun.mohanty@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "tapan.mohanty@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "tupakula.babu@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "ashutosh.das@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "snigdha.mohapatra@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "chirag.bansal@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "niranjan.mishra@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "biranchi.biswal@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "umesh.mohapatra@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "susmita.dutta@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "sunil.dora@falcon.com",
+        "scores": [
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9
+        ],
+        "total": 89,
+        "percentage": 80.91,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anil.mohanty@falcon.com",
+        "subject": "syed.ali@falcon.com",
+        "scores": [
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7
+        ],
+        "total": 88,
+        "percentage": 80,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "gauri.rath@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "gauri.rath@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "gauri.rath@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "gauri.rath@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sailesh.patnaik@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sailesh.patnaik@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "sailesh.patnaik@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "sailesh.patnaik@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "anjan.mohanty@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "anjan.mohanty@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "anjan.mohanty@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "anjan.mohanty@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "swadesh.sarangi@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "swadesh.sarangi@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "swadesh.sarangi@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "swadesh.sarangi@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "kamala.dash@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "kamala.dash@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "kamala.dash@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "kamala.dash@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "gaurav.kaushik@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "gaurav.kaushik@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "gaurav.kaushik@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "gaurav.kaushik@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "vikrant.gupta@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "vikrant.gupta@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "vikrant.gupta@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "vikrant.gupta@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "jayanta.ghose@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "jayanta.ghose@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "jayanta.ghose@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "jayanta.ghose@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "arun.mohanty@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "arun.mohanty@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "arun.mohanty@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "arun.mohanty@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "gauri.rath@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "sailesh.patnaik@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "anjan.mohanty@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "swadesh.sarangi@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "kamala.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "gaurav.kaushik@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "vikrant.gupta@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "jayanta.ghose@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "arun.mohanty@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "tapan.mohanty@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "tupakula.babu@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "ashutosh.das@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "snigdha.mohapatra@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "chirag.bansal@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "niranjan.mishra@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "biranchi.biswal@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "umesh.mohapatra@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "susmita.dutta@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "sunil.dora@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sai.dash@falcon.com",
+        "subject": "syed.ali@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "tapan.mohanty@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "tapan.mohanty@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "tapan.mohanty@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "tapan.mohanty@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "tupakula.babu@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "tupakula.babu@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "tupakula.babu@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "tupakula.babu@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "ashutosh.das@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "ashutosh.das@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "ashutosh.das@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "ashutosh.das@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "snigdha.mohapatra@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "snigdha.mohapatra@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "snigdha.mohapatra@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "snigdha.mohapatra@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "chirag.bansal@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "chirag.bansal@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "chirag.bansal@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "chirag.bansal@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "niranjan.mishra@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "niranjan.mishra@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "niranjan.mishra@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "niranjan.mishra@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "biranchi.biswal@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "biranchi.biswal@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "biranchi.biswal@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "biranchi.biswal@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "umesh.mohapatra@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "umesh.mohapatra@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "umesh.mohapatra@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "umesh.mohapatra@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "susmita.dutta@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "susmita.dutta@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "susmita.dutta@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "susmita.dutta@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sunil.dora@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "sunil.dora@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "sunil.dora@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "sunil.dora@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "syed.ali@falcon.com",
+        "subject": "ranjan.behera@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    },
+    {
+        "assessor": "syed.ali@falcon.com",
+        "subject": "surajit.satpathy@falcon.com",
+        "scores": [
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10,
+            10
+        ],
+        "total": 110,
+        "percentage": 100,
+        "category": "Achiever"
+    },
+    {
+        "assessor": "syed.ali@falcon.com",
+        "subject": "anil.mohanty@falcon.com",
+        "scores": [
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8,
+            9,
+            7,
+            8
+        ],
+        "total": 87,
+        "percentage": 79.09,
+        "category": "Initiator"
+    },
+    {
+        "assessor": "syed.ali@falcon.com",
+        "subject": "sai.dash@falcon.com",
+        "scores": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        "total": 11,
+        "percentage": 10,
+        "category": "Resistor"
+    }
+]

@@ -28,10 +28,10 @@ chmod 664 /var/www/html/database/database.sqlite
 # Run database migrations
 php artisan migrate --force
 
-# Seed database if no users exist yet
-USER_COUNT=$(php artisan tinker --execute 'echo \App\Models\User::count();' 2>/dev/null || echo "0")
-if [ "$USER_COUNT" = "0" ] || [ -z "$USER_COUNT" ]; then
-    echo "First boot: Seeding default database accounts and MVP demo survey..."
+# Seed database if Falcon Group does not exist or if database has no users
+FALCON_EXISTS=$(php artisan tinker --execute 'echo \App\Models\Company::where("name", "like", "%Falcon%")->exists() ? "1" : "0";' 2>/dev/null || echo "0")
+if [ "$FALCON_EXISTS" != "1" ]; then
+    echo "Falcon Group not found. Seeding Falcon Group and 360 assessment data..."
     php artisan db:seed --force
 fi
 
