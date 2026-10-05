@@ -27,7 +27,7 @@
     }
     $needleAngle = round(max(-90, min(90, $needleAngle)), 2);
 
-    // Archetype narrative and styling
+    // Archetype narrative and styling matching theme template image exactly
     if ($score <= 2.0) {
         $tierName = 'Resistant';
         $levelHeading = 'Change Resistant level';
@@ -46,21 +46,21 @@
         $tierName = 'Supporter';
         $levelHeading = 'Change Supporter level';
         $tierColor = '#15803d';
-        $tierBg = '#d1efe0';
-        $tierBorder = '#bbf7d0';
+        $tierBg = '#f2faf5';
+        $tierBorder = '#d1fae5';
         $description = 'The team is generally open to change and willing to contribute. With focused development and alignment, the team can move towards the Driver and Champion levels.';
     } elseif ($score <= 8.0) {
         $tierName = 'Driver';
         $levelHeading = 'Change Driver level';
         $tierColor = '#b45309';
-        $tierBg = '#f9efcb';
+        $tierBg = '#fefce8';
         $tierBorder = '#fde68a';
         $description = 'The team proactively leads change initiatives and problem solves. With continuous empowerment and strategic alignment, the team is on track towards the Champion level.';
     } else {
         $tierName = 'Champion';
         $levelHeading = 'Change Champion level';
         $tierColor = '#1d4ed8';
-        $tierBg = '#d3e4fd';
+        $tierBg = '#eff6ff';
         $tierBorder = '#bfdbfe';
         $description = 'The team embodies transformational agility and continuous innovation, serving as role models and mentors across the organization.';
     }
@@ -75,75 +75,74 @@
         <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">Current overall position of the team</p>
     </div>
 
-    <!-- Semicircular Speedometer Arc Gauge -->
-    <div class="w-full max-w-[380px] mx-auto aspect-[400/240] relative flex items-end justify-center select-none pt-2"
+    <!-- Semicircular Speedometer Arc Gauge (Floating Needle design matching template image) -->
+    <div class="w-full max-w-[390px] mx-auto aspect-[400/235] relative flex items-end justify-center select-none pt-2"
          x-data="{ mounted: false }"
          x-init="setTimeout(() => mounted = true, 50)">
-        <svg viewBox="0 0 400 240" class="w-full h-full overflow-visible select-none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 400 230" class="w-full h-full overflow-visible select-none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <!-- Needle Drop Shadow -->
                 <filter id="{{ $filterId }}" x="-30%" y="-30%" width="160%" height="160%">
-                    <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-opacity="0.30"/>
+                    <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.25"/>
                 </filter>
             </defs>
 
             <!-- ============================================================== -->
-            <!-- 5 Speedometer Segment Wedges (Center 200, 200 | Ro 180, Ri 98)  -->
+            <!-- 5 Speedometer Segment Wedges (Center 200, 200 | Ro 180, Ri 108)  -->
             <!-- ============================================================== -->
 
-            <!-- Sector 1: Resistant (Coral Red #f87171) -->
-            <path d="M 102.0,200.0 L 20.0,200.0 A 180,180 0 0,1 54.38,94.20 L 120.72,142.40 A 98,98 0 0,0 102.0,200.0 Z" 
-                  fill="#f87171" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Sector 1: Resistant (Warm Coral Red #f75357) -->
+            <path d="M 92,200 L 20,200 A 180,180 0 0,1 54.38,94.20 L 112.63,136.52 A 108,108 0 0,0 92,200 Z" 
+                  fill="#f75357" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-            <!-- Sector 2: Follower (Warm Peach/Orange #fb923c) -->
-            <path d="M 120.72,142.40 L 54.38,94.20 A 180,180 0 0,1 144.38,28.81 L 169.72,106.80 A 98,98 0 0,0 120.72,142.40 Z" 
-                  fill="#fb923c" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Sector 2: Follower (Warm Peach/Orange #fba05a) -->
+            <path d="M 112.63,136.52 L 54.38,94.20 A 180,180 0 0,1 144.38,28.81 L 166.63,97.29 A 108,108 0 0,0 112.63,136.52 Z" 
+                  fill="#fba05a" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-            <!-- Sector 3: Supporter (Mint/Soft Green #86efac) -->
-            <path d="M 169.72,106.80 L 144.38,28.81 A 180,180 0 0,1 255.62,28.81 L 230.28,106.80 A 98,98 0 0,0 169.72,106.80 Z" 
-                  fill="#86efac" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Sector 3: Supporter (Soft Mint #8de0a6) -->
+            <path d="M 166.63,97.29 L 144.38,28.81 A 180,180 0 0,1 255.62,28.81 L 233.37,97.29 A 108,108 0 0,0 166.63,97.29 Z" 
+                  fill="#8de0a6" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-            <!-- Sector 4: Driver (Warm Yellow #fde047) -->
-            <path d="M 230.28,106.80 L 255.62,28.81 A 180,180 0 0,1 345.62,94.20 L 279.28,142.40 A 98,98 0 0,0 230.28,106.80 Z" 
-                  fill="#fde047" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Sector 4: Driver (Warm Yellow #fddb58) -->
+            <path d="M 233.37,97.29 L 255.62,28.81 A 180,180 0 0,1 345.62,94.20 L 287.37,136.52 A 108,108 0 0,0 233.37,97.29 Z" 
+                  fill="#fddb58" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
-            <!-- Sector 5: Champion (Sky Blue #60a5fa) -->
-            <path d="M 279.28,142.40 L 345.62,94.20 A 180,180 0 0,1 380.0,200.0 L 298.0,200.0 A 98,98 0 0,0 279.28,142.40 Z" 
-                  fill="#60a5fa" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Sector 5: Champion (Vibrant Sky Blue #0082fb) -->
+            <path d="M 287.37,136.52 L 345.62,94.20 A 180,180 0 0,1 380,200 L 308,200 A 108,108 0 0,0 287.37,136.52 Z" 
+                  fill="#0082fb" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
             <!-- ============================================================== -->
             <!-- 5 Archetype Text Labels Centered inside each Sector             -->
             <!-- ============================================================== -->
-            <text x="68" y="157" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Resistant</text>
-            <text x="118" y="88" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Follower</text>
+            <text x="70" y="160" text-anchor="middle" font-size="13" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Resistant</text>
+            <text x="120" y="90" text-anchor="middle" font-size="13" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Follower</text>
             <text x="200" y="62" text-anchor="middle" font-size="13" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Supporter</text>
-            <text x="282" y="88" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Driver</text>
-            <text x="332" y="157" text-anchor="middle" font-size="12.5" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Champion</text>
+            <text x="280" y="90" text-anchor="middle" font-size="13" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Driver</text>
+            <text x="330" y="160" text-anchor="middle" font-size="13" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">Champion</text>
 
-            <!-- Decorative Inner Arch Rim Track -->
-            <path d="M 108 200 A 92 92 0 0 1 292 200" fill="none" stroke="#e2e8f0" stroke-width="10" opacity="0.65" />
+            <!-- Inner Light Grey Arched Track (Ro 108, Ri 94) -->
+            <path d="M 92,200 A 108,108 0 0,1 308,200 L 294,200 A 94,94 0 0,0 106,200 Z" fill="#edf0f5" />
 
-            <!-- Inner White Hub Dome -->
-            <circle cx="200" cy="200" r="86" fill="#ffffff" />
+            <!-- Inner White Hub Dome (Clean canvas for numeric score) -->
+            <circle cx="200" cy="200" r="93" fill="#ffffff" />
 
             <!-- ============================================================== -->
-            <!-- Dynamic Speedometer Needle with Circular Cutout Base            -->
+            <!-- Dynamic Floating Needle (Base floats on track, NEVER blocks score) -->
             <!-- ============================================================== -->
             <g :style="mounted ? 'transform: rotate({{ $needleAngle }}deg); transition: transform 1.2s cubic-bezier(0.34, 1.4, 0.64, 1);' : 'transform: rotate(-90deg);'"
                style="transform-origin: 200px 200px; transform: rotate({{ $needleAngle }}deg);"
                filter="url(#{{ $filterId }})">
-                <!-- Tapered Sharp Needle extending to the outer rim -->
-                <path d="M 194 200 L 198.5 28 L 201.5 28 L 206 200 Z" fill="#0a0f37" />
-                <!-- Circular Hub with inner hole cutout -->
-                <circle cx="200" cy="200" r="14" fill="#0a0f37" />
-                <circle cx="200" cy="190" r="4.5" fill="#ffffff" />
+                <!-- Floating needle body starting from hub at track radius ~100 to tip at radius 176 -->
+                <path d="M 191.5 100 L 198.5 24 A 1.5 1.5 0 0 1 201.5 24 L 208.5 100 A 8.5 8.5 0 1 1 191.5 100 Z" fill="#001452" />
+                <!-- White circular hole inside the hub -->
+                <circle cx="200" cy="100" r="3.5" fill="#ffffff" />
             </g>
 
-            <!-- Central Numeric Score Display -->
-            <text x="200" y="172" text-anchor="middle" font-size="42" font-weight="900" fill="#0a0f37" letter-spacing="-1" font-family="ui-sans-serif, system-ui, sans-serif">
+            <!-- Central Numeric Score Display (Unobstructed & 100% visible) -->
+            <text x="200" y="164" text-anchor="middle" font-size="46" font-weight="900" fill="#0a0f37" letter-spacing="-1.5" font-family="ui-sans-serif, system-ui, sans-serif">
                 {{ number_format($score, 1) }}
             </text>
-            <text x="200" y="196" text-anchor="middle" font-size="15" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">
+            <text x="200" y="190" text-anchor="middle" font-size="16" font-weight="800" fill="#0a0f37" font-family="ui-sans-serif, system-ui, sans-serif">
                 / 10
             </text>
         </svg>
