@@ -2,7 +2,7 @@
 # Exit on error
 set -e
 
-echo "=== Building Personality 360 Assessment for Render ==="
+echo "=== Building Change Quo Assessment for Render ==="
 
 # Install PHP dependencies
 composer install --no-dev --optimize-autoloader --no-interaction

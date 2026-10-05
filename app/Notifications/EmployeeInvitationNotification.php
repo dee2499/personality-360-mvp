@@ -37,9 +37,9 @@ class EmployeeInvitationNotification extends Notification
         $activationUrl = route('invitation.show', ['token' => $this->token]);
 
         return (new MailMessage)
-            ->subject("You've been invited to {$company} on Personality 360")
+            ->subject("You've been invited to {$company} on Change Quo")
             ->greeting("Hello {$notifiable->name}!")
-            ->line("You have been added as an employee of {$company} on Personality 360 Assessment.")
+            ->line("You have been added as an employee of {$company} on Change Quo Assessment.")
             ->line('Please click the button below to set your password and activate your account so you can participate in 360 feedback surveys.')
             ->action('Set Password & Activate Account', $activationUrl)
             ->line('If you did not expect this invitation, you can safely ignore this email.');

@@ -16,7 +16,7 @@ You can deploy this application directly to Render using the button above or fol
 4. Runtime: **Docker** (Render auto-detects `Dockerfile` and `render.yaml`).
 5. Instance Type: **Free**.
 6. Environment variables (already pre-configured in `render.yaml`):
-   * `APP_NAME`: `Personality 360`
+   * `APP_NAME`: `Change Quo`
    * `APP_ENV`: `production`
    * `APP_DEBUG`: `false`
    * `APP_KEY`: `base64:1wWf5KHtdnNCU3beG42ECrqpZJHGTjZbPPWpYWyDkvg=`

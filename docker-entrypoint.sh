@@ -51,7 +51,7 @@ php artisan view:cache
 # Ensure generated cache files in bootstrap/cache are accessible by www-data
 chown -R www-data:www-data /var/www/html/bootstrap/cache
 
-echo "Personality 360 Assessment is ready on port ${PORT}."
+echo "Change Quo Assessment is ready on port ${PORT}."
 
 # Hand over to Apache
 exec apache2-foreground

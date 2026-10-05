@@ -24,7 +24,7 @@ class AdminSidebarNavigationTest extends TestCase
 
         // Check Brand & Admin Console
         $response->assertSee('Admin Console');
-        $response->assertSee('Personality 360');
+        $response->assertSee('Change Quo');
 
         // Check Mobile Menu Toggle Button
         $response->assertSee('Open sidebar menu');
@@ -58,7 +58,7 @@ class AdminSidebarNavigationTest extends TestCase
 
         // Check Brand & Participant Portal
         $response->assertSee('Participant Portal');
-        $response->assertSee('Personality 360');
+        $response->assertSee('Change Quo');
 
         // Check Mobile Menu Toggle Button
         $response->assertSee('Open sidebar menu');

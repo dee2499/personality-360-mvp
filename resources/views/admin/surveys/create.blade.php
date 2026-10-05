@@ -50,7 +50,7 @@
                     </label>
                     <input type="text" name="title" id="title" required
                            value="{{ old('title', 'Personality Assessment ' . date('Y')) }}"
-                           placeholder="e.g. Leadership & Personality 360 Feedback 2026"
+                           placeholder="e.g. Leadership & Change Quo Feedback 2026"
                            class="mt-1.5 block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 @error('title') border-rose-500 @enderror">
                     @error('title')
                         <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>

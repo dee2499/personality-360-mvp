@@ -24,6 +24,6 @@ class ExampleTest extends TestCase
         $response = $this->get(route('login'));
 
         $response->assertStatus(200);
-        $response->assertSee('Personality 360');
+        $response->assertSee('Change Quo');
     }
 }

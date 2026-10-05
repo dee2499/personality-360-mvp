@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Personality 360 Assessment' }} — 360 Assessment</title>
+    <title>{{ $title ?? 'Change Quo Assessment' }} — Change Quo</title>
 
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -509,7 +509,7 @@
             <!-- Authenticated Footer -->
             <footer class="bg-white border-t border-slate-200 mt-auto py-5 px-4 sm:px-6 lg:px-8">
                 <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
-                    <span>&copy; {{ date('Y') }} Personality 360 Assessment System. All rights reserved.</span>
+                    <span>&copy; {{ date('Y') }} Change Quo Assessment System. All rights reserved.</span>
                 </div>
             </footer>
         </div>
@@ -594,7 +594,7 @@
         <!-- Guest Footer -->
         <footer class="bg-white border-t border-slate-200 mt-auto py-6">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
-                <span>&copy; {{ date('Y') }} Personality 360 Assessment System. All rights reserved.</span>
+                <span>&copy; {{ date('Y') }} Change Quo Assessment System. All rights reserved.</span>
             </div>
         </footer>
     @endif

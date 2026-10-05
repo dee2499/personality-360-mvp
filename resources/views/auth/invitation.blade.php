@@ -11,7 +11,7 @@
                 Employee Invitation
             </span>
             <h2 class="mt-2 text-2xl font-black tracking-tight text-slate-900">
-                Welcome to {{ $user->company?->name ?? 'Personality 360' }}!
+                Welcome to {{ $user->company?->name ?? 'Change Quo' }}!
             </h2>
             <p class="mt-1 text-xs text-slate-500 font-medium">
                 Hello <strong class="text-slate-700">{{ $user->name }}</strong>, set your password to activate your account.
