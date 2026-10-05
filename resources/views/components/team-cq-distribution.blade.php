@@ -207,45 +207,50 @@
     </div>
 
     <!-- Bottom 5-Archetype Distribution Summary Table (Matching Template Design) -->
-    <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-2xs grid grid-cols-5 text-center">
+    <div class="rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs grid grid-cols-5 text-center">
         <!-- 1. Resistant -->
-        <div class="py-3 px-2 sm:px-4 bg-[#ffe4e6] border-r border-rose-200 flex flex-col items-center justify-center">
-            <div class="font-extrabold text-xs sm:text-sm text-[#9f1239]">Resistant</div>
-            <div class="text-[11px] sm:text-xs font-medium text-slate-700 mt-0.5">1.0 – 2.0</div>
-            <div class="text-xs sm:text-sm font-black text-[#be123c] mt-1">{{ $dist['resistant']['percentage'] ?? 0 }}%</div>
-            <div class="text-[11px] sm:text-xs font-bold text-slate-900 mt-0.5">({{ $dist['resistant']['count'] ?? 0 }})</div>
+        <div class="py-3 px-2 sm:px-4 flex flex-col items-center justify-center transition-colors border-r border-white/60"
+             style="background-color: #fedee4 !important;">
+            <div class="font-black text-xs sm:text-sm tracking-tight" style="color: #881337 !important;">Resistant</div>
+            <div class="text-[11px] sm:text-xs font-semibold mt-0.5" style="color: #475569 !important;">1.0 – 2.0</div>
+            <div class="text-xs sm:text-sm font-black mt-1" style="color: #be123c !important;">{{ $dist['resistant']['percentage'] ?? 0 }}%</div>
+            <div class="text-[11px] sm:text-xs font-black mt-0.5" style="color: #0f172a !important;">({{ $dist['resistant']['count'] ?? 0 }})</div>
         </div>
 
         <!-- 2. Follower -->
-        <div class="py-3 px-2 sm:px-4 bg-[#ffedd5] border-r border-orange-200 flex flex-col items-center justify-center">
-            <div class="font-extrabold text-xs sm:text-sm text-[#9a3412]">Follower</div>
-            <div class="text-[11px] sm:text-xs font-medium text-slate-700 mt-0.5">2.1 – 4.0</div>
-            <div class="text-xs sm:text-sm font-black text-[#c2410c] mt-1">{{ $dist['follower']['percentage'] ?? 0 }}%</div>
-            <div class="text-[11px] sm:text-xs font-bold text-slate-900 mt-0.5">({{ $dist['follower']['count'] ?? 0 }})</div>
+        <div class="py-3 px-2 sm:px-4 flex flex-col items-center justify-center transition-colors border-r border-white/60"
+             style="background-color: #faecd9 !important;">
+            <div class="font-black text-xs sm:text-sm tracking-tight" style="color: #7c2d12 !important;">Follower</div>
+            <div class="text-[11px] sm:text-xs font-semibold mt-0.5" style="color: #475569 !important;">2.1 – 4.0</div>
+            <div class="text-xs sm:text-sm font-black mt-1" style="color: #0f172a !important;">{{ $dist['follower']['percentage'] ?? 0 }}%</div>
+            <div class="text-[11px] sm:text-xs font-black mt-0.5" style="color: #0f172a !important;">({{ $dist['follower']['count'] ?? 0 }})</div>
         </div>
 
         <!-- 3. Supporter -->
-        <div class="py-3 px-2 sm:px-4 bg-[#dcfce7] border-r border-emerald-200 flex flex-col items-center justify-center">
-            <div class="font-extrabold text-xs sm:text-sm text-[#14532d]">Supporter</div>
-            <div class="text-[11px] sm:text-xs font-medium text-slate-700 mt-0.5">4.1 – 6.0</div>
-            <div class="text-xs sm:text-sm font-black text-[#15803d] mt-1">{{ $dist['supporter']['percentage'] ?? 0 }}%</div>
-            <div class="text-[11px] sm:text-xs font-bold text-slate-900 mt-0.5">({{ $dist['supporter']['count'] ?? 0 }})</div>
+        <div class="py-3 px-2 sm:px-4 flex flex-col items-center justify-center transition-colors border-r border-white/60"
+             style="background-color: #d1efe0 !important;">
+            <div class="font-black text-xs sm:text-sm tracking-tight" style="color: #064e3b !important;">Supporter</div>
+            <div class="text-[11px] sm:text-xs font-semibold mt-0.5" style="color: #475569 !important;">4.1 – 6.0</div>
+            <div class="text-xs sm:text-sm font-black mt-1" style="color: #0f172a !important;">{{ $dist['supporter']['percentage'] ?? 0 }}%</div>
+            <div class="text-[11px] sm:text-xs font-black mt-0.5" style="color: #0f172a !important;">({{ $dist['supporter']['count'] ?? 0 }})</div>
         </div>
 
         <!-- 4. Driver -->
-        <div class="py-3 px-2 sm:px-4 bg-[#fef3c7] border-r border-amber-200 flex flex-col items-center justify-center">
-            <div class="font-extrabold text-xs sm:text-sm text-[#78350f]">Driver</div>
-            <div class="text-[11px] sm:text-xs font-medium text-slate-700 mt-0.5">6.1 – 8.0</div>
-            <div class="text-xs sm:text-sm font-black text-[#b45309] mt-1">{{ $dist['driver']['percentage'] ?? 0 }}%</div>
-            <div class="text-[11px] sm:text-xs font-bold text-slate-900 mt-0.5">({{ $dist['driver']['count'] ?? 0 }})</div>
+        <div class="py-3 px-2 sm:px-4 flex flex-col items-center justify-center transition-colors border-r border-white/60"
+             style="background-color: #f9efcb !important;">
+            <div class="font-black text-xs sm:text-sm tracking-tight" style="color: #78350f !important;">Driver</div>
+            <div class="text-[11px] sm:text-xs font-semibold mt-0.5" style="color: #475569 !important;">6.1 – 8.0</div>
+            <div class="text-xs sm:text-sm font-black mt-1" style="color: #0f172a !important;">{{ $dist['driver']['percentage'] ?? 0 }}%</div>
+            <div class="text-[11px] sm:text-xs font-black mt-0.5" style="color: #0f172a !important;">({{ $dist['driver']['count'] ?? 0 }})</div>
         </div>
 
         <!-- 5. Champion -->
-        <div class="py-3 px-2 sm:px-4 bg-[#dbeafe] flex flex-col items-center justify-center">
-            <div class="font-extrabold text-xs sm:text-sm text-[#1e3a8a]">Champion</div>
-            <div class="text-[11px] sm:text-xs font-medium text-slate-700 mt-0.5">8.1 – 10.0</div>
-            <div class="text-xs sm:text-sm font-black text-[#1d4ed8] mt-1">{{ $dist['champion']['percentage'] ?? 0 }}%</div>
-            <div class="text-[11px] sm:text-xs font-bold text-slate-900 mt-0.5">({{ $dist['champion']['count'] ?? 0 }})</div>
+        <div class="py-3 px-2 sm:px-4 flex flex-col items-center justify-center transition-colors"
+             style="background-color: #d3e4fd !important;">
+            <div class="font-black text-xs sm:text-sm tracking-tight" style="color: #1e3a8a !important;">Champion</div>
+            <div class="text-[11px] sm:text-xs font-semibold mt-0.5" style="color: #475569 !important;">8.1 – 10.0</div>
+            <div class="text-xs sm:text-sm font-black mt-1" style="color: #0f172a !important;">{{ $dist['champion']['percentage'] ?? 0 }}%</div>
+            <div class="text-[11px] sm:text-xs font-black mt-0.5" style="color: #0f172a !important;">({{ $dist['champion']['count'] ?? 0 }})</div>
         </div>
     </div>
 </div>
