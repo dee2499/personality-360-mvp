@@ -1396,6 +1396,20 @@ class AssessmentScoreService
             'Champion' => 0,
         ];
 
+        // 10 Bins for detailed score distribution histogram (0.0 to 10.0)
+        $histogramBins = [
+            0 => ['from' => 0.0, 'to' => 1.0, 'count' => 0, 'archetype' => 'resistant', 'color' => '#f87171'],
+            1 => ['from' => 1.0, 'to' => 2.0, 'count' => 0, 'archetype' => 'resistant', 'color' => '#f87171'],
+            2 => ['from' => 2.0, 'to' => 3.0, 'count' => 0, 'archetype' => 'follower', 'color' => '#fb923c'],
+            3 => ['from' => 3.0, 'to' => 4.0, 'count' => 0, 'archetype' => 'follower', 'color' => '#fb923c'],
+            4 => ['from' => 4.0, 'to' => 5.0, 'count' => 0, 'archetype' => 'supporter', 'color' => '#86efac'],
+            5 => ['from' => 5.0, 'to' => 6.0, 'count' => 0, 'archetype' => 'supporter', 'color' => '#86efac'],
+            6 => ['from' => 6.0, 'to' => 7.0, 'count' => 0, 'archetype' => 'driver', 'color' => '#fde047'],
+            7 => ['from' => 7.0, 'to' => 8.0, 'count' => 0, 'archetype' => 'driver', 'color' => '#fde047'],
+            8 => ['from' => 8.0, 'to' => 9.0, 'count' => 0, 'archetype' => 'champion', 'color' => '#60a5fa'],
+            9 => ['from' => 9.0, 'to' => 10.0, 'count' => 0, 'archetype' => 'champion', 'color' => '#60a5fa'],
+        ];
+
         foreach ($individualCQScores as $s) {
             if ($s <= 2.0) {
                 $distributionCounts['Resistant']++;
@@ -1407,6 +1421,29 @@ class AssessmentScoreService
                 $distributionCounts['Driver']++;
             } else {
                 $distributionCounts['Champion']++;
+            }
+
+            // Assign to 10-bin histogram
+            if ($s <= 1.0) {
+                $histogramBins[0]['count']++;
+            } elseif ($s <= 2.0) {
+                $histogramBins[1]['count']++;
+            } elseif ($s <= 3.0) {
+                $histogramBins[2]['count']++;
+            } elseif ($s <= 4.0) {
+                $histogramBins[3]['count']++;
+            } elseif ($s <= 5.0) {
+                $histogramBins[4]['count']++;
+            } elseif ($s <= 6.0) {
+                $histogramBins[5]['count']++;
+            } elseif ($s <= 7.0) {
+                $histogramBins[6]['count']++;
+            } elseif ($s <= 8.0) {
+                $histogramBins[7]['count']++;
+            } elseif ($s <= 9.0) {
+                $histogramBins[8]['count']++;
+            } else {
+                $histogramBins[9]['count']++;
             }
         }
 
@@ -1608,6 +1645,8 @@ class AssessmentScoreService
                 'gap' => $gapCQ,
             ],
             'distribution' => $distribution,
+            'histogram_bins' => $histogramBins,
+            'individual_cq_scores' => $individualCQScores,
             'strategic_recommendations' => $strategicRecommendations,
             'plan_30_60_90' => $plan306090,
             'expected_outcomes' => $expectedOutcomes,

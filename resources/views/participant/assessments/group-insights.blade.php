@@ -405,42 +405,8 @@
 
             <!-- Middle Row: Distribution Histogram & Key Statistics (Image 4) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Histogram Spread across 5 Archetypes (7 cols) -->
-                <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-base font-black text-slate-900">Team CQ Distribution</h3>
-                            <p class="text-xs text-slate-400">Spread of normalised CQ scores across {{ $insights['cohort_size'] }} employees</p>
-                        </div>
-                        <div class="text-xs text-slate-500 font-bold">
-                            Mean: {{ number_format($stats['mean'] ?? $cqScore, 1) }} • Median: {{ number_format($stats['median'] ?? $cqScore, 1) }}
-                        </div>
-                    </div>
-
-                    <!-- Histogram Bars -->
-                    <div class="pt-6 space-y-4">
-                        <div class="grid grid-cols-5 gap-2 h-44 items-end border-b border-slate-200 pb-2">
-                            @foreach($dist as $d)
-                                <div class="flex flex-col items-center gap-1 h-full justify-end">
-                                    <span class="text-[11px] font-extrabold text-slate-700">{{ $d['count'] }}</span>
-                                    <div class="w-full rounded-t-xl transition-all duration-700"
-                                         style="height: {{ max(10, min(100, $d['percentage'])) }}%; background-color: {{ $d['color'] }}; opacity: 0.85;"></div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- 5 Archetype Range Labels -->
-                        <div class="grid grid-cols-5 gap-2 text-center text-xs">
-                            @foreach($dist as $d)
-                                <div class="p-2 rounded-xl border border-slate-100 bg-slate-50/50">
-                                    <span class="block font-black text-slate-900 text-xs">{{ $d['name'] }}</span>
-                                    <span class="block text-[10px] text-slate-400">{{ $d['range'] }}</span>
-                                    <span class="block text-[11px] font-extrabold text-slate-700 mt-1">{{ $d['percentage'] }}% ({{ $d['count'] }})</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+                <!-- Team CQ Distribution (Matching Theme Template) -->
+                <x-team-cq-distribution :insights="$insights" class="lg:col-span-7" />
 
                 <!-- Key Statistics Table (5 cols) -->
                 <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-4">

@@ -494,4 +494,30 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $reportResponse->assertSee('Alex Person');
         $reportResponse->assertSee('Achiever');
     }
+
+    public function test_group_insights_includes_histogram_bins_and_team_cq_distribution(): void
+    {
+        $data = $this->setupSurveyWithParticipants();
+        $survey = $data['survey'];
+        $admin = $data['admin'];
+
+        $scoreService = app(AssessmentScoreService::class);
+        $insights = $scoreService->calculateGroupInsights($survey);
+
+        $this->assertArrayHasKey('histogram_bins', $insights);
+        $this->assertCount(10, $insights['histogram_bins']);
+        $this->assertArrayHasKey('distribution', $insights);
+
+        // Check that group-insights page renders Team CQ Distribution and archetype summary table
+        $response = $this->actingAs($admin)->get(route('admin.surveys.group-insights', $survey));
+        $response->assertOk();
+        $response->assertSee('Team CQ Distribution');
+        $response->assertSee('Number of Employees');
+        $response->assertSee('Normalised CQ Score');
+        $response->assertSee('Resistant');
+        $response->assertSee('Follower');
+        $response->assertSee('Supporter');
+        $response->assertSee('Driver');
+        $response->assertSee('Champion');
+    }
 }
