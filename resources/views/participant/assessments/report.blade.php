@@ -38,10 +38,10 @@
         <!-- Top Action Bar (Back, Survey Switcher & Print) -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
             <div class="flex items-center gap-3">
-                <a href="{{ route('participant.assessments.index', ['survey_id' => $survey->id]) }}" 
-                   class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span>Back to Assessments</span>
+                <a href="{{ route('participant.assessments.index', ['survey_id' => $survey->id, 'view' => 'matrix']) }}" 
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition shadow-2xs">
+                    <i data-lucide="layout-grid" class="w-4 h-4 text-indigo-600"></i>
+                    <span>View Detailed Matrix</span>
                 </a>
 
                 @if(isset($availableSurveys) && $availableSurveys->count() > 1)

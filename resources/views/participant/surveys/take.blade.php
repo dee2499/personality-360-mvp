@@ -158,7 +158,7 @@
                     <a href="{{ route('participant.assessments.index') }}" 
                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition mb-2">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                        <span>Exit to My Assessments</span>
+                        <span>Exit to Dashboard</span>
                     </a>
                     <div class="flex items-center gap-2 flex-wrap">
                         <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $survey->title }}</h1>

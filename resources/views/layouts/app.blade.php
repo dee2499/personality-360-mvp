@@ -65,13 +65,24 @@
                     
                     <!-- Drawer Header & Close Button -->
                     <div class="flex items-center justify-between px-6 pb-4 border-b border-slate-100">
-                        <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2.5 font-bold text-base text-slate-900">
-                            <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-sm shadow-indigo-100">
-                                <i data-lucide="compass" class="w-4 h-4"></i>
+                        <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2 font-bold group">
+                            <div class="w-8 h-8 flex items-center justify-center shrink-0">
+                                <svg class="w-7 h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
+                                    <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
+                                    <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
+                                    <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
+                                    <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
+                                    <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
+                                </svg>
                             </div>
                             <div class="flex flex-col">
-                                <span class="leading-tight tracking-tight text-slate-900 font-extrabold">Personality 360</span>
-                                <span class="text-[9px] font-bold tracking-wider uppercase text-indigo-600">{{ $portalLabel }}</span>
+                                <span class="text-lg font-black tracking-tight text-purple-950 leading-none">
+                                    change<span class="text-purple-600">quo</span>
+                                </span>
+                                <span class="text-[8px] font-bold tracking-tight text-purple-700 mt-0.5">
+                                    Unlocking Possibilities
+                                </span>
                             </div>
                         </a>
                         <button type="button" 
@@ -153,18 +164,22 @@
                                     Assessments
                                 </div>
                                 <div class="space-y-1">
+                                    @php
+                                        $isDashboardActive = (request()->routeIs('participant.assessments.index') && request()->query('view') !== 'matrix') || request()->routeIs('participant.cq-report') || request()->routeIs('participant.assessments.report');
+                                        $isMatrixActive = request()->routeIs('participant.assessments.index') && request()->query('view') === 'matrix';
+                                    @endphp
                                     <a href="{{ route('participant.assessments.index') }}" 
                                        @click="mobileNavOpen = false"
-                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.index') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                        <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.index') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                        <span>My Assessments</span>
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ $isDashboardActive ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="layout-dashboard" class="w-4 h-4 {{ $isDashboardActive ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>My Dashboard</span>
                                     </a>
 
-                                    <a href="{{ route('participant.cq-report') }}" 
+                                    <a href="{{ route('participant.assessments.index', ['view' => 'matrix']) }}" 
                                        @click="mobileNavOpen = false"
-                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                        <i data-lucide="file-bar-chart-2" class="w-4 h-4 {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                        <span>CQ Report</span>
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ $isMatrixActive ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="clipboard-check" class="w-4 h-4 {{ $isMatrixActive ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>My Assessments</span>
                                     </a>
                                 </div>
                             </div>
@@ -218,13 +233,24 @@
         <aside class="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col border-r border-slate-200 bg-white shadow-xs">
             <!-- Sidebar Brand Header -->
             <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-slate-100">
-                <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2.5 font-bold text-lg text-slate-900 group">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-sm shadow-indigo-200 group-hover:bg-indigo-700 transition">
-                        <i data-lucide="compass" class="w-5 h-5"></i>
+                <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2.5 font-bold group">
+                    <div class="w-9 h-9 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
+                            <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
+                            <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
+                            <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
+                            <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
+                            <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
+                        </svg>
                     </div>
                     <div class="flex flex-col">
-                        <span class="leading-tight tracking-tight text-slate-900 font-extrabold">Personality 360</span>
-                        <span class="text-[10px] font-bold tracking-wider uppercase text-indigo-600">{{ $portalLabel }}</span>
+                        <span class="text-xl font-black tracking-tight text-purple-950 leading-none">
+                            change<span class="text-purple-600">quo</span>
+                        </span>
+                        <span class="text-[9px] font-bold tracking-tight text-purple-700 mt-1">
+                            Unlocking Possibilities
+                        </span>
                     </div>
                 </a>
             </div>
@@ -295,16 +321,20 @@
                                 Evaluations
                             </div>
                             <div class="space-y-1">
+                                @php
+                                    $isDashboardActive = (request()->routeIs('participant.assessments.index') && request()->query('view') !== 'matrix') || request()->routeIs('participant.cq-report') || request()->routeIs('participant.assessments.report');
+                                    $isMatrixActive = request()->routeIs('participant.assessments.index') && request()->query('view') === 'matrix';
+                                @endphp
                                 <a href="{{ route('participant.assessments.index') }}" 
-                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.index') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="clipboard-check" class="w-4 h-4 {{ request()->routeIs('participant.assessments.index') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                    <span>My Assessments</span>
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ $isDashboardActive ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4 {{ $isDashboardActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>My Dashboard</span>
                                 </a>
 
-                                <a href="{{ route('participant.cq-report') }}" 
-                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="file-bar-chart-2" class="w-4 h-4 {{ request()->routeIs('participant.assessments.report') || request()->routeIs('participant.cq-report') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                    <span>CQ Report</span>
+                                <a href="{{ route('participant.assessments.index', ['view' => 'matrix']) }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ $isMatrixActive ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="clipboard-check" class="w-4 h-4 {{ $isMatrixActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>My Assessments</span>
                                 </a>
                             </div>
                         </div>
@@ -365,11 +395,18 @@
                             aria-label="Open sidebar menu">
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </button>
-                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2 font-bold text-sm text-slate-900">
-                        <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-extrabold shadow-xs">
-                            <i data-lucide="compass" class="w-4 h-4"></i>
+                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-1.5 font-bold text-sm">
+                        <div class="w-6 h-6 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
+                                <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
+                                <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
+                                <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
+                                <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
+                                <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
+                            </svg>
                         </div>
-                        <span class="tracking-tight font-extrabold text-slate-900">Personality 360</span>
+                        <span class="tracking-tight font-black text-purple-950">change<span class="text-purple-600">quo</span></span>
                     </a>
                 </div>
 
@@ -473,14 +510,6 @@
             <footer class="bg-white border-t border-slate-200 mt-auto py-5 px-4 sm:px-6 lg:px-8">
                 <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
                     <span>&copy; {{ date('Y') }} Personality 360 Assessment System. All rights reserved.</span>
-                    <span class="flex items-center gap-2">
-                        <span>Categories:</span>
-                        <span class="inline-flex items-center gap-1 font-medium">🍏 Apple (0-20%)</span>
-                        <span class="inline-flex items-center gap-1 font-medium">🍊 Orange (>20-40%)</span>
-                        <span class="inline-flex items-center gap-1 font-medium">🍅 Tomato (>40-60%)</span>
-                        <span class="inline-flex items-center gap-1 font-medium">🍋 Lemon (>60-80%)</span>
-                        <span class="inline-flex items-center gap-1 font-medium">🥒 Cucumber (>80-100%)</span>
-                    </span>
                 </div>
             </footer>
         </div>
@@ -494,13 +523,24 @@
                 <div class="flex justify-between h-16 items-center">
                     <!-- Brand / Logo -->
                     <div class="flex items-center gap-3">
-                        <a href="{{ url('/') }}" class="flex items-center gap-2.5 font-bold text-lg text-slate-900 group">
-                            <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold shadow-sm group-hover:bg-indigo-700 transition">
-                                <i data-lucide="compass" class="w-5 h-5"></i>
+                        <a href="{{ url('/') }}" class="flex items-center gap-2.5 font-bold group">
+                            <div class="w-9 h-9 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
+                                    <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
+                                    <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
+                                    <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
+                                    <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
+                                    <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
+                                </svg>
                             </div>
                             <div class="flex flex-col">
-                                <span class="leading-tight tracking-tight text-slate-900 font-extrabold">Personality 360</span>
-                                <span class="text-[10px] font-semibold tracking-wider uppercase text-slate-400">Enterprise Feedback</span>
+                                <span class="text-xl font-black tracking-tight text-purple-950 leading-none">
+                                    change<span class="text-purple-600">quo</span>
+                                </span>
+                                <span class="text-[9px] font-bold tracking-tight text-purple-700 mt-1">
+                                    Unlocking Possibilities
+                                </span>
                             </div>
                         </a>
                     </div>

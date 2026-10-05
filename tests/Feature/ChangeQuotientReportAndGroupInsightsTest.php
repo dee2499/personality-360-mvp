@@ -264,7 +264,7 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
     {
         $data = $this->setupSurveyWithParticipants();
 
-        $response = $this->actingAs($data['alice'])->get(route('participant.assessments.index', ['survey_id' => $data['survey']->id]));
+        $response = $this->actingAs($data['alice'])->get(route('participant.assessments.index', ['survey_id' => $data['survey']->id, 'view' => 'matrix']));
         $response->assertOk();
 
         $response->assertSee(route('participant.assessments.report', $data['survey']));

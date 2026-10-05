@@ -215,8 +215,8 @@ class AssessmentScoreTest extends TestCase
         $responseAdmin->assertSee('Pending Survey');
         $responseAdmin->assertSee('Completed');
 
-        // 2. Participant Portal (/my-assessments)
-        $responseParticipant = $this->actingAs($participant)->get(route('participant.assessments.index'));
+        // 2. Participant Portal (/my-assessments?view=matrix)
+        $responseParticipant = $this->actingAs($participant)->get(route('participant.assessments.index', ['view' => 'matrix']));
         $responseParticipant->assertOk();
         $responseParticipant->assertSee('Survey Alpha 2026');
         $responseParticipant->assertSee('Survey Beta 2026');

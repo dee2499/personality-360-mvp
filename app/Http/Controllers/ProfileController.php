@@ -20,6 +20,26 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's personal details (first name and last name).
+     * Email cannot be changed.
+     */
+    public function update(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $fullName = trim($validated['first_name'].' '.($validated['last_name'] ?? ''));
+
+        $request->user()->update([
+            'name' => $fullName,
+        ]);
+
+        return back()->with('success', 'Your name has been updated successfully.');
+    }
+
+    /**
      * Update the user password.
      */
     public function updatePassword(Request $request): RedirectResponse

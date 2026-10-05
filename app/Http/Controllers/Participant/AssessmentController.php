@@ -27,8 +27,9 @@ class AssessmentController extends Controller
 
     /**
      * Display the participant dashboard with assigned assessments.
+     * When completed, replaces the homepage with the CQ Report page.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         $user = $request->user();
 
@@ -81,7 +82,7 @@ class AssessmentController extends Controller
 
             $self = $surveyAssessments->first(fn ($a) => $a->isSelfAssessment());
             $peers = $surveyAssessments->filter(fn ($a) => ! $a->isSelfAssessment());
-            $isCompleted = $surveyAssessments->isNotEmpty() && $surveyAssessments->every(fn ($a) => $a->isCompleted());
+            $isCompleted = $surveyAssessments->isNotEmpty() && $surveyAssessments->where('status', 'completed')->isNotEmpty();
             $completed = $surveyAssessments->where('status', 'completed')->count();
             $total = $surveyAssessments->count();
 
@@ -137,11 +138,22 @@ class AssessmentController extends Controller
 
         // 4. Handle survey selection from the top
         $selectedSurveyId = $request->query('survey_id');
-        $selectedGroup = $selectedSurveyId
-            ? $surveyGroups->first(fn ($g) => $g['survey']->id == $selectedSurveyId)
-            : $surveyGroups->first();
+        $selectedGroup = null;
+
+        if ($selectedSurveyId) {
+            $selectedGroup = $surveyGroups->first(fn ($g) => $g['survey']->id == $selectedSurveyId);
+        }
+
+        if (! $selectedGroup) {
+            $selectedGroup = $surveyGroups->first(fn ($g) => $g['isCompleted']) ?? $surveyGroups->first();
+        }
 
         $selectedSurvey = $selectedGroup ? $selectedGroup['survey'] : null;
+
+        // If user has filled the survey / took the assessment, replace homepage with CQ report page!
+        if ($selectedSurvey && ($selectedGroup['isCompleted'] ?? false) && $request->query('view') !== 'matrix') {
+            return $this->report($request, $selectedSurvey);
+        }
 
         // 5. Detailed matrix breakdown for selected survey
         $questionsBreakdown = [];
@@ -451,7 +463,11 @@ class AssessmentController extends Controller
         }
 
         if (! $survey) {
-            $survey = $targetUser->surveys()->where('status', 'published')->latest('published_at')->first()
+            // Find a survey where target user has completed assessments, or latest published
+            $survey = Survey::whereHas('assessments', function ($q) use ($targetUser) {
+                $q->where('assessor_id', $targetUser->id)->where('status', 'completed');
+            })->latest()->first()
+                ?? $targetUser->surveys()->where('status', 'published')->latest('published_at')->first()
                 ?? Survey::whereHas('assessments', function ($q) use ($targetUser) {
                     $q->where('subject_id', $targetUser->id)->orWhere('assessor_id', $targetUser->id);
                 })->latest()->first()
@@ -470,7 +486,7 @@ class AssessmentController extends Controller
      * Display the confidential individual Change Quotient (CQ 1-3, CQ Sync) report.
      * Strictly confidential for the authenticated user's self-introspection.
      */
-    public function report(Request $request, Survey $survey): View
+    public function report(Request $request, Survey $survey): View|RedirectResponse
     {
         $user = $request->user();
         $targetUser = ($user->isAdmin() && $request->filled('user_id'))
@@ -487,14 +503,29 @@ class AssessmentController extends Controller
             abort(403, 'Unauthorized. This individual CQ report is confidential.');
         }
 
+        // If target user has NOT completed this survey, redirect them to dashboard prompt
+        $hasCompleted = Assessment::where('survey_id', $survey->id)
+            ->where('assessor_id', $targetUser->id)
+            ->where('status', 'completed')
+            ->exists();
+
+        if (! $hasCompleted && ! $user->isAdmin()) {
+            return redirect()->route('participant.assessments.index', ['survey_id' => $survey->id])
+                ->with('info', "Please complete your assessment for '{$survey->title}' to unlock your confidential CQ Report.");
+        }
+
         $cq = $this->scoreService->calculateChangeQuotientReport($targetUser, $survey);
 
-        $availableSurveys = $targetUser->surveys()->where('status', 'published')->get();
-        if ($availableSurveys->isEmpty()) {
-            $availableSurveys = Survey::whereHas('assessments', function ($q) use ($targetUser) {
-                $q->where('subject_id', $targetUser->id)->orWhere('assessor_id', $targetUser->id);
-            })->get();
-        }
+        $availableSurveys = Survey::query()
+            ->where(function ($q) use ($targetUser) {
+                $q->whereHas('participants', fn ($sq) => $sq->where('users.id', $targetUser->id))
+                    ->orWhereHas('assessments', fn ($sq) => $sq->where('assessor_id', $targetUser->id));
+                if ($targetUser->company_id) {
+                    $q->orWhere('company_id', $targetUser->company_id);
+                }
+            })
+            ->where('status', 'published')
+            ->get();
 
         return view('participant.assessments.report', [
             'survey' => $survey,

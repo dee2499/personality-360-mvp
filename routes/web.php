@@ -44,6 +44,7 @@ Route::post('/logout', [AuthController::class, 'destroy'])
 Route::middleware('auth')->group(function () {
     // User Profile & Password Update
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 
     // Participant 360 Surveys & Assessments

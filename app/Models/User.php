@@ -62,6 +62,20 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
+    public function getFirstNameAttribute(): string
+    {
+        $parts = explode(' ', trim($this->name ?? ''), 2);
+
+        return $parts[0] ?? '';
+    }
+
+    public function getLastNameAttribute(): string
+    {
+        $parts = explode(' ', trim($this->name ?? ''), 2);
+
+        return $parts[1] ?? '';
+    }
+
     public function isInvited(): bool
     {
         return ! empty($this->invitation_token) && empty($this->invitation_accepted_at);

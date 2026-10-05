@@ -273,8 +273,8 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $response->assertSee('New Password');
         $response->assertDontSee('Three Score Meters (Normalised, Self, Peer)');
 
-        // 2. Visit Alice's user home page (dashboard): displays the 3 Meters (Normalised, Self, Peer)
-        $homeResponse = $this->actingAs($alice)->get(route('participant.assessments.index'));
+        // 2. Visit Alice's user assessments matrix view: displays the 3 Meters (Normalised, Self, Peer)
+        $homeResponse = $this->actingAs($alice)->get(route('participant.assessments.index', ['view' => 'matrix']));
         $homeResponse->assertOk();
         $homeResponse->assertSee('Three Score Meters (Normalised, Self, Peer)');
         $homeResponse->assertSee('Meter 1: Normalised');
@@ -373,8 +373,8 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         ]);
         AssessmentAnswer::create(['assessment_id' => $rhodeyPeer2->id, 'question_id' => $q2->id, 'score' => 9]);
 
-        // 1. Visit Tony's dashboard (default view displays Survey 1)
-        $response1 = $this->actingAs($tony)->get(route('participant.assessments.index'));
+        // 1. Visit Tony's dashboard matrix view (default view displays Survey 1)
+        $response1 = $this->actingAs($tony)->get(route('participant.assessments.index', ['view' => 'matrix']));
         $response1->assertOk();
         $response1->assertSee('Select Survey to View Matrix');
         $response1->assertSee('Leadership & Strategy 360');
@@ -386,7 +386,7 @@ class B2BCompanyAndSurveySliderTest extends TestCase
         $response1->assertSee('Demonstrates technical visionary leadership');
 
         // 2. Select Survey 2 by name on top via query string
-        $response2 = $this->actingAs($tony)->get(route('participant.assessments.index', ['survey_id' => $survey2->id]));
+        $response2 = $this->actingAs($tony)->get(route('participant.assessments.index', ['survey_id' => $survey2->id, 'view' => 'matrix']));
         $response2->assertOk();
         $response2->assertSee('Innovation & Team Culture 360');
         $response2->assertSee('72.73');
