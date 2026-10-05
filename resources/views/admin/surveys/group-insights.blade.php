@@ -418,40 +418,60 @@
                 <x-team-maturity-level-gauge :insights="$insights" class="lg:col-span-5 flex flex-col justify-between" />
             </div>
 
-            <!-- Key Statistics Horizontal Strip -->
+            <!-- Key Statistics Horizontal Strip (Matching Template Design) -->
             <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs">
                 <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
-                    <h4 class="text-xs font-black uppercase tracking-wider text-slate-800">Capability Key Statistics</h4>
+                    <h4 class="text-sm font-black text-[#0a0f37] tracking-tight">Key Statistics</h4>
                     <span class="text-[11px] text-slate-400 font-medium">Cohort size: {{ $insights['cohort_size'] }} employees</span>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Mean (Average)</span>
-                        <span class="text-slate-900 font-black text-base">{{ number_format($stats['mean'] ?? 0, 1) }}</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 text-center">
+                    <!-- 1. Mean (Average) -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #edf5fe !important; border-color: #dbeafe !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold">Mean (Average)</span>
+                        <span class="text-[#0a0f37] font-black text-lg sm:text-xl mt-1">{{ number_format($stats['mean'] ?? 0, 1) }}</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Median</span>
-                        <span class="text-slate-900 font-black text-base">{{ number_format($stats['median'] ?? 0, 1) }}</span>
+
+                    <!-- 2. Median -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #f8fafc !important; border-color: #f1f5f9 !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold">Median</span>
+                        <span class="text-[#0a0f37] font-black text-lg sm:text-xl mt-1">{{ number_format($stats['median'] ?? 0, 1) }}</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Std. Dev.</span>
-                        <span class="text-slate-900 font-black text-base">{{ number_format($stats['std_dev'] ?? 0, 1) }}</span>
+
+                    <!-- 3. Standard Deviation -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #f8fafc !important; border-color: #f1f5f9 !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold leading-tight">Standard Deviation</span>
+                        <span class="text-[#0a0f37] font-black text-lg sm:text-xl mt-1">{{ number_format($stats['std_dev'] ?? 0, 1) }}</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Highest</span>
-                        <span class="text-emerald-700 font-black text-base">{{ number_format($stats['highest'] ?? 0, 1) }}</span>
+
+                    <!-- 4. Highest Score -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #f8fafc !important; border-color: #f1f5f9 !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold">Highest Score</span>
+                        <span class="text-[#0a0f37] font-black text-lg sm:text-xl mt-1">{{ number_format($stats['highest'] ?? 0, 1) }}</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Lowest</span>
-                        <span class="text-rose-700 font-black text-base">{{ number_format($stats['lowest'] ?? 0, 1) }}</span>
+
+                    <!-- 5. Lowest Score -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #f8fafc !important; border-color: #f1f5f9 !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold">Lowest Score</span>
+                        <span class="text-[#0a0f37] font-black text-lg sm:text-xl mt-1">{{ number_format($stats['lowest'] ?? 0, 1) }}</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Benchmark</span>
-                        <span class="text-emerald-700 font-black text-base">8.0</span>
+
+                    <!-- 6. Team Benchmark (Target) -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #ecfbf3 !important; border-color: #d1fae5 !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold leading-tight">Team Benchmark (Target)</span>
+                        <span class="text-[#15803d] font-black text-lg sm:text-xl mt-1">8.0</span>
                     </div>
-                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
-                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Gap</span>
-                        <span class="text-rose-600 font-black text-base">{{ $gapCQ }}</span>
+
+                    <!-- 7. Gap to Benchmark -->
+                    <div class="p-3 rounded-2xl border transition-colors flex flex-col justify-between"
+                         style="background-color: #feeff1 !important; border-color: #fecdd3 !important;">
+                        <span class="text-slate-600 block text-[11px] font-bold leading-tight">Gap to Benchmark</span>
+                        <span class="text-[#dc2626] font-black text-lg sm:text-xl mt-1">{{ $gapCQ }}</span>
                     </div>
                 </div>
             </div>
