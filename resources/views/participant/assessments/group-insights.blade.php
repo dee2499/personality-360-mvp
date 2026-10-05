@@ -335,8 +335,11 @@
                 <x-path-opportunity-zone :cq-score="$cqScore" :sync-score="$syncScore" :benchmark-cq="$benchmarkCQ" :benchmark-sync="$benchmarkSync" :insights="$insights" />
             </div>
 
-            <!-- Bottom Row: Strategic Recommendations, 30-60-90 Day Plan, Expected Outcomes (Image 2) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Section: 30 – 60 – 90 Day Plan (Full Width Matching Reference Template) -->
+            <x-plan-30-60-90 :insights="$insights" />
+
+            <!-- Bottom Row: Strategic Recommendations & Expected Outcomes (2 Columns) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 1. Strategic Recommendations -->
                 <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
                     <div class="flex items-center gap-2">
@@ -358,41 +361,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 30 - 60 - 90 Day Plan -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="calendar" class="w-5 h-5 text-amber-500"></i>
-                        <h4 class="text-sm font-black text-slate-900">30 – 60 – 90 Day Plan</h4>
-                    </div>
-
-                    <div class="space-y-3 text-xs">
-                        <div class="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
-                            <span class="font-extrabold text-amber-950 block text-xs">First 30 Days: Align & Engage</span>
-                            <ul class="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
-                                <li>Conduct team alignment workshop (See, Agree, Act)</li>
-                                <li>Clarify key change priorities and expected outcomes</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-3 rounded-2xl bg-blue-50/60 border border-blue-200/80 space-y-1">
-                            <span class="font-extrabold text-blue-950 block text-xs">Next 60 Days: Build & Act Together</span>
-                            <ul class="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
-                                <li>Run focused capability building sessions</li>
-                                <li>Execute cross-functional commitments</li>
-                            </ul>
-                        </div>
-
-                        <div class="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
-                            <span class="font-extrabold text-emerald-950 block text-xs">Next 90 Days: Scale & Institutionalise</span>
-                            <ul class="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
-                                <li>Review progress and measure improvements in CQ</li>
-                                <li>Embed successful practices into standard rituals</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Expected Outcomes -->
+                <!-- 2. Expected Outcomes -->
                 <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
                     <div class="flex items-center gap-2">
                         <i data-lucide="award" class="w-5 h-5 text-emerald-600"></i>
