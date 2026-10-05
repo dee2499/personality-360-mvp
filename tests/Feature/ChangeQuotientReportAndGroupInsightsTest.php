@@ -508,12 +508,14 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $this->assertCount(10, $insights['histogram_bins']);
         $this->assertArrayHasKey('distribution', $insights);
 
-        // Check that group-insights page renders Team CQ Distribution and archetype summary table
+        // Check that group-insights page renders Team CQ Distribution and Team Maturity Level gauge
         $response = $this->actingAs($admin)->get(route('admin.surveys.group-insights', $survey));
         $response->assertOk();
         $response->assertSee('Team CQ Distribution');
         $response->assertSee('Number of Employees');
         $response->assertSee('Normalised CQ Score');
+        $response->assertSee('Team Maturity Level');
+        $response->assertSee('Current overall position of the team');
         $response->assertSee('Resistant');
         $response->assertSee('Follower');
         $response->assertSee('Supporter');

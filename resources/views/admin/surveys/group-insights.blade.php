@@ -409,44 +409,49 @@
             <!-- Top 5 Metric Cards (Matching Theme Template) -->
             <x-team-insights-metric-cards :insights="$insights" />
 
-            <!-- Middle Row: Distribution Histogram & Key Statistics (Image 4) -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Middle Row: Distribution Histogram & Team Maturity Level Meter (Matching Template Design) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                 <!-- Team CQ Distribution (Matching Theme Template) -->
-                <x-team-cq-distribution :insights="$insights" class="lg:col-span-7" />
+                <x-team-cq-distribution :insights="$insights" class="lg:col-span-7 flex flex-col justify-between" />
 
-                <!-- Key Statistics Table (5 cols) -->
-                <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-4">
-                    <h3 class="text-base font-black text-slate-900">Key Statistics</h3>
-                    
-                    <div class="divide-y divide-slate-100 text-xs">
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Mean (Average)</span>
-                            <span class="font-black text-slate-900">{{ number_format($stats['mean'] ?? 0, 1) }}</span>
-                        </div>
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Median</span>
-                            <span class="font-black text-slate-900">{{ number_format($stats['median'] ?? 0, 1) }}</span>
-                        </div>
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Standard Deviation</span>
-                            <span class="font-black text-slate-900">{{ number_format($stats['std_dev'] ?? 0, 1) }}</span>
-                        </div>
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Highest Score</span>
-                            <span class="font-black text-emerald-700">{{ number_format($stats['highest'] ?? 0, 1) }}</span>
-                        </div>
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Lowest Score</span>
-                            <span class="font-black text-rose-700">{{ number_format($stats['lowest'] ?? 0, 1) }}</span>
-                        </div>
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Team Benchmark (Target)</span>
-                            <span class="font-black text-emerald-700">8.0</span>
-                        </div>
-                        <div class="py-2.5 flex items-center justify-between">
-                            <span class="text-slate-500">Gap to Benchmark</span>
-                            <span class="font-black text-rose-600">{{ $gapCQ }}</span>
-                        </div>
+                <!-- Team Maturity Level Gauge (Matching Theme Template Image) -->
+                <x-team-maturity-level-gauge :insights="$insights" class="lg:col-span-5 flex flex-col justify-between" />
+            </div>
+
+            <!-- Key Statistics Horizontal Strip -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+                <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-slate-800">Capability Key Statistics</h4>
+                    <span class="text-[11px] text-slate-400 font-medium">Cohort size: {{ $insights['cohort_size'] }} employees</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Mean (Average)</span>
+                        <span class="text-slate-900 font-black text-base">{{ number_format($stats['mean'] ?? 0, 1) }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Median</span>
+                        <span class="text-slate-900 font-black text-base">{{ number_format($stats['median'] ?? 0, 1) }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Std. Dev.</span>
+                        <span class="text-slate-900 font-black text-base">{{ number_format($stats['std_dev'] ?? 0, 1) }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Highest</span>
+                        <span class="text-emerald-700 font-black text-base">{{ number_format($stats['highest'] ?? 0, 1) }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Lowest</span>
+                        <span class="text-rose-700 font-black text-base">{{ number_format($stats['lowest'] ?? 0, 1) }}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Benchmark</span>
+                        <span class="text-emerald-700 font-black text-base">8.0</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100">
+                        <span class="text-slate-400 block text-[10px] font-bold uppercase">Gap</span>
+                        <span class="text-rose-600 font-black text-base">{{ $gapCQ }}</span>
                     </div>
                 </div>
             </div>
