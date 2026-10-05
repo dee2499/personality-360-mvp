@@ -52,11 +52,9 @@
         }
 
         $syncPillClass = match ($sync['maturity_level'] ?? 'Aligned') {
-            'Divergent' => 'bg-rose-100 text-rose-950',
-            'Fragmented' => 'bg-amber-100 text-amber-950',
-            'Synchronised' => 'bg-[#dcfce7] text-[#0a0f37]',
-            'Unified' => 'bg-emerald-200 text-emerald-950',
-            default => 'bg-[#dcfce7] text-[#0a0f37]',
+            'Divergent' => 'bg-[#ffd2dc] text-[#0a0f37]',
+            'Fragmented' => 'bg-[#fed7aa] text-[#0a0f37]',
+            default => 'bg-[#d4fce6] text-[#0a0f37]',
         };
     @endphp
 
@@ -154,58 +152,58 @@
             <!-- 4 Top Cards (Image 2) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- 1. Team CQ (Group Score) -->
-                <div class="bg-[#f8faff] rounded-3xl border border-blue-100/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-blue-100/80 flex items-center justify-center shrink-0 mt-0.5">
-                        <svg class="w-7 h-7 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
+                <div class="bg-[#eef7fe] rounded-2xl border border-[#d7ebfc] p-4 shadow-2xs flex items-start gap-3">
+                    <div class="w-12 h-12 rounded-full bg-[#d0e5ff] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-6 h-6 text-[#0f78ec]" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
                             <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
                             <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Team CQ</div>
-                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Group Score)</div>
-                        <div class="mt-1.5 flex items-baseline gap-1.5">
-                            <span class="text-3xl font-black text-[#0a0f37] tracking-tight">{{ number_format($cqScore, 1) }}</span>
-                            <span class="text-xl font-medium text-slate-500">/ 10</span>
+                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Team CQ</div>
+                        <div class="text-[11px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Group Score)</div>
+                        <div class="mt-1 flex items-baseline gap-1">
+                            <span class="text-2xl font-black text-[#0a0f37] tracking-tight">{{ number_format($cqScore, 1) }}</span>
+                            <span class="text-xs font-semibold text-slate-500">/ 10</span>
                         </div>
-                        <div class="mt-2.5">
-                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-[#fef08a] text-[#0a0f37] shadow-2xs">
+                        <div class="mt-1.5">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#fef08a] text-[#0a0f37] whitespace-nowrap">
                                 {{ $insights['group_transition_label'] ?? 'Change Supporter → Driver' }}
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-[#4b5585] font-normal">Capability to navigate change</p>
+                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">Capability to navigate change</p>
                     </div>
                 </div>
 
                 <!-- 2. Team CQ Sync -->
-                <div class="bg-[#faf8ff] rounded-3xl border border-purple-100/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-purple-100/80 flex items-center justify-center shrink-0 mt-0.5">
-                        <svg class="w-7 h-7 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
+                <div class="bg-[#f4f2fd] rounded-2xl border border-[#e7ddfb] p-4 shadow-2xs flex items-start gap-3">
+                    <div class="w-12 h-12 rounded-full bg-[#e4d5ff] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-6 h-6 text-[#6f01d2]" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             <path d="M4.5 10.5c1.38 0 2.5-1.12 2.5-2.5S5.88 5.5 4.5 5.5 2 6.62 2 8s1.12 2.5 2.5 2.5zm0 1.5C2.83 12 0 12.83 0 14.5V17h5v-1.5c0-.98.39-1.87 1.03-2.56C5.41 12.35 4.88 12 4.5 12z" opacity="0.85"/>
                             <path d="M19.5 10.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5-2.5 1.12-2.5 2.5 1.12 2.5 2.5 2.5zm0 1.5c-.38 0-.91.35-1.53.94.64.69 1.03 1.58 1.03 2.56V17h5v-2.5c0-1.67-2.83-2.5-4.5-2.5z" opacity="0.85"/>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
-                        <div class="mt-1.5 flex items-baseline gap-1.5">
-                            <span class="text-3xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
-                            <span class="text-xl font-medium text-slate-500">/ 10</span>
+                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
+                        <div class="mt-1 flex items-baseline gap-1">
+                            <span class="text-2xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
+                            <span class="text-xs font-semibold text-slate-500">/ 10</span>
                         </div>
-                        <div class="mt-2.5">
-                            <span class="inline-flex items-center px-4 py-0.5 rounded-xl text-xs font-bold {{ $syncPillClass }} shadow-2xs">
+                        <div class="mt-1.5">
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-[11px] font-bold {{ $syncPillClass }} whitespace-nowrap">
                                 {{ $sync['maturity_level'] ?? 'Aligned' }}
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-[#4b5585] font-normal">How well we see, agree and act together</p>
+                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">How well we see, agree and act together</p>
                     </div>
                 </div>
 
                 <!-- 3. Expected / Benchmark -->
-                <div class="bg-[#f4fbf7] rounded-3xl border border-emerald-100/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-emerald-100/80 flex items-center justify-center shrink-0 mt-0.5">
-                        <svg class="w-7 h-7 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="bg-[#f2fbf6] rounded-2xl border border-[#daf5e6] p-4 shadow-2xs flex items-start gap-3">
+                    <div class="w-12 h-12 rounded-full bg-[#d4fce6] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-6 h-6 text-[#047857]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="9"/>
                             <circle cx="12" cy="12" r="5"/>
                             <circle cx="12" cy="12" r="2" fill="currentColor"/>
@@ -214,46 +212,46 @@
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
-                        <div class="mt-1 flex items-baseline gap-1.5 flex-wrap">
-                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ:</span>
-                            <span class="text-2xl font-black text-[#047857] tracking-tight">{{ number_format($benchmarkCQ, 1) }}</span>
-                            <span class="text-slate-300 mx-1.5 text-sm font-light">|</span>
-                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ Sync:</span>
-                            <span class="text-2xl font-black text-[#047857] tracking-tight">{{ number_format($benchmarkSync, 1) }}</span>
+                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
+                        <div class="mt-1 flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-xs font-bold text-[#0a0f37]">CQ:</span>
+                            <span class="text-base sm:text-lg font-black text-[#047857] tracking-tight">{{ number_format($benchmarkCQ, 1) }}</span>
+                            <span class="text-slate-300 mx-1 text-xs font-light">|</span>
+                            <span class="text-xs font-bold text-[#0a0f37]">CQ Sync:</span>
+                            <span class="text-base sm:text-lg font-black text-[#047857] tracking-tight">{{ number_format($benchmarkSync, 1) }}</span>
                         </div>
-                        <div class="mt-2.5">
-                            <span class="inline-flex items-center px-3.5 py-0.5 rounded-xl text-xs font-bold bg-[#dcfce7] text-[#0a0f37] shadow-2xs">
+                        <div class="mt-1.5">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#d4fce6] text-[#0a0f37] whitespace-nowrap">
                                 Change Champion & Unified
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-[#4b5585] font-normal">High capability with strong synchronisation</p>
+                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">High capability with strong synchronisation</p>
                     </div>
                 </div>
 
                 <!-- 4. Gaps to Benchmark -->
-                <div class="bg-[#fef7f7] rounded-3xl border border-rose-100/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-rose-100/80 flex items-center justify-center shrink-0 mt-0.5">
-                        <svg class="w-7 h-7 text-[#e11d48]" viewBox="0 0 24 24" fill="currentColor">
+                <div class="bg-[#fef2f2] rounded-2xl border border-[#fcd5dc] p-4 shadow-2xs flex items-start gap-3">
+                    <div class="w-12 h-12 rounded-full bg-[#ffd2dc] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-6 h-6 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
                             <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
                             <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
-                        <div class="mt-1 flex items-baseline gap-1.5 flex-wrap">
-                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ:</span>
-                            <span class="text-2xl font-black {{ $gapCQ < 0 ? 'text-[#e11d48]' : 'text-[#047857]' }} tracking-tight">
+                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
+                        <div class="mt-1 flex items-baseline gap-1 whitespace-nowrap">
+                            <span class="text-xs font-bold text-[#0a0f37]">CQ:</span>
+                            <span class="text-base sm:text-lg font-black {{ $gapCQ < 0 ? 'text-[#ed082d]' : 'text-[#047857]' }} tracking-tight">
                                 {{ $gapCQ > 0 ? '+'.number_format($gapCQ, 1) : number_format($gapCQ, 1) }}
                             </span>
-                            <span class="text-slate-300 mx-1.5 text-sm font-light">|</span>
-                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ Sync:</span>
-                            <span class="text-2xl font-black {{ $gapSync < 0 ? 'text-[#e11d48]' : 'text-[#047857]' }} tracking-tight">
+                            <span class="text-slate-300 mx-1 text-xs font-light">|</span>
+                            <span class="text-xs font-bold text-[#0a0f37]">CQ Sync:</span>
+                            <span class="text-base sm:text-lg font-black {{ $gapSync < 0 ? 'text-[#ed082d]' : 'text-[#047857]' }} tracking-tight">
                                 {{ $gapSync > 0 ? '+'.number_format($gapSync, 1) : number_format($gapSync, 1) }}
                             </span>
                         </div>
-                        <p class="mt-2.5 text-xs text-[#4b5585] leading-relaxed font-normal">
+                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">
                             {{ $gapDescription }}
                         </p>
                     </div>
