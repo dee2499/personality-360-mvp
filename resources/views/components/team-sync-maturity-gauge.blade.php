@@ -108,6 +108,21 @@
                   fill="#0284c7" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/>
 
             <!-- ============================================================== -->
+            <!-- The Speedometer Needle (Pivot at 200, 200, Base moved UP to r=-86) -->
+            <!-- ============================================================== -->
+            <g transform="translate(200, 200)">
+                <g :style="`transform: rotate(${mounted ? {{ $syncNeedleAngle }} : -90}deg); transform-origin: 0 0; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
+                   style="transform: rotate({{ $syncNeedleAngle }}deg); transform-origin: 0 0;"
+                   filter="url(#{{ $filterId }})">
+                    <polygon points="-5.5,-86 -1.2,-166 0,-172 1.2,-166 5.5,-86" fill="#0a0f37"/>
+                    <polygon points="0,-86 0,-172 1.2,-166 5.5,-86" fill="#1e293b"/>
+                    <!-- Base anchor cap with white dot hole matching template image -->
+                    <circle cx="0" cy="-86" r="8.5" fill="#0a0f37"/>
+                    <circle cx="0" cy="-86" r="3.5" fill="#FFFFFF"/>
+                </g>
+            </g>
+
+            <!-- ============================================================== -->
             <!-- Sector 1: Divergent Content                                    -->
             <!-- ============================================================== -->
             <!-- Divergent 3-Arrow Node Icon -->
@@ -117,28 +132,28 @@
                 <path d="M -3,5 L -12,0 M -12,0 L -7,-2 M -12,0 L -9,5"/>
                 <path d="M 3,5 L 12,0 M 12,0 L 7,-2 M 12,0 L 9,5"/>
             </g>
-            <text x="68" y="165" text-anchor="middle" font-size="11" font-weight="900" fill="#FFFFFF">Divergent</text>
-            <text x="68" y="179" text-anchor="middle" font-size="9.5" font-weight="700" fill="#ffe4e6">1.0 – 2.0</text>
+            <text x="68" y="165" text-anchor="middle" font-size="11.5" font-weight="900" fill="#FFFFFF">Divergent</text>
+            <text x="68" y="179" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">1.0 – 2.0</text>
 
             <!-- ============================================================== -->
             <!-- Sector 2: Fragmented Content                                  -->
             <!-- ============================================================== -->
             <!-- Fragmented Dumbbell Nodes Icon -->
-            <g transform="translate(122, 68)" fill="#451a03" stroke="#451a03" stroke-width="2" stroke-linecap="round">
+            <g transform="translate(122, 68)" fill="#0a0f37" stroke="#0a0f37" stroke-width="2" stroke-linecap="round">
                 <circle cx="-9" cy="-7" r="3.2"/>
                 <circle cx="9" cy="-5" r="3.5"/>
                 <circle cx="2" cy="7" r="3.2"/>
                 <line x1="-7" y1="-5" x2="0" y2="5" stroke-dasharray="2.5,2.5" stroke-width="2.2"/>
                 <line x1="7" y1="-3" x2="3" y2="5" stroke-width="2.2"/>
             </g>
-            <text x="122" y="96" text-anchor="middle" font-size="11" font-weight="900" fill="#0a0f37">Fragmented</text>
-            <text x="122" y="110" text-anchor="middle" font-size="9.5" font-weight="700" fill="#475569">2.1 – 4.0</text>
+            <text x="122" y="96" text-anchor="middle" font-size="11.5" font-weight="900" fill="#0a0f37">Fragmented</text>
+            <text x="122" y="110" text-anchor="middle" font-size="10" font-weight="800" fill="#1e293b">2.1 – 4.0</text>
 
             <!-- ============================================================== -->
             <!-- Sector 3: Aligned Content                                     -->
             <!-- ============================================================== -->
             <!-- 3 Silhouetted People Group Icon -->
-            <g transform="translate(200, 40)" fill="#064e3b">
+            <g transform="translate(200, 38)" fill="#064e3b">
                 <circle cx="0" cy="-5" r="3.4"/>
                 <path d="M -5.5,5 C -5.5,1 -2.5,0 0,0 C 2.5,0 5.5,1 5.5,5 Z"/>
                 <circle cx="-8" cy="-3.5" r="2.6"/>
@@ -146,8 +161,8 @@
                 <circle cx="8" cy="-3.5" r="2.6"/>
                 <path d="M 5.5,4.5 C 5.5,2.6 7,2 8.5,2 C 10,2 12,2.8 12,5.5"/>
             </g>
-            <text x="200" y="66" text-anchor="middle" font-size="11" font-weight="900" fill="#0a0f37">Aligned</text>
-            <text x="200" y="80" text-anchor="middle" font-size="9.5" font-weight="700" fill="#064e3b">4.1 – 6.0</text>
+            <text x="200" y="64" text-anchor="middle" font-size="12" font-weight="900" fill="#0a0f37">Aligned</text>
+            <text x="200" y="78" text-anchor="middle" font-size="10" font-weight="800" fill="#064e3b">4.1 – 6.0</text>
 
             <!-- ============================================================== -->
             <!-- Sector 4: Synchronised Content                                -->
@@ -159,8 +174,8 @@
                 <circle cx="6" cy="-4" r="3.5" fill="#facc15"/>
                 <path d="M 6,-9.5 L 6,-8 M 6,0 L 6,1.5 M 1.5,-4 L 3,-4 M 9,-4 L 10.5,-4"/>
             </g>
-            <text x="278" y="96" text-anchor="middle" font-size="11" font-weight="900" fill="#0a0f37">Synchronised</text>
-            <text x="278" y="110" text-anchor="middle" font-size="9.5" font-weight="700" fill="#78350f">6.1 – 8.0</text>
+            <text x="278" y="96" text-anchor="middle" font-size="11.5" font-weight="900" fill="#0a0f37">Synchronised</text>
+            <text x="278" y="110" text-anchor="middle" font-size="10" font-weight="800" fill="#78350f">6.1 – 8.0</text>
 
             <!-- ============================================================== -->
             <!-- Sector 5: Unified Content                                      -->
@@ -176,8 +191,8 @@
                 <circle cx="7" cy="-0.5" r="2.4" stroke="none"/>
                 <path d="M 4.5,6 C 4.5,4.2 5.5,3.5 7,3.5 C 9,3.5 11,4.2 11,7" stroke="none"/>
             </g>
-            <text x="332" y="165" text-anchor="middle" font-size="11" font-weight="900" fill="#FFFFFF">Unified</text>
-            <text x="332" y="179" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e0f2fe">8.1 – 10.0</text>
+            <text x="332" y="165" text-anchor="middle" font-size="11.5" font-weight="900" fill="#FFFFFF">Unified</text>
+            <text x="332" y="179" text-anchor="middle" font-size="10" font-weight="800" fill="#FFFFFF">8.1 – 10.0</text>
 
             <!-- ============================================================== -->
             <!-- Inner Elevated White Cutout Semicircle (Radius 94 at 200, 200) -->
@@ -185,27 +200,13 @@
             <path d="M 106,200 A 94,94 0 0,1 294,200 Z" fill="#FFFFFF" filter="url(#{{ $hubShadowId }})"/>
 
             <!-- ============================================================== -->
-            <!-- Center Readout Inside White Hub                                -->
+            <!-- Center Readout Inside White Hub (100% Unobstructed & Visible)  -->
             <!-- ============================================================== -->
-            <text x="200" y="146" text-anchor="middle" font-size="11" font-weight="800" fill="#0a0f37" letter-spacing="0.01em">Team CQ Sync Score</text>
+            <text x="200" y="146" text-anchor="middle" font-size="12" font-weight="800" fill="#0a0f37" letter-spacing="0.01em">Team CQ Sync Score</text>
             <text x="200" y="184" text-anchor="middle">
                 <tspan font-size="38" font-weight="900" fill="#0a0f37">{{ number_format($score, 1) }}</tspan>
                 <tspan font-size="20" font-weight="700" fill="#0a0f37" dx="4"> / 10</tspan>
             </text>
-
-            <!-- ============================================================== -->
-            <!-- The Speedometer Needle (Pivot at 200, 200)                     -->
-            <!-- ============================================================== -->
-            <g transform="translate(200, 200)">
-                <g :style="`transform: rotate(${mounted ? {{ $syncNeedleAngle }} : -90}deg); transform-origin: 0 0; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
-                   style="transform: rotate({{ $syncNeedleAngle }}deg); transform-origin: 0 0;"
-                   filter="url(#{{ $filterId }})">
-                    <polygon points="-4.5,0 -1,-126 0,-134 1,-126 4.5,0" fill="#0a0f37"/>
-                    <polygon points="0,0 0,-134 1,-126 4.5,0" fill="#1e293b"/>
-                    <circle cx="0" cy="-20" r="3.2" fill="#FFFFFF"/>
-                    <circle cx="0" cy="0" r="8" fill="#0a0f37"/>
-                </g>
-            </g>
 
             <!-- ============================================================== -->
             <!-- Centered Active Tier Pill Badge at Bottom Hub Opening          -->

@@ -344,31 +344,31 @@
                         <text x="332" y="179" text-anchor="middle" font-size="9.5" font-weight="700" fill="#e0f2fe">8.1 – 10.0</text>
 
                         <!-- ============================================================== -->
-                        <!-- Inner Elevated White Cutout Semicircle (Radius 90 at 200, 200) -->
-                        <!-- ============================================================== -->
-                        <path d="M 110,200 A 90,90 0 0,1 290,200 Z" fill="#FFFFFF" filter="url(#hubElevationShadow)"/>
-
-                        <!-- ============================================================== -->
-                        <!-- Center Readout Inside White Hub                                -->
-                        <!-- ============================================================== -->
-                        <text x="200" y="138" text-anchor="middle" font-size="10.5" font-weight="700" fill="#64748b" letter-spacing="0.2">Your</text>
-                        <text x="200" y="152" text-anchor="middle" font-size="11.5" font-weight="800" fill="#0a0f37">ChangeQuo Score</text>
-                        <text x="200" y="186" text-anchor="middle" font-size="36" font-weight="900" fill="#0a0f37">{{ $hasData && $cqScore > 0 ? number_format($cqScore, 1) : '0.0' }}</text>
-                        <text x="200" y="202" text-anchor="middle" font-size="13" font-weight="900" fill="#0a0f37">{{ $hasData && $cqScore > 0 ? $meterTierName : 'Pending' }}</text>
-
-                        <!-- ============================================================== -->
-                        <!-- The Speedometer Needle (Pivot at 200, 200)                     -->
+                        <!-- The Speedometer Needle (Pivot at 200, 200, Base moved UP to r=-86) -->
                         <!-- ============================================================== -->
                         <g transform="translate(200, 200)">
                             <g :style="`transform: rotate(${mounted ? {{ $needleAngle }} : -90}deg); transform-origin: 0 0; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);`"
                                style="transform: rotate({{ $needleAngle }}deg); transform-origin: 0 0;"
                                filter="url(#gaugeNeedleShadow)">
-                                <polygon points="-4.5,0 -1,-126 0,-134 1,-126 4.5,0" fill="#0a0f37"/>
-                                <polygon points="0,0 0,-134 1,-126 4.5,0" fill="#1e293b"/>
-                                <circle cx="0" cy="0" r="9" fill="#0a0f37"/>
-                                <circle cx="0" cy="0" r="3.5" fill="#FFFFFF"/>
+                                <polygon points="-5.5,-86 -1.2,-166 0,-172 1.2,-166 5.5,-86" fill="#0a0f37"/>
+                                <polygon points="0,-86 0,-172 1.2,-166 5.5,-86" fill="#1e293b"/>
+                                <circle cx="0" cy="-86" r="8.5" fill="#0a0f37"/>
+                                <circle cx="0" cy="-86" r="3.5" fill="#FFFFFF"/>
                             </g>
                         </g>
+
+                        <!-- ============================================================== -->
+                        <!-- Inner Elevated White Cutout Semicircle (Radius 90 at 200, 200) -->
+                        <!-- ============================================================== -->
+                        <path d="M 110,200 A 90,90 0 0,1 290,200 Z" fill="#FFFFFF" filter="url(#hubElevationShadow)"/>
+
+                        <!-- ============================================================== -->
+                        <!-- Center Readout Inside White Hub (100% Unobstructed)            -->
+                        <!-- ============================================================== -->
+                        <text x="200" y="138" text-anchor="middle" font-size="10.5" font-weight="700" fill="#64748b" letter-spacing="0.2">Your</text>
+                        <text x="200" y="152" text-anchor="middle" font-size="12" font-weight="800" fill="#0a0f37">ChangeQuo Score</text>
+                        <text x="200" y="186" text-anchor="middle" font-size="36" font-weight="900" fill="#0a0f37">{{ $hasData && $cqScore > 0 ? number_format($cqScore, 1) : '0.0' }}</text>
+                        <text x="200" y="202" text-anchor="middle" font-size="13" font-weight="900" fill="#0a0f37">{{ $hasData && $cqScore > 0 ? $meterTierName : 'Pending' }}</text>
                     </svg>
                 </div>
 
