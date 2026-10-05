@@ -60,11 +60,11 @@
     }
 @endphp
 
-<div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
+<div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-3">
     <!-- Header Matching Reference Design -->
-    <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
-            <svg class="w-5 h-5 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+    <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
+            <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <circle cx="12" cy="12" r="6"/>
                 <circle cx="12" cy="12" r="2" fill="currentColor"/>
@@ -72,11 +72,11 @@
                 <path d="M15 5h4v4"/>
             </svg>
         </div>
-        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">Path to the Opportunity Zone</h3>
+        <h3 class="text-sm sm:text-base font-black text-[#0a0f37] tracking-tight">Path to the Opportunity Zone</h3>
     </div>
 
     <!-- Interactive / Responsive Trajectory Improvement Chart (1:1 with photo) -->
-    <div class="w-full relative">
+    <div class="w-full max-w-[360px] mx-auto relative">
         <svg viewBox="0 0 430 360" class="w-full h-auto select-none" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
             <!-- Opportunity Zone dashed box -->
             <rect x="185" y="10" width="235" height="195" rx="14" fill="#e6fded" stroke="#86efac" stroke-width="1.5" stroke-dasharray="5,4" />

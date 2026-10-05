@@ -142,62 +142,62 @@
         <!-- ============================================================= -->
         <!-- TAB 1: SUMMARY REPORT & TEAM POSITION MATRIX (MATCHING IMAGE 2) -->
         <!-- ============================================================= -->
-        <div x-show="activeTab === 'summary'" class="space-y-6 sm:space-y-8" x-transition>
+        <div x-show="activeTab === 'summary'" class="space-y-4 sm:space-y-5" x-transition>
             <!-- 4 Top Cards (Matching Reference Photo) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <!-- 1. Team CQ (Group Score) -->
-                <div class="rounded-2xl p-4 shadow-2xs flex items-start gap-3" style="background-color: #eef7fe !important; border: 1px solid #d7ebfc !important;">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #d0e5ff !important;">
-                        <svg class="w-6 h-6 text-[#0f78ec]" viewBox="0 0 24 24" fill="currentColor">
+                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #eef7fe !important; border: 1px solid #d7ebfc !important;">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #d0e5ff !important;">
+                        <svg class="w-5 h-5 text-[#0f78ec]" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
                             <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
                             <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Team CQ</div>
-                        <div class="text-[11px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Group Score)</div>
+                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Team CQ</div>
+                        <div class="text-[10px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Group Score)</div>
                         <div class="mt-1 flex items-baseline gap-1">
-                            <span class="text-2xl font-black text-[#0a0f37] tracking-tight">{{ number_format($cqScore, 1) }}</span>
-                            <span class="text-xs font-semibold text-slate-500">/ 10</span>
+                            <span class="text-xl font-black text-[#0a0f37] tracking-tight">{{ number_format($cqScore, 1) }}</span>
+                            <span class="text-[11px] font-semibold text-slate-500">/ 10</span>
                         </div>
-                        <div class="mt-1.5">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #fef08a !important; color: #0a0f37 !important;">
+                        <div class="mt-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #fef08a !important; color: #0a0f37 !important;">
                                 {{ $insights['group_transition_label'] ?? 'Change Supporter → Driver' }}
                             </span>
                         </div>
-                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">Capability to navigate change</p>
+                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">Capability to navigate change</p>
                     </div>
                 </div>
 
                 <!-- 2. Team CQ Sync -->
-                <div class="rounded-2xl p-4 shadow-2xs flex items-start gap-3" style="background-color: #f4f2fd !important; border: 1px solid #e7ddfb !important;">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #e4d5ff !important;">
-                        <svg class="w-6 h-6 text-[#6f01d2]" viewBox="0 0 24 24" fill="currentColor">
+                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #f4f2fd !important; border: 1px solid #e7ddfb !important;">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #e4d5ff !important;">
+                        <svg class="w-5 h-5 text-[#6f01d2]" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             <path d="M4.5 10.5c1.38 0 2.5-1.12 2.5-2.5S5.88 5.5 4.5 5.5 2 6.62 2 8s1.12 2.5 2.5 2.5zm0 1.5C2.83 12 0 12.83 0 14.5V17h5v-1.5c0-.98.39-1.87 1.03-2.56C5.41 12.35 4.88 12 4.5 12z" opacity="0.85"/>
                             <path d="M19.5 10.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5-2.5 1.12-2.5 2.5 1.12 2.5 2.5 2.5zm0 1.5c-.38 0-.91.35-1.53.94.64.69 1.03 1.58 1.03 2.56V17h5v-2.5c0-1.67-2.83-2.5-4.5-2.5z" opacity="0.85"/>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
+                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
                         <div class="mt-1 flex items-baseline gap-1">
-                            <span class="text-2xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
-                            <span class="text-xs font-semibold text-slate-500">/ 10</span>
+                            <span class="text-xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
+                            <span class="text-[11px] font-semibold text-slate-500">/ 10</span>
                         </div>
-                        <div class="mt-1.5">
-                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #d4fce6 !important; color: #0a0f37 !important;">
+                        <div class="mt-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #d4fce6 !important; color: #0a0f37 !important;">
                                 {{ $sync['maturity_level'] ?? 'Aligned' }}
                             </span>
                         </div>
-                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">How well we see, agree and act together</p>
+                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">How well we see, agree and act together</p>
                     </div>
                 </div>
 
                 <!-- 3. Expected / Benchmark -->
-                <div class="rounded-2xl p-4 shadow-2xs flex items-start gap-3" style="background-color: #f2fbf6 !important; border: 1px solid #daf5e6 !important;">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #d4fce6 !important;">
-                        <svg class="w-6 h-6 text-[#047857]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #f2fbf6 !important; border: 1px solid #daf5e6 !important;">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #d4fce6 !important;">
+                        <svg class="w-5 h-5 text-[#047857]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="9"/>
                             <circle cx="12" cy="12" r="5"/>
                             <circle cx="12" cy="12" r="2" fill="currentColor"/>
@@ -206,46 +206,46 @@
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
+                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
                         <div class="mt-1 flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-xs font-bold text-[#0a0f37]">CQ:</span>
-                            <span class="text-base sm:text-lg font-black tracking-tight" style="color: #047857 !important;">{{ number_format($benchmarkCQ, 1) }}</span>
+                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ:</span>
+                            <span class="text-base font-black tracking-tight" style="color: #047857 !important;">{{ number_format($benchmarkCQ, 1) }}</span>
                             <span class="text-slate-300 mx-1 text-xs font-light">|</span>
-                            <span class="text-xs font-bold text-[#0a0f37]">CQ Sync:</span>
-                            <span class="text-base sm:text-lg font-black tracking-tight" style="color: #047857 !important;">{{ number_format($benchmarkSync, 1) }}</span>
+                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ Sync:</span>
+                            <span class="text-base font-black tracking-tight" style="color: #047857 !important;">{{ number_format($benchmarkSync, 1) }}</span>
                         </div>
-                        <div class="mt-1.5">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #d4fce6 !important; color: #0a0f37 !important;">
+                        <div class="mt-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap shadow-2xs" style="background-color: #d4fce6 !important; color: #0a0f37 !important;">
                                 Change Champion & Unified
                             </span>
                         </div>
-                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">High capability with strong synchronisation</p>
+                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">High capability with strong synchronisation</p>
                     </div>
                 </div>
 
                 <!-- 4. Gaps to Benchmark -->
-                <div class="rounded-2xl p-4 shadow-2xs flex items-start gap-3" style="background-color: #fef2f2 !important; border: 1px solid #fcd5dc !important;">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #ffd2dc !important;">
-                        <svg class="w-6 h-6 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
+                <div class="rounded-2xl p-3.5 shadow-2xs flex items-start gap-2.5 sm:gap-3" style="background-color: #fef2f2 !important; border: 1px solid #fcd5dc !important;">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background-color: #ffd2dc !important;">
+                        <svg class="w-5 h-5 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
                             <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
                             <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="text-[13px] font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
+                        <div class="text-xs font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
                         <div class="mt-1 flex items-baseline gap-1 whitespace-nowrap">
-                            <span class="text-xs font-bold text-[#0a0f37]">CQ:</span>
-                            <span class="text-base sm:text-lg font-black tracking-tight" style="color: {{ $gapCQ < 0 ? '#ed082d' : '#047857' }} !important;">
+                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ:</span>
+                            <span class="text-base font-black tracking-tight" style="color: {{ $gapCQ < 0 ? '#ed082d' : '#047857' }} !important;">
                                 {{ $gapCQ > 0 ? '+'.number_format($gapCQ, 1) : number_format($gapCQ, 1) }}
                             </span>
                             <span class="text-slate-300 mx-1 text-xs font-light">|</span>
-                            <span class="text-xs font-bold text-[#0a0f37]">CQ Sync:</span>
-                            <span class="text-base sm:text-lg font-black tracking-tight" style="color: {{ $gapSync < 0 ? '#ed082d' : '#047857' }} !important;">
+                            <span class="text-[11px] font-bold text-[#0a0f37]">CQ Sync:</span>
+                            <span class="text-base font-black tracking-tight" style="color: {{ $gapSync < 0 ? '#ed082d' : '#047857' }} !important;">
                                 {{ $gapSync > 0 ? '+'.number_format($gapSync, 1) : number_format($gapSync, 1) }}
                             </span>
                         </div>
-                        <p class="mt-1.5 text-[11px] text-[#4b5585] leading-tight">
+                        <p class="mt-1 text-[10.5px] text-[#4b5585] leading-tight">
                             {{ $gapDescription }}
                         </p>
                     </div>
@@ -258,25 +258,25 @@
             </div>
 
             <!-- Section: What This Means & Path to Opportunity Zone (2-Column Row) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
                 <!-- What This Means Card (Matching Reference Design) -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
-                            <svg class="w-5 h-5 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
+                            <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
                                 <path d="M9 18h6"/>
                                 <path d="M10 22h4"/>
                             </svg>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">What This Means</h3>
+                        <h3 class="text-sm sm:text-base font-black text-[#0a0f37] tracking-tight">What This Means</h3>
                     </div>
 
-                    <div class="space-y-6 flex-1 flex flex-col justify-around py-1">
+                    <div class="space-y-3 sm:space-y-3.5 flex-1 flex flex-col justify-around py-0.5">
                         <!-- 1. Current Position -->
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #fef08a !important;">
-                                <svg class="w-6 h-6 text-[#d97706]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="flex items-start gap-3 sm:gap-3.5">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #fef08a !important;">
+                                <svg class="w-4.5 h-4.5 text-[#d97706]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="9"/>
                                     <circle cx="12" cy="12" r="5"/>
                                     <circle cx="12" cy="12" r="2" fill="currentColor"/>
@@ -285,45 +285,45 @@
                                 </svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-black text-sm sm:text-base leading-tight tracking-tight text-[#d97706]">
+                                <h4 class="font-black text-xs sm:text-[13.5px] leading-tight tracking-tight text-[#d97706]">
                                     Current Position: {{ $insights['matrix_zone_name'] }}
                                     <span class="font-bold">({{ number_format($cqScore, 1) }}, {{ number_format($syncScore, 1) }})</span>
                                 </h4>
-                                <p class="mt-1.5 text-xs sm:text-[13px] text-[#4b5585] leading-relaxed">
+                                <p class="mt-1 text-[11px] sm:text-xs text-[#4b5585] leading-relaxed">
                                     {{ $insights['matrix_zone_subtitle'] }}
                                 </p>
                             </div>
                         </div>
 
                         <!-- 2. Key Blind Spot -->
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #ffd2dc !important;">
-                                <svg class="w-6 h-6 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
+                        <div class="flex items-start gap-3 sm:gap-3.5">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #ffd2dc !important;">
+                                <svg class="w-4.5 h-4.5 text-[#ed082d]" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M10.75 4a1.25 1.25 0 0 1 2.5 0v8.5a1.25 1.25 0 0 1-2.5 0V4zM12 17.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
                                 </svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-black text-sm sm:text-base leading-tight tracking-tight text-[#b91c1c]">
+                                <h4 class="font-black text-xs sm:text-[13.5px] leading-tight tracking-tight text-[#b91c1c]">
                                     Key Blind Spot
                                 </h4>
-                                <p class="mt-1.5 text-xs sm:text-[13px] text-[#4b5585] leading-relaxed">
+                                <p class="mt-1 text-[11px] sm:text-xs text-[#4b5585] leading-relaxed">
                                     {{ $insights['matrix_blind_spot'] }}
                                 </p>
                             </div>
                         </div>
 
                         <!-- 3. Opportunity -->
-                        <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #d4fce6 !important;">
-                                <svg class="w-6 h-6 text-[#047857]" viewBox="0 0 24 24" fill="currentColor">
+                        <div class="flex items-start gap-3 sm:gap-3.5">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #d4fce6 !important;">
+                                <svg class="w-4.5 h-4.5 text-[#047857]" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 3.5l-6 6h3.5v9h5v-9H18l-6-6z" />
                                 </svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-black text-sm sm:text-base leading-tight tracking-tight text-[#047857]">
+                                <h4 class="font-black text-xs sm:text-[13.5px] leading-tight tracking-tight text-[#047857]">
                                     Opportunity
                                 </h4>
-                                <p class="mt-1.5 text-xs sm:text-[13px] text-[#4b5585] leading-relaxed">
+                                <p class="mt-1 text-[11px] sm:text-xs text-[#4b5585] leading-relaxed">
                                     {{ $insights['matrix_opportunity'] }}
                                 </p>
                             </div>
@@ -339,27 +339,27 @@
             <x-plan-30-60-90 :insights="$insights" />
 
             <!-- Bottom Row: Strategic Recommendations & Expected Outcomes (2 Columns) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                 <!-- 1. Strategic Recommendations -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-6 flex flex-col justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-4 flex flex-col justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0" style="background-color: #f4f2fd !important;">
+                            <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#6f01d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">Strategic Recommendations</h3>
+                        <h3 class="text-sm sm:text-base font-black text-[#0a0f37] tracking-tight">Strategic Recommendations</h3>
                     </div>
-                    <div class="space-y-4 sm:space-y-5 flex-1 flex flex-col justify-around py-1">
+                    <div class="space-y-3 sm:space-y-3.5 flex-1 flex flex-col justify-around py-0.5">
                         @foreach($insights['strategic_recommendations'] ?? [] as $rec)
-                            <div class="flex items-start gap-3.5">
-                                <span class="w-7 h-7 rounded-full text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #6f01d2 !important;">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full text-white font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs" style="background-color: #6f01d2 !important;">
                                     {{ $rec['number'] }}
                                 </span>
                                 <div>
-                                    <h4 class="text-xs sm:text-[13.5px] font-bold text-[#0a0f37] leading-snug">{{ $rec['title'] }}</h4>
-                                    <p class="text-[11px] sm:text-xs text-[#4b5585] leading-relaxed mt-1">{{ $rec['description'] }}</p>
+                                    <h4 class="text-xs sm:text-[12.5px] font-bold text-[#0a0f37] leading-snug">{{ $rec['title'] }}</h4>
+                                    <p class="text-[10.5px] sm:text-[11.5px] text-[#4b5585] leading-relaxed mt-0.5">{{ $rec['description'] }}</p>
                                 </div>
                             </div>
                         @endforeach

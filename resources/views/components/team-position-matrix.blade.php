@@ -68,20 +68,20 @@
     }
 @endphp
 
-<div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4">
+<div class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3">
     <!-- Header -->
     <div class="flex items-center justify-between">
         <div>
-            <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Team Position Matrix</h3>
-            <p class="text-xs font-medium text-slate-400">CQ Group Score vs CQ Sync Score</p>
+            <h3 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">Team Position Matrix</h3>
+            <p class="text-[11px] sm:text-xs font-medium text-slate-400">CQ Group Score vs CQ Sync Score</p>
         </div>
-        <span class="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80 shadow-2xs">
+        <span class="text-[10px] sm:text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/80 shadow-2xs">
             Benchmark ({{ number_format($bmCq, 1) }}, {{ number_format($bmSync, 1) }}) ★
         </span>
     </div>
 
     <!-- Responsive SVG Chart Container -->
-    <div class="relative w-full overflow-hidden">
+    <div class="relative w-full max-w-[760px] mx-auto overflow-hidden">
         <svg class="w-full h-auto select-none" viewBox="0 0 880 625" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <filter id="matrixBadgeShadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
