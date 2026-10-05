@@ -39,6 +39,25 @@
         // Speedometer needle angle for team maturity
         $clampedCQ = max(1.0, min(10.0, $cqScore > 0 ? $cqScore : 5.0));
         $cqNeedleAngle = -90 + (($clampedCQ - 1.0) / 9.0) * 180;
+
+        // Dynamic gap description matching reference card
+        if ($gapCQ < 0 && $gapSync < 0) {
+            $gapDescription = 'Need to strengthen both capability and synchronisation to reach the target zone.';
+        } elseif ($gapCQ < 0 && $gapSync >= 0) {
+            $gapDescription = 'Need to strengthen capability while maintaining strong team synchronisation.';
+        } elseif ($gapCQ >= 0 && $gapSync < 0) {
+            $gapDescription = 'Strong capability present; need to strengthen synchronisation to reach the target zone.';
+        } else {
+            $gapDescription = 'Target benchmark achieved across both capability and synchronisation.';
+        }
+
+        $syncPillClass = match ($sync['maturity_level'] ?? 'Aligned') {
+            'Divergent' => 'bg-rose-100 text-rose-950',
+            'Fragmented' => 'bg-amber-100 text-amber-950',
+            'Synchronised' => 'bg-[#dcfce7] text-[#0a0f37]',
+            'Unified' => 'bg-emerald-200 text-emerald-950',
+            default => 'bg-[#dcfce7] text-[#0a0f37]',
+        };
     @endphp
 
     <div class="space-y-6 sm:space-y-8" x-data="{ activeTab: '{{ request()->query('tab', 'summary') }}' }">
@@ -135,8 +154,8 @@
             <!-- 4 Top Cards (Image 2) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- 1. Team CQ (Group Score) -->
-                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-blue-100/70 flex items-center justify-center shrink-0 mt-0.5">
+                <div class="bg-[#f8faff] rounded-3xl border border-blue-100/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-blue-100/80 flex items-center justify-center shrink-0 mt-0.5">
                         <svg class="w-7 h-7 text-sky-600" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
                             <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
@@ -151,59 +170,71 @@
                             <span class="text-xl font-medium text-slate-500">/ 10</span>
                         </div>
                         <div class="mt-2.5">
-                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-[#fef08a] text-slate-900 shadow-2xs">
+                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-[#fef08a] text-[#0a0f37] shadow-2xs">
                                 {{ $insights['group_transition_label'] ?? 'Change Supporter → Driver' }}
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-slate-500 font-normal">Capability to navigate change</p>
+                        <p class="mt-2 text-xs text-[#4b5585] font-normal">Capability to navigate change</p>
                     </div>
                 </div>
 
                 <!-- 2. Team CQ Sync -->
-                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-purple-100/70 flex items-center justify-center shrink-0 mt-0.5">
-                        <i data-lucide="users" class="w-7 h-7 text-purple-600"></i>
+                <div class="bg-[#faf8ff] rounded-3xl border border-purple-100/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-purple-100/80 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-7 h-7 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            <path d="M4.5 10.5c1.38 0 2.5-1.12 2.5-2.5S5.88 5.5 4.5 5.5 2 6.62 2 8s1.12 2.5 2.5 2.5zm0 1.5C2.83 12 0 12.83 0 14.5V17h5v-1.5c0-.98.39-1.87 1.03-2.56C5.41 12.35 4.88 12 4.5 12z" opacity="0.85"/>
+                            <path d="M19.5 10.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5-2.5 1.12-2.5 2.5 1.12 2.5 2.5 2.5zm0 1.5c-.38 0-.91.35-1.53.94.64.69 1.03 1.58 1.03 2.56V17h5v-2.5c0-1.67-2.83-2.5-4.5-2.5z" opacity="0.85"/>
+                        </svg>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Team CQ Sync</div>
-                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">(Alignment Index)</div>
                         <div class="mt-1.5 flex items-baseline gap-1.5">
                             <span class="text-3xl font-black text-[#0a0f37] tracking-tight">{{ number_format($syncScore, 1) }}</span>
                             <span class="text-xl font-medium text-slate-500">/ 10</span>
                         </div>
                         <div class="mt-2.5">
-                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-950 shadow-2xs">
+                            <span class="inline-flex items-center px-4 py-0.5 rounded-xl text-xs font-bold {{ $syncPillClass }} shadow-2xs">
                                 {{ $sync['maturity_level'] ?? 'Aligned' }}
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-slate-500 font-normal">How well we see, agree and act together</p>
+                        <p class="mt-2 text-xs text-[#4b5585] font-normal">How well we see, agree and act together</p>
                     </div>
                 </div>
 
                 <!-- 3. Expected / Benchmark -->
-                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-emerald-100/70 flex items-center justify-center shrink-0 mt-0.5">
-                        <i data-lucide="target" class="w-7 h-7 text-emerald-600"></i>
+                <div class="bg-[#f4fbf7] rounded-3xl border border-emerald-100/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-emerald-100/80 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-7 h-7 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9"/>
+                            <circle cx="12" cy="12" r="5"/>
+                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                            <path d="M19 5l-5 5"/>
+                            <path d="M15 5h4v4"/>
+                        </svg>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Expected / Benchmark</div>
-                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">Target Standard</div>
-                        <div class="mt-2 text-sm font-extrabold text-[#0a0f37]">
-                            CQ: <span class="font-black">8.0</span> <span class="text-slate-300 mx-1">|</span> CQ Sync: <span class="font-black">8.0</span>
+                        <div class="mt-1 flex items-baseline gap-1.5 flex-wrap">
+                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ:</span>
+                            <span class="text-2xl font-black text-[#047857] tracking-tight">{{ number_format($benchmarkCQ, 1) }}</span>
+                            <span class="text-slate-300 mx-1.5 text-sm font-light">|</span>
+                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ Sync:</span>
+                            <span class="text-2xl font-black text-[#047857] tracking-tight">{{ number_format($benchmarkSync, 1) }}</span>
                         </div>
                         <div class="mt-2.5">
-                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-950 shadow-2xs">
+                            <span class="inline-flex items-center px-3.5 py-0.5 rounded-xl text-xs font-bold bg-[#dcfce7] text-[#0a0f37] shadow-2xs">
                                 Change Champion & Unified
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-slate-500 font-normal">High capability with strong synchronisation</p>
+                        <p class="mt-2 text-xs text-[#4b5585] font-normal">High capability with strong synchronisation</p>
                     </div>
                 </div>
 
                 <!-- 4. Gaps to Benchmark -->
-                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs flex items-start gap-4">
-                    <div class="w-14 h-14 rounded-full bg-rose-100/70 flex items-center justify-center shrink-0 mt-0.5">
-                        <svg class="w-7 h-7 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
+                <div class="bg-[#fef7f7] rounded-3xl border border-rose-100/80 p-5 shadow-xs flex items-start gap-4">
+                    <div class="w-14 h-14 rounded-full bg-rose-100/80 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-7 h-7 text-[#e11d48]" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="3" y="14" width="3.5" height="7" rx="1.75" />
                             <rect x="9.75" y="8.5" width="3.5" height="12.5" rx="1.75" />
                             <rect x="16.5" y="3" width="3.5" height="18" rx="1.75" />
@@ -211,16 +242,20 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="text-[15px] font-black text-[#0a0f37] leading-tight">Gaps to Benchmark</div>
-                        <div class="text-[13px] font-bold text-[#0a0f37] leading-tight mt-0.5">Distance to Target</div>
-                        <div class="mt-2 text-sm font-extrabold text-rose-700">
-                            CQ: <span class="font-black">{{ $gapCQ > 0 ? '+'.$gapCQ : $gapCQ }}</span> <span class="text-slate-300 mx-1">|</span> CQ Sync: <span class="font-black">{{ $gapSync > 0 ? '+'.$gapSync : $gapSync }}</span>
-                        </div>
-                        <div class="mt-2.5">
-                            <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-rose-100 text-rose-950 shadow-2xs">
-                                {{ abs($gapCQ) > 1.5 || abs($gapSync) > 1.5 ? 'Capability & Sync Deficits' : 'Minor Gaps' }}
+                        <div class="mt-1 flex items-baseline gap-1.5 flex-wrap">
+                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ:</span>
+                            <span class="text-2xl font-black {{ $gapCQ < 0 ? 'text-[#e11d48]' : 'text-[#047857]' }} tracking-tight">
+                                {{ $gapCQ > 0 ? '+'.number_format($gapCQ, 1) : number_format($gapCQ, 1) }}
+                            </span>
+                            <span class="text-slate-300 mx-1.5 text-sm font-light">|</span>
+                            <span class="text-sm font-extrabold text-[#0a0f37]">CQ Sync:</span>
+                            <span class="text-2xl font-black {{ $gapSync < 0 ? 'text-[#e11d48]' : 'text-[#047857]' }} tracking-tight">
+                                {{ $gapSync > 0 ? '+'.number_format($gapSync, 1) : number_format($gapSync, 1) }}
                             </span>
                         </div>
-                        <p class="mt-2 text-xs text-slate-500 font-normal">Need to strengthen capability & synchronisation</p>
+                        <p class="mt-2.5 text-xs text-[#4b5585] leading-relaxed font-normal">
+                            {{ $gapDescription }}
+                        </p>
                     </div>
                 </div>
             </div>
