@@ -1557,22 +1557,43 @@ class AssessmentScoreService
             ],
         ];
 
-        // 6. Strengths and Areas of Concern (Image 4)
+        // 6. Strengths and Areas of Concern (Matching Theme Template)
         $supporterOrHigherPct = round(($distribution['supporter']['count'] + $distribution['driver']['count'] + $distribution['champion']['count']) / $totalCountForDist * 100);
+        $driverOrChampionPct = round(($distribution['driver']['count'] + $distribution['champion']['count']) / $totalCountForDist * 100);
         $resistantOrFollowerPct = round(($distribution['resistant']['count'] + $distribution['follower']['count']) / $totalCountForDist * 100);
+        $resistantOrFollowerCount = $distribution['resistant']['count'] + $distribution['follower']['count'];
+        $absGapCQ = abs((float) $gapCQ);
 
         $teamStrengths = [
             "Majority of the team ({$supporterOrHigherPct}%) are in the Supporter or higher category (CQ ≥ 4.1).",
-            'Positive openness towards change and willingness to contribute constructively.',
-            "A solid core of team members are already in the Driver and Champion category ({$distribution['driver']['percentage']}%).",
-            'Strong operational foundation to build on for higher organizational agility.',
+            'Positive openness towards change and willingness to contribute.',
+            "A good set of team members are already in the Driver and Champion category ({$driverOrChampionPct}%).",
+            'Strong base to build on for higher change maturity.',
         ];
 
         $areasOfConcern = [
-            "{$resistantOrFollowerPct}% of the team are in the Resistant or Follower category (CQ ≤ 4.0).",
-            "Variation in scores (Standard Deviation {$stdDev}) indicates uneven change readiness across roles.",
-            "Team is currently {$gapCQ} points below the target benchmark of 8.0.",
-            'Need to improve alignment consistency and reduce pockets of hesitation.',
+            "{$resistantOrFollowerPct}% of the team ({$resistantOrFollowerCount} employees) are in the Resistant or Follower category (CQ ≤ 4.0).",
+            "Variation in scores (Standard Deviation {$stdDev}) indicates uneven change readiness.",
+            "Team is below the benchmark of 8.0, with a gap of {$absGapCQ}.",
+            'Need to improve consistency and reduce pockets of resistance.',
+        ];
+
+        $topRecommendations = [
+            [
+                'number' => 1,
+                'title' => 'Build Awareness and Common Understanding',
+                'description' => 'Create a shared view of the key changes and why they matter.',
+            ],
+            [
+                'number' => 2,
+                'title' => 'Strengthen Capability for Change',
+                'description' => 'Provide targeted learning and support for those in Resistant and Follower categories.',
+            ],
+            [
+                'number' => 3,
+                'title' => 'Drive Alignment and Collective Action',
+                'description' => 'Use team dialogue, involvement and quick wins to build momentum towards the Driver and Champion levels.',
+            ],
         ];
 
         // 7. Competency Questions Breakdown (11 Individual Questions across all participants)
@@ -1648,6 +1669,7 @@ class AssessmentScoreService
             'histogram_bins' => $histogramBins,
             'individual_cq_scores' => $individualCQScores,
             'strategic_recommendations' => $strategicRecommendations,
+            'top_recommendations' => $topRecommendations,
             'plan_30_60_90' => $plan306090,
             'expected_outcomes' => $expectedOutcomes,
             'team_strengths' => $teamStrengths,

@@ -521,5 +521,8 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $response->assertSee('Supporter');
         $response->assertSee('Driver');
         $response->assertSee('Champion');
+        $response->assertSee('Team Strengths');
+        $response->assertSee('Areas of Concern');
+        $response->assertSee('Top Recommendations');
     }
 }

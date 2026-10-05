@@ -476,38 +476,104 @@
                 </div>
             </div>
 
-            <!-- Bottom Row: Team Strengths & Areas of Concern (Image 4) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Team Strengths -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-3">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="thumbs-up" class="w-5 h-5 text-emerald-600"></i>
-                        <h4 class="text-sm font-black text-emerald-950 uppercase tracking-wider">Team Strengths</h4>
+            <!-- Bottom Row: Team Strengths, Areas of Concern & Top Recommendations (Matching Theme Template) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+                <!-- 1. Team Strengths Card -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs flex flex-col justify-between space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                             style="background-color: #e3f8ea !important;">
+                            <svg class="w-5 h-5 text-[#029656]" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">Team Strengths</h3>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-700">
+
+                    <ul class="space-y-3.5 flex-1 flex flex-col justify-around py-1">
                         @foreach($insights['team_strengths'] ?? [] as $str)
-                            <li class="flex items-start gap-2">
-                                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
-                                <span>{{ $str }}</span>
+                            <li class="flex items-start gap-2.5">
+                                <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                                     style="background-color: #029656 !important;">
+                                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"/>
+                                    </svg>
+                                </div>
+                                <span class="text-xs sm:text-[13px] text-[#334155] font-medium leading-relaxed">{{ $str }}</span>
                             </li>
                         @endforeach
                     </ul>
                 </div>
 
-                <!-- Areas of Concern -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-3">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
-                        <h4 class="text-sm font-black text-rose-950 uppercase tracking-wider">Areas of Concern</h4>
+                <!-- 2. Areas of Concern Card -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs flex flex-col justify-between space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                             style="background-color: #fddcdf !important;">
+                            <svg class="w-5 h-5 text-[#e11d48]" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="3" y="14" width="4" height="7" rx="1"/>
+                                <rect x="10" y="8" width="4" height="13" rx="1"/>
+                                <rect x="17" y="3" width="4" height="18" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">Areas of Concern</h3>
                     </div>
-                    <ul class="space-y-2 text-xs text-slate-700">
+
+                    <ul class="space-y-3.5 flex-1 flex flex-col justify-around py-1">
                         @foreach($insights['areas_of_concern'] ?? [] as $concern)
-                            <li class="flex items-start gap-2">
-                                <i data-lucide="alert-circle" class="w-4 h-4 text-rose-500 shrink-0 mt-0.5"></i>
-                                <span>{{ $concern }}</span>
+                            <li class="flex items-start gap-2.5">
+                                <div class="w-4.5 h-4.5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                                     style="background-color: #e11d48 !important;">
+                                    <span class="text-white font-black text-[11px] leading-none">!</span>
+                                </div>
+                                <span class="text-xs sm:text-[13px] text-[#334155] font-medium leading-relaxed">{{ $concern }}</span>
                             </li>
                         @endforeach
                     </ul>
+                </div>
+
+                <!-- 3. Top Recommendations Card -->
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs flex flex-col justify-between space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-2xs"
+                             style="background-color: #f3e8ff !important;">
+                            <svg class="w-5 h-5 text-[#7616c1]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <circle cx="12" cy="12" r="6"/>
+                                <circle cx="12" cy="12" r="2"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-base sm:text-lg font-black text-[#0a0f37] tracking-tight">Top Recommendations</h3>
+                    </div>
+
+                    <div class="space-y-3.5 flex-1 flex flex-col justify-around py-1">
+                        @php
+                            $recBadges = [
+                                1 => ['bg' => '#3b82f6', 'text' => '#ffffff'], // Blue
+                                2 => ['bg' => '#f97316', 'text' => '#ffffff'], // Orange
+                                3 => ['bg' => '#10b981', 'text' => '#ffffff'], // Green
+                            ];
+                        @endphp
+                        @foreach($insights['top_recommendations'] ?? $insights['strategic_recommendations'] ?? [] as $rec)
+                            @php
+                                $badge = $recBadges[$rec['number'] ?? 1] ?? ['bg' => '#3b82f6', 'text' => '#ffffff'];
+                            @endphp
+                            <div class="flex items-start gap-3">
+                                <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 font-black text-xs shadow-2xs mt-0.5"
+                                     style="background-color: {{ $badge['bg'] }} !important; color: {{ $badge['text'] }} !important;">
+                                    {{ $rec['number'] }}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xs sm:text-[13px] font-black text-[#0a0f37] leading-snug">
+                                        {{ $rec['title'] }}
+                                    </h4>
+                                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium leading-relaxed mt-0.5">
+                                        {{ $rec['description'] }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
