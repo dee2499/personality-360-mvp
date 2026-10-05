@@ -8,7 +8,6 @@ use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
-use App\Services\AssessmentGenerationService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -39,22 +38,7 @@ class FalconGroupSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
-        // 2. Ensure Admin users exist with password "password"
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'System Admin',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-                'company_id' => null,
-            ]
-        );
-        $admin->update([
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'company_id' => null,
-        ]);
-
+        // 2. Ensure Admin user: Srinivas Patnaik (srini@saipio.com)
         $srini = User::firstOrCreate(
             ['email' => 'srini@saipio.com'],
             [
@@ -128,7 +112,7 @@ class FalconGroupSeeder extends Seeder
             'description' => "This assessment measures the change readiness individually and as part of a team.\r\nYou will respond to questions about yourself, others anonymously. Feel free to answer each of them openly and to the best of your knowledge as we are noting putting any report around who said what. the scores will always go as an average input of multiple people. \r\nPlease answer based on your actual experience and observations to provide an accurate reflection of CQ.",
             'status' => 'published',
             'published_at' => now(),
-            'created_by' => $admin->id,
+            'created_by' => $srini->id,
         ]);
 
         // 6. Create 14 Questions (11 Individual CQ + 3 Group Sync)
@@ -283,103 +267,5 @@ class FalconGroupSeeder extends Seeder
 
         // 7. Attach all 24 participants to survey
         $survey->participants()->attach(collect($usersByEmail)->pluck('id'));
-
-        // 8. Generate 576 pairings
-        app(AssessmentGenerationService::class)->generateForSurvey($survey);
-
-        // 9. Seed Group Sync Answers (72 rows)
-        $groupSyncJsonPath = __DIR__.'/group_sync_answers.json';
-        if (file_exists($groupSyncJsonPath)) {
-            $groupSyncData = json_decode(file_get_contents($groupSyncJsonPath), true);
-            $now = now();
-            $gsaInserts = [];
-            foreach ($groupSyncData as $email => $scores) {
-                $user = $usersByEmail[$email] ?? null;
-                if (! $user) {
-                    continue;
-                }
-                foreach ($scores as $sortOrder => $score) {
-                    $question = $questionsByOrder[(int) $sortOrder] ?? null;
-                    if (! $question) {
-                        continue;
-                    }
-                    $gsaInserts[] = [
-                        'survey_id' => $survey->id,
-                        'user_id' => $user->id,
-                        'question_id' => $question->id,
-                        'score' => $score,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                }
-            }
-            if (! empty($gsaInserts)) {
-                DB::table('group_sync_answers')->insert($gsaInserts);
-            }
-        }
-
-        // 10. Seed Completed Assessments and Answers (176 assessments, 1936 answers)
-        $completedJsonPath = __DIR__.'/completed_assessments.json';
-        if (file_exists($completedJsonPath)) {
-            $completedData = json_decode(file_get_contents($completedJsonPath), true);
-            $now = now();
-            $answerInserts = [];
-
-            // Pre-fetch all assessments for fast lookup
-            $assessmentsLookup = Assessment::where('survey_id', $survey->id)
-                ->get()
-                ->keyBy(fn ($a) => $a->assessor_id.'_'.$a->subject_id);
-
-            // Questions 1 to 11 in sort_order order
-            $individualQuestions = [];
-            for ($i = 1; $i <= 11; $i++) {
-                $individualQuestions[] = $questionsByOrder[$i];
-            }
-
-            foreach ($completedData as $entry) {
-                $assessor = $usersByEmail[$entry['assessor']] ?? null;
-                $subject = $usersByEmail[$entry['subject']] ?? null;
-
-                if (! $assessor || ! $subject) {
-                    continue;
-                }
-
-                $key = $assessor->id.'_'.$subject->id;
-                $assessment = $assessmentsLookup->get($key);
-
-                if (! $assessment) {
-                    continue;
-                }
-
-                $assessment->update([
-                    'status' => 'completed',
-                    'total_score' => $entry['total'],
-                    'max_score' => 110,
-                    'percentage' => $entry['percentage'],
-                    'category' => $entry['category'],
-                    'started_at' => $now->copy()->subMinutes(15),
-                    'completed_at' => $now,
-                ]);
-
-                foreach ($entry['scores'] as $idx => $score) {
-                    $q = $individualQuestions[$idx] ?? null;
-                    if (! $q) {
-                        continue;
-                    }
-                    $answerInserts[] = [
-                        'assessment_id' => $assessment->id,
-                        'question_id' => $q->id,
-                        'score' => $score,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                }
-            }
-
-            // Insert in chunks of 500
-            foreach (array_chunk($answerInserts, 500) as $chunk) {
-                AssessmentAnswer::insert($chunk);
-            }
-        }
     }
 }
