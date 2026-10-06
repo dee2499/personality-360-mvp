@@ -21,22 +21,27 @@ class GcodeSeeder extends Seeder
         $adminId = $sriniAdmin?->id;
 
         // 2. Create Company: GCODE
-        $company = Company::create([
-            'name' => 'GCODE',
-            'contact_email' => 'srini@gcode.in',
-            'description' => 'GCODE Team Alignment & CQ Assessment',
-        ]);
+        $company = Company::firstOrCreate(
+            ['name' => 'GCODE'],
+            [
+                'contact_email' => 'srini@gcode.in',
+                'description' => 'GCODE Team Alignment & CQ Assessment',
+            ]
+        );
 
         // 3. Create Manager: srini@gcode.in
-        $manager = User::create([
-            'company_id' => $company->id,
-            'name' => 'srini',
-            'email' => 'srini@gcode.in',
-            'password' => Hash::make('password'),
-            'role' => 'manager',
-            'email_verified_at' => now(),
-            'invitation_accepted_at' => now(),
-        ]);
+        $manager = User::firstOrCreate(
+            ['email' => 'srini@gcode.in'],
+            [
+                'company_id' => $company->id,
+                'name' => 'srini',
+                'password' => Hash::make('password'),
+                'role' => 'manager',
+                'email_verified_at' => now(),
+                'invitation_accepted_at' => now(),
+            ]
+        );
+        $manager->update(['company_id' => $company->id, 'role' => 'manager']);
 
         // 4. Create 3 GCODE Employees
         $employeesData = [
@@ -47,27 +52,34 @@ class GcodeSeeder extends Seeder
 
         $employeeIds = [];
         foreach ($employeesData as $data) {
-            $employee = User::create([
-                'company_id' => $company->id,
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make('password'),
-                'role' => 'participant',
-                'email_verified_at' => now(),
-                'invitation_accepted_at' => now(),
-            ]);
+            $employee = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'company_id' => $company->id,
+                    'name' => $data['name'],
+                    'password' => Hash::make('password'),
+                    'role' => 'participant',
+                    'email_verified_at' => now(),
+                    'invitation_accepted_at' => now(),
+                ]
+            );
+            $employee->update(['company_id' => $company->id, 'role' => 'participant']);
             $employeeIds[] = $employee->id;
         }
 
         // 5. Create Survey: Team Up for GCODE
-        $survey = Survey::create([
-            'company_id' => $company->id,
-            'title' => 'Team Up',
-            'description' => "This assessment measures the change readiness individually and as part of a team.\r\nYou will respond to questions about yourself, others anonymously. Feel free to answer each of them openly and to the best of your knowledge as we are noting putting any report around who said what. the scores will always go as an average input of multiple people. \r\nPlease answer based on your actual experience and observations to provide an accurate reflection of CQ.",
-            'status' => 'published',
-            'published_at' => now(),
-            'created_by' => $adminId ?? $manager->id,
-        ]);
+        $survey = Survey::firstOrCreate(
+            [
+                'company_id' => $company->id,
+                'title' => 'Team Up',
+            ],
+            [
+                'description' => "This assessment measures the change readiness individually and as part of a team.\r\nYou will respond to questions about yourself, others anonymously. Feel free to answer each of them openly and to the best of your knowledge as we are noting putting any report around who said what. the scores will always go as an average input of multiple people. \r\nPlease answer based on your actual experience and observations to provide an accurate reflection of CQ.",
+                'status' => 'published',
+                'published_at' => now(),
+                'created_by' => $adminId ?? $manager->id,
+            ]
+        );
 
         // 6. Create 14 Questions (11 Individual CQ + 3 Group Sync) - exact same as Falcon
         $questionsData = [
@@ -214,10 +226,16 @@ class GcodeSeeder extends Seeder
         ];
 
         foreach ($questionsData as $qData) {
-            Question::create(array_merge($qData, ['survey_id' => $survey->id]));
+            Question::firstOrCreate(
+                [
+                    'survey_id' => $survey->id,
+                    'sort_order' => $qData['sort_order'],
+                ],
+                $qData
+            );
         }
 
         // 7. Attach the 3 GCODE employees as survey participants (NO matrix, NO assessments)
-        $survey->participants()->attach($employeeIds);
+        $survey->participants()->syncWithoutDetaching($employeeIds);
     }
 }
