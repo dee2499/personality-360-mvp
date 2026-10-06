@@ -86,6 +86,16 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isManager(): bool
+    {
+        return $this->role === 'manager';
+    }
+
+    public function isStaff(): bool
+    {
+        return in_array($this->role, ['admin', 'manager'], true);
+    }
+
     public function isParticipant(): bool
     {
         return $this->role === 'participant';

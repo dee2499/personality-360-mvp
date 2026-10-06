@@ -12,6 +12,10 @@ class SurveyQuestionController extends Controller
 {
     public function store(Request $request, Survey $survey): RedirectResponse
     {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, "You are not authorized to manage questions for another company's survey.");
+        }
+
         $validated = $request->validate([
             'question_text' => ['required', 'string', 'max:500'],
         ]);
@@ -30,6 +34,10 @@ class SurveyQuestionController extends Controller
 
     public function update(Request $request, Survey $survey, Question $question): RedirectResponse
     {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, "You are not authorized to manage questions for another company's survey.");
+        }
+
         $validated = $request->validate([
             'question_text' => ['required', 'string', 'max:500'],
             'sort_order' => ['nullable', 'integer'],
@@ -40,8 +48,12 @@ class SurveyQuestionController extends Controller
         return back()->with('success', 'Question updated successfully.');
     }
 
-    public function destroy(Survey $survey, Question $question): RedirectResponse
+    public function destroy(Request $request, Survey $survey, Question $question): RedirectResponse
     {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, "You are not authorized to manage questions for another company's survey.");
+        }
+
         $question->delete();
 
         return back()->with('success', 'Question removed.');

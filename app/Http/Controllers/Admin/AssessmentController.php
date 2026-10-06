@@ -23,29 +23,40 @@ class AssessmentController extends Controller
         $companyId = $request->query('company_id');
         $companyFilter = $request->query('company');
 
+        $isManager = $request->user()->isManager();
+        $managerCompanyId = $isManager ? $request->user()->company_id : null;
+
+        if ($isManager && ! $managerCompanyId) {
+            abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
+        }
+
         $query = Assessment::has('survey')
             ->with(['assessor', 'subject', 'survey.company'])
             ->latest('updated_at');
 
-        if ($status && in_array($status, ['pending', 'in_progress', 'completed'])) {
-            $query->where('status', $status);
+        if ($isManager) {
+            $query->whereHas('survey', fn ($q) => $q->where('company_id', $managerCompanyId));
+        } else {
+            if ($companyId) {
+                if ($companyId === 'none') {
+                    $query->whereHas('survey', fn ($q) => $q->whereNull('company_id'));
+                } else {
+                    $query->whereHas('survey', fn ($q) => $q->where('company_id', $companyId));
+                }
+            } elseif ($companyFilter) {
+                $compName = trim((string) $companyFilter);
+                if (strtolower($compName) === 'none' || strtolower($compName) === 'unassigned') {
+                    $query->whereHas('survey', fn ($q) => $q->whereNull('company_id'));
+                } else {
+                    $query->whereHas('survey.company', function ($q) use ($compName) {
+                        $q->where('name', 'like', "%{$compName}%");
+                    });
+                }
+            }
         }
 
-        if ($companyId) {
-            if ($companyId === 'none') {
-                $query->whereHas('survey', fn ($q) => $q->whereNull('company_id'));
-            } else {
-                $query->whereHas('survey', fn ($q) => $q->where('company_id', $companyId));
-            }
-        } elseif ($companyFilter) {
-            $compName = trim((string) $companyFilter);
-            if (strtolower($compName) === 'none' || strtolower($compName) === 'unassigned') {
-                $query->whereHas('survey', fn ($q) => $q->whereNull('company_id'));
-            } else {
-                $query->whereHas('survey.company', function ($q) use ($compName) {
-                    $q->where('name', 'like', "%{$compName}%");
-                });
-            }
+        if ($status && in_array($status, ['pending', 'in_progress', 'completed'])) {
+            $query->where('status', $status);
         }
 
         if ($surveyId) {
@@ -53,9 +64,14 @@ class AssessmentController extends Controller
         }
 
         $assessments = $query->paginate(15)->withQueryString();
-        $companies = Company::orderBy('name')->get();
+        $companies = $isManager
+            ? Company::where('id', $managerCompanyId)->get()
+            : Company::orderBy('name')->get();
         $surveysQuery = Survey::with('company')->orderBy('title');
-        if ($companyId && $companyId !== 'none') {
+
+        if ($isManager) {
+            $surveysQuery->where('company_id', $managerCompanyId);
+        } elseif ($companyId && $companyId !== 'none') {
             $surveysQuery->where('company_id', $companyId);
         } elseif ($companyFilter) {
             $compName = trim((string) $companyFilter);
@@ -68,7 +84,9 @@ class AssessmentController extends Controller
         $surveys = $surveysQuery->get();
 
         $selectedCompany = null;
-        if ($companyId && $companyId !== 'none') {
+        if ($isManager) {
+            $selectedCompany = $companies->first();
+        } elseif ($companyId && $companyId !== 'none') {
             $selectedCompany = $companies->firstWhere('id', (int) $companyId);
         } elseif ($companyFilter) {
             $selectedCompany = $companies->first(fn ($c) => strcasecmp($c->name, trim((string) $companyFilter)) === 0)
@@ -91,6 +109,10 @@ class AssessmentController extends Controller
     {
         if (! $assessment->survey) {
             abort(404, 'The survey for this assessment no longer exists.');
+        }
+
+        if (request()->user()->isManager() && $assessment->survey?->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to view assessments outside your company.');
         }
 
         $assessment->load([

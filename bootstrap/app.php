@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureUserIsAdminOrManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            'admin_or_manager' => EnsureUserIsAdminOrManager::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

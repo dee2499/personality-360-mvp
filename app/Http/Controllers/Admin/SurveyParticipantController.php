@@ -17,6 +17,10 @@ class SurveyParticipantController extends Controller
         Survey $survey,
         AssessmentGenerationService $generationService
     ): RedirectResponse {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, "You are not authorized to enroll participants into another company's survey.");
+        }
+
         $validated = $request->validate([
             'user_ids' => ['nullable', 'array'],
             'user_ids.*' => ['exists:users,id'],
@@ -26,6 +30,7 @@ class SurveyParticipantController extends Controller
 
         if (! empty($validated['new_name']) && ! empty($validated['new_email'])) {
             $newUser = User::create([
+                'company_id' => $survey->company_id,
                 'name' => $validated['new_name'],
                 'email' => $validated['new_email'],
                 'password' => Hash::make('password'),
@@ -36,10 +41,14 @@ class SurveyParticipantController extends Controller
         }
 
         if (! empty($validated['user_ids'])) {
-            $nonAdminIds = User::whereIn('id', $validated['user_ids'])
-                ->where('role', '!=', 'admin')
-                ->pluck('id')
-                ->all();
+            $query = User::whereIn('id', $validated['user_ids'])
+                ->where('role', '!=', 'admin');
+
+            if ($request->user()->isManager()) {
+                $query->where('company_id', $request->user()->company_id);
+            }
+
+            $nonAdminIds = $query->pluck('id')->all();
 
             if (! empty($nonAdminIds)) {
                 $survey->participants()->syncWithoutDetaching($nonAdminIds);
@@ -52,8 +61,12 @@ class SurveyParticipantController extends Controller
         return back()->with('success', "Participants enrolled. Updated {$generated} assessment pairings in cohort.");
     }
 
-    public function destroy(Survey $survey, User $participant): RedirectResponse
+    public function destroy(Request $request, Survey $survey, User $participant): RedirectResponse
     {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, "You are not authorized to remove participants from another company's survey.");
+        }
+
         $survey->participants()->detach($participant->id);
 
         return back()->with('success', "Participant '{$participant->name}' removed from survey.");

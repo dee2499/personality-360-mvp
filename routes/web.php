@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 // Guest / Landing redirect
 Route::get('/', function () {
     if (Auth::check()) {
-        return Auth::user()->isAdmin()
+        return (Auth::user()->isAdmin() || Auth::user()->isManager())
             ? redirect()->route('admin.dashboard')
             : redirect()->route('participant.assessments.index');
     }
@@ -76,10 +76,10 @@ Route::middleware('auth')->group(function () {
         ->name('participant.assessments.submit');
 });
 
-// Admin Routes
+// Admin & Company Manager Routes
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'admin'])
+    ->middleware(['auth', 'admin_or_manager'])
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -87,6 +87,7 @@ Route::prefix('admin')
         Route::get('companies/{company}/team-sync', [AdminCompanyController::class, 'teamSyncReport'])->name('companies.team-sync');
         Route::resource('companies', AdminCompanyController::class);
         Route::post('companies/{company}/invite', [AdminCompanyController::class, 'inviteEmployee'])->name('companies.invite');
+        Route::post('companies/{company}/employees/{employee}/role', [AdminCompanyController::class, 'updateEmployeeRole'])->name('companies.employees.role');
         Route::delete('companies/{company}/employees/{employee}', [AdminCompanyController::class, 'destroyEmployee'])->name('companies.employees.destroy');
 
         // Surveys
@@ -115,8 +116,14 @@ Route::prefix('admin')
         Route::get('/assessments', [AdminAssessmentController::class, 'index'])->name('assessments.index');
         Route::get('/assessments/{assessment}', [AdminAssessmentController::class, 'show'])->name('assessments.show');
 
-        // Score Categories CRUD
-        Route::post('categories/reset-defaults', [AdminCategoryController::class, 'resetDefaults'])->name('categories.reset-defaults');
-        Route::post('categories/recalculate', [AdminCategoryController::class, 'recalculate'])->name('categories.recalculate');
-        Route::resource('categories', AdminCategoryController::class)->except(['show']);
+        // Score Categories CRUD (Global - Admin Only)
+        Route::post('categories/reset-defaults', [AdminCategoryController::class, 'resetDefaults'])
+            ->middleware('admin')
+            ->name('categories.reset-defaults');
+        Route::post('categories/recalculate', [AdminCategoryController::class, 'recalculate'])
+            ->middleware('admin')
+            ->name('categories.recalculate');
+        Route::resource('categories', AdminCategoryController::class)
+            ->except(['show'])
+            ->middleware('admin');
     });

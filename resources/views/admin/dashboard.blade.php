@@ -3,7 +3,16 @@
         <!-- Page Title & Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900">Executive Dashboard</h1>
+                @if(isset($company))
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                            <i data-lucide="building-2" class="w-3.5 h-3.5 text-purple-600"></i>
+                            {{ $company->name }}
+                        </span>
+                        <span class="text-xs text-slate-400 font-medium">Company Management Portal</span>
+                    </div>
+                @endif
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ isset($company) ? $company->name . ' Dashboard' : 'Executive Dashboard' }}</h1>
                 <p class="text-xs text-slate-500 font-medium">Overview of surveys, participant evaluations, and 360-degree completion status</p>
             </div>
             <div class="flex items-center gap-2">
@@ -223,6 +232,68 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+            @endif
+        </div>
+
+        <!-- Surveys Section on Dashboard -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">{{ isset($company) ? $company->name . ' Surveys' : 'Active Surveys' }}</h2>
+                    <p class="text-xs text-slate-400 font-medium">Evaluation cycles and cohort feedback status</p>
+                </div>
+                <a href="{{ route('admin.surveys.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                    <span>View all surveys</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+
+            @if($surveys->isEmpty())
+                <div class="py-12 px-6 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800">No surveys found</h3>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+                        Start a new evaluation cycle for this organization.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{{ route('admin.surveys.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            <span>Create Survey</span>
+                        </a>
+                    </div>
+                </div>
+            @else
+                <div class="divide-y divide-slate-100">
+                    @foreach($surveys as $survey)
+                        <div class="p-4 sm:px-6 hover:bg-slate-50/50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('admin.surveys.show', $survey) }}" class="font-bold text-slate-900 hover:text-indigo-600 transition text-sm">
+                                        {{ $survey->title }}
+                                    </a>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full capitalize {{ $survey->isPublished() ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600' }}">
+                                        {{ $survey->status }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-3 text-xs text-slate-400">
+                                    <span>{{ $survey->participants_count }} Participants</span>
+                                    <span>•</span>
+                                    <span>{{ $survey->assessments_count }} Evaluations</span>
+                                    <span>•</span>
+                                    <span>{{ $survey->questions_count }} Questions</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('admin.surveys.show', $survey) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition">
+                                    <span>Manage</span>
+                                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @endif
         </div>

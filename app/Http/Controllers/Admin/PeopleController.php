@@ -25,10 +25,20 @@ class PeopleController extends Controller
         $selectedSurveyId = $request->query('survey_id');
         $selectedSurvey = $selectedSurveyId ? Survey::find($selectedSurveyId) : null;
 
-        $surveys = Survey::all();
+        $isManager = $request->user()->isManager();
+        $managerCompanyId = $isManager ? $request->user()->company_id : null;
+
+        if ($isManager && ! $managerCompanyId) {
+            abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
+        }
+
+        $surveys = $isManager
+            ? Survey::where('company_id', $managerCompanyId)->get()
+            : Survey::all();
 
         $participants = User::query()
-            ->where('role', 'participant')
+            ->where('role', '!=', 'admin')
+            ->when($managerCompanyId, fn ($q) => $q->where('company_id', $managerCompanyId))
             ->when($selectedSurvey, function ($query, $survey) {
                 $query->whereHas('surveys', fn ($q) => $q->where('surveys.id', $survey->id));
             })
@@ -49,10 +59,16 @@ class PeopleController extends Controller
      */
     public function show(User $person, Request $request): View
     {
+        if ($request->user()->isManager() && $person->company_id !== $request->user()->company_id) {
+            abort(403, 'You are not authorized to view employees outside your company.');
+        }
+
         $selectedSurveyId = $request->query('survey_id');
         $selectedSurvey = $selectedSurveyId ? Survey::find($selectedSurveyId) : null;
 
-        $surveys = Survey::all();
+        $surveys = $request->user()->isManager()
+            ? Survey::where('company_id', $request->user()->company_id)->get()
+            : Survey::all();
 
         // Get all surveys associated with this person (as participant or in assessments)
         $userSurveys = Survey::query()
@@ -121,6 +137,10 @@ class PeopleController extends Controller
      */
     public function destroy(Request $request, User $person): RedirectResponse
     {
+        if ($request->user()->isManager() && $person->company_id !== $request->user()->company_id) {
+            abort(403, 'You are not authorized to delete employees outside your company.');
+        }
+
         if ($person->id === $request->user()->id) {
             return back()->with('error', 'You cannot delete your own account.');
         }

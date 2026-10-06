@@ -41,6 +41,11 @@ class Company extends Model
         return $this->hasMany(User::class)->where('role', '!=', 'admin');
     }
 
+    public function managers(): HasMany
+    {
+        return $this->hasMany(User::class)->where('role', 'manager');
+    }
+
     public function surveys(): HasMany
     {
         return $this->hasMany(Survey::class);

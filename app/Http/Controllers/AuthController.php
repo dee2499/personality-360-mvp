@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function create(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return Auth::user()->isAdmin()
+            return (Auth::user()->isAdmin() || Auth::user()->isManager())
                 ? redirect()->route('admin.dashboard')
                 : redirect()->route('participant.assessments.index');
         }
@@ -33,7 +33,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->isAdmin()) {
+        if ($request->user()->isAdmin() || $request->user()->isManager()) {
             return redirect()->intended(route('admin.dashboard'));
         }
 

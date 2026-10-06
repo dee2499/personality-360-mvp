@@ -23,9 +23,37 @@ class SurveyController extends Controller
         $companyFilter = $request->query('company');
         $companyId = $request->query('company_id');
 
+        $isManager = $request->user()->isManager();
+        $managerCompanyId = $isManager ? $request->user()->company_id : null;
+
+        if ($isManager && ! $managerCompanyId) {
+            abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
+        }
+
         $surveysQuery = Survey::withCount(['questions', 'participants', 'assessments'])
             ->with(['creator', 'company'])
             ->latest();
+
+        if ($isManager) {
+            $surveysQuery->where('company_id', $managerCompanyId);
+        } else {
+            if ($request->filled('company')) {
+                $companyName = trim((string) $companyFilter);
+                if (strtolower($companyName) === 'none' || strtolower($companyName) === 'unassigned') {
+                    $surveysQuery->whereNull('company_id');
+                } else {
+                    $surveysQuery->whereHas('company', function ($query) use ($companyName) {
+                        $query->where('name', 'like', "%{$companyName}%");
+                    });
+                }
+            } elseif ($request->filled('company_id')) {
+                if ($companyId === 'none') {
+                    $surveysQuery->whereNull('company_id');
+                } else {
+                    $surveysQuery->where('company_id', $companyId);
+                }
+            }
+        }
 
         if ($request->filled('search')) {
             $searchTerm = trim((string) $search);
@@ -35,30 +63,19 @@ class SurveyController extends Controller
             });
         }
 
-        if ($request->filled('company')) {
-            $companyName = trim((string) $companyFilter);
-            if (strtolower($companyName) === 'none' || strtolower($companyName) === 'unassigned') {
-                $surveysQuery->whereNull('company_id');
-            } else {
-                $surveysQuery->whereHas('company', function ($query) use ($companyName) {
-                    $query->where('name', 'like', "%{$companyName}%");
-                });
-            }
-        } elseif ($request->filled('company_id')) {
-            if ($companyId === 'none') {
-                $surveysQuery->whereNull('company_id');
-            } else {
-                $surveysQuery->where('company_id', $companyId);
-            }
-        }
-
         $surveys = $surveysQuery->paginate(10)->withQueryString();
-        $companies = Company::withCount('surveys')->orderBy('name')->get();
-        $totalSurveysCount = Survey::count();
-        $unassignedSurveysCount = Survey::whereNull('company_id')->count();
+        $companies = $isManager
+            ? Company::where('id', $managerCompanyId)->get()
+            : Company::withCount('surveys')->orderBy('name')->get();
+        $totalSurveysCount = $isManager
+            ? Survey::where('company_id', $managerCompanyId)->count()
+            : Survey::count();
+        $unassignedSurveysCount = $isManager ? 0 : Survey::whereNull('company_id')->count();
 
         $selectedCompany = null;
-        if ($request->filled('company_id') && $companyId !== 'none') {
+        if ($isManager) {
+            $selectedCompany = $companies->first();
+        } elseif ($request->filled('company_id') && $companyId !== 'none') {
             $selectedCompany = $companies->firstWhere('id', (int) $companyId);
         } elseif ($request->filled('company')) {
             $selectedCompany = $companies->first(fn ($c) => strcasecmp($c->name, trim((string) $companyFilter)) === 0)
@@ -79,8 +96,13 @@ class SurveyController extends Controller
 
     public function create(Request $request): View
     {
-        $companies = Company::orderBy('name')->get();
-        $selectedCompanyId = $request->query('company_id');
+        $isManager = $request->user()->isManager();
+        $managerCompanyId = $isManager ? $request->user()->company_id : null;
+
+        $companies = $isManager
+            ? Company::where('id', $managerCompanyId)->get()
+            : Company::orderBy('name')->get();
+        $selectedCompanyId = $isManager ? $managerCompanyId : $request->query('company_id');
         $defaultQuestions = ChangeQuotientQuestionService::getDefaultQuestions();
 
         return view('admin.surveys.create', compact('defaultQuestions', 'companies', 'selectedCompanyId'));
@@ -88,7 +110,9 @@ class SurveyController extends Controller
 
     public function store(StoreSurveyRequest $request): RedirectResponse
     {
-        $companyId = $request->input('company_id');
+        $companyId = $request->user()->isManager()
+            ? $request->user()->company_id
+            : $request->input('company_id');
 
         $survey = Survey::create([
             'company_id' => $companyId,
@@ -140,6 +164,10 @@ class SurveyController extends Controller
 
     public function show(Survey $survey): View
     {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         $survey->load([
             'creator',
             'questions' => fn ($q) => $q->orderBy('sort_order'),
@@ -148,7 +176,11 @@ class SurveyController extends Controller
             'assessments.subject',
         ]);
 
-        $allParticipants = User::where('role', 'participant')->orderBy('name')->get();
+        $participantsQuery = User::where('role', '!=', 'admin');
+        if ($survey->company_id) {
+            $participantsQuery->where('company_id', $survey->company_id);
+        }
+        $allParticipants = $participantsQuery->orderBy('name')->get();
 
         $completedAssessmentsCount = $survey->assessments->where('status', 'completed')->count();
         $totalAssessmentsCount = $survey->assessments->count();
@@ -163,11 +195,19 @@ class SurveyController extends Controller
 
     public function edit(Survey $survey): View
     {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         return view('admin.surveys.edit', compact('survey'));
     }
 
     public function update(Request $request, Survey $survey): RedirectResponse
     {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
@@ -179,8 +219,12 @@ class SurveyController extends Controller
             ->with('success', 'Survey details updated successfully.');
     }
 
-    public function destroy(Survey $survey): RedirectResponse
+    public function destroy(Survey $survey, Request $request): RedirectResponse
     {
+        if (! $request->user()->isAdmin() && ($request->user()->company_id !== $survey->company_id)) {
+            abort(403, 'Access restricted.');
+        }
+
         $title = $survey->title;
         $survey->delete();
 
@@ -190,6 +234,10 @@ class SurveyController extends Controller
 
     public function publish(Survey $survey, AssessmentGenerationService $generationService): RedirectResponse
     {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         if ($survey->questions()->count() === 0) {
             return back()->with('error', 'Cannot publish a survey with no questions. Please add questions first.');
         }
@@ -213,6 +261,10 @@ class SurveyController extends Controller
 
     public function unpublish(Survey $survey): RedirectResponse
     {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         $survey->update([
             'status' => 'draft',
         ]);
@@ -225,6 +277,10 @@ class SurveyController extends Controller
      */
     public function teamSyncReport(Survey $survey, AssessmentScoreService $scoreService): View
     {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         $insights = $scoreService->calculateGroupInsights($survey);
         $company = $survey->company;
 
@@ -237,6 +293,10 @@ class SurveyController extends Controller
      */
     public function groupInsights(Survey $survey, AssessmentScoreService $scoreService): View
     {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
         $insights = $scoreService->calculateGroupInsights($survey);
 
         return view('admin.surveys.group-insights', compact('survey', 'insights'));
@@ -247,6 +307,9 @@ class SurveyController extends Controller
      */
     public function signOff(Request $request, Survey $survey): RedirectResponse
     {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
         $validated = $request->validate([
             'sign_off_lead' => ['required', 'string', 'max:255'],
             'sign_off_status' => ['required', 'in:approved,pending,needs_review'],
