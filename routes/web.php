@@ -24,7 +24,7 @@ Route::get('/', function () {
     }
 
     return redirect()->route('login');
-});
+})->name('home');
 
 // Authentication
 Route::middleware('guest')->group(function () {
