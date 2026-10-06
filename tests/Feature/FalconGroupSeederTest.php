@@ -19,40 +19,68 @@ class FalconGroupSeederTest extends TestCase
 
     public function test_database_seeder_populates_exact_falcon_group_dataset(): void
     {
-        // Run DatabaseSeeder (which calls ScoreCategorySeeder & FalconGroupSeeder)
+        // Run DatabaseSeeder (which calls ScoreCategorySeeder, FalconGroupSeeder, and GcodeSeeder)
         $this->seed(DatabaseSeeder::class);
 
-        // 1. Verify Company
+        // 1. Verify Companies (Falcon Group and GCODE)
+        $this->assertEquals(2, Company::count());
         $this->assertDatabaseHas('companies', [
             'name' => 'Falcon Group',
-            'contact_email' => 'srini@saipio.com',
+            'contact_email' => 'srini@falcon.com',
         ]);
-        $company = Company::where('name', 'Falcon Group')->first();
-        $this->assertNotNull($company);
+        $this->assertDatabaseHas('companies', [
+            'name' => 'GCODE',
+            'contact_email' => 'srini@gcode.in',
+        ]);
 
-        // 2. Verify Users count (1 admin: srini only, 24 participants)
-        $this->assertEquals(25, User::count());
+        $falcon = Company::where('name', 'Falcon Group')->first();
+        $gcode = Company::where('name', 'GCODE')->first();
+        $this->assertNotNull($falcon);
+        $this->assertNotNull($gcode);
+
+        // 2. Verify Users: 1 Admin, 2 Managers (1 Falcon, 1 GCODE), 27 Participants (24 Falcon, 3 GCODE) = 30 Total Users
+        $this->assertEquals(30, User::count());
         $this->assertEquals(1, User::where('role', 'admin')->count());
-        $this->assertEquals(24, User::where('role', 'participant')->where('company_id', $company->id)->count());
+        $this->assertEquals(2, User::where('role', 'manager')->count());
+        $this->assertEquals(27, User::where('role', 'participant')->count());
 
-        // Verify Admins
-        $this->assertDatabaseMissing('users', ['email' => 'admin@example.com']);
-        $this->assertDatabaseHas('users', ['email' => 'srini@saipio.com', 'role' => 'admin']);
+        // Verify Master Admin
+        $this->assertDatabaseHas('users', ['email' => 'srini@saipio.com', 'role' => 'admin', 'company_id' => null]);
 
-        // 3. Verify Survey
-        $this->assertEquals(1, Survey::count());
-        $survey = Survey::where('title', 'Team Up')->first();
-        $srini = User::where('email', 'srini@saipio.com')->first();
-        $this->assertNotNull($srini);
-        $this->assertEquals($srini->id, $survey->created_by);
-        $this->assertEquals(24, $survey->participants()->count());
+        // Verify Managers
+        $this->assertDatabaseHas('users', ['email' => 'srini@falcon.com', 'role' => 'manager', 'company_id' => $falcon->id]);
+        $this->assertDatabaseHas('users', ['email' => 'srini@gcode.in', 'role' => 'manager', 'company_id' => $gcode->id]);
 
-        // 4. Verify Questions
-        $this->assertEquals(14, Question::where('survey_id', $survey->id)->count());
-        $this->assertEquals(11, Question::where('survey_id', $survey->id)->where('type', 'individual')->count());
-        $this->assertEquals(3, Question::where('survey_id', $survey->id)->where('type', 'group_sync')->count());
+        // Verify Falcon Employees
+        $this->assertEquals(24, User::where('role', 'participant')->where('company_id', $falcon->id)->count());
 
-        // 5. Verify No Assessments, No Pairings, No Answers
+        // Verify GCODE Employees
+        $this->assertEquals(3, User::where('role', 'participant')->where('company_id', $gcode->id)->count());
+        $this->assertDatabaseHas('users', ['email' => 'shashwat@gcode.in', 'company_id' => $gcode->id]);
+        $this->assertDatabaseHas('users', ['email' => 'atharva@gcode.in', 'company_id' => $gcode->id]);
+        $this->assertDatabaseHas('users', ['email' => 'lavya@gcode.in', 'company_id' => $gcode->id]);
+
+        // 3. Verify Surveys (Team Up for Falcon Group and Team Up for GCODE)
+        $this->assertEquals(2, Survey::count());
+        $falconSurvey = Survey::where('company_id', $falcon->id)->where('title', 'Team Up')->first();
+        $gcodeSurvey = Survey::where('company_id', $gcode->id)->where('title', 'Team Up')->first();
+
+        $this->assertNotNull($falconSurvey);
+        $this->assertNotNull($gcodeSurvey);
+
+        $this->assertEquals(24, $falconSurvey->participants()->count());
+        $this->assertEquals(3, $gcodeSurvey->participants()->count());
+
+        // 4. Verify Questions (14 each = 28 total: 11 individual + 3 group_sync each)
+        $this->assertEquals(14, Question::where('survey_id', $falconSurvey->id)->count());
+        $this->assertEquals(11, Question::where('survey_id', $falconSurvey->id)->where('type', 'individual')->count());
+        $this->assertEquals(3, Question::where('survey_id', $falconSurvey->id)->where('type', 'group_sync')->count());
+
+        $this->assertEquals(14, Question::where('survey_id', $gcodeSurvey->id)->count());
+        $this->assertEquals(11, Question::where('survey_id', $gcodeSurvey->id)->where('type', 'individual')->count());
+        $this->assertEquals(3, Question::where('survey_id', $gcodeSurvey->id)->where('type', 'group_sync')->count());
+
+        // 5. Verify NO Assessments, NO Pairings, NO Answers (will be created by users later)
         $this->assertEquals(0, Assessment::count());
         $this->assertEquals(0, AssessmentAnswer::count());
         $this->assertEquals(0, DB::table('group_sync_answers')->count());

@@ -2,131 +2,74 @@
 
 namespace Database\Seeders;
 
-use App\Models\Assessment;
-use App\Models\AssessmentAnswer;
 use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 
-class FalconGroupSeeder extends Seeder
+class GcodeSeeder extends Seeder
 {
     /**
-     * Run the Falcon Group database seed.
+     * Run the GCODE company and survey seeder.
      */
     public function run(): void
     {
-        Schema::disableForeignKeyConstraints();
+        // 1. Find or create master admin for survey ownership
+        $sriniAdmin = User::where('email', 'srini@saipio.com')->first();
+        $adminId = $sriniAdmin?->id;
 
-        // 1. Clean existing records
-        AssessmentAnswer::truncate();
-        DB::table('group_sync_answers')->truncate();
-        Assessment::truncate();
-        DB::table('survey_participants')->truncate();
-        Question::truncate();
-        Survey::withTrashed()->forceDelete();
-
-        // Remove non-admin users
-        User::where('role', '!=', 'admin')->delete();
-
-        // Remove existing companies
-        Company::truncate();
-
-        Schema::enableForeignKeyConstraints();
-
-        // 2. Ensure Admin user: Srinivas Patnaik (srini@saipio.com)
-        $srini = User::firstOrCreate(
-            ['email' => 'srini@saipio.com'],
-            [
-                'name' => 'Srinivas Patnaik',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
-                'company_id' => null,
-                'email_verified_at' => now(),
-                'invitation_accepted_at' => now(),
-            ]
-        );
-        $srini->update([
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'company_id' => null,
-        ]);
-
-        // 3. Create Company: Falcon Group
+        // 2. Create Company: GCODE
         $company = Company::create([
-            'name' => 'Falcon Group',
-            'slug' => 'falcon-group-X6geC',
-            'contact_email' => 'srini@falcon.com',
-            'description' => 'Leadership CQ Score & CQ Sync Score (Change readiness & Adaptability)',
+            'name' => 'GCODE',
+            'contact_email' => 'srini@gcode.in',
+            'description' => 'GCODE Team Alignment & CQ Assessment',
         ]);
 
-        // 4. Create Falcon Manager: Srini (srini@falcon.com)
-        User::create([
+        // 3. Create Manager: srini@gcode.in
+        $manager = User::create([
             'company_id' => $company->id,
-            'name' => 'Srini',
-            'email' => 'srini@falcon.com',
+            'name' => 'srini',
+            'email' => 'srini@gcode.in',
             'password' => Hash::make('password'),
             'role' => 'manager',
             'email_verified_at' => now(),
             'invitation_accepted_at' => now(),
         ]);
 
-        // 5. Create 24 Falcon Employees
+        // 4. Create 3 GCODE Employees
         $employeesData = [
-            ['name' => 'Ranjan Kumar Behera', 'email' => 'ranjan.behera@falcon.com'],
-            ['name' => 'Surajit Satpathy', 'email' => 'surajit.satpathy@falcon.com'],
-            ['name' => 'Anil Prasad Mohanty', 'email' => 'anil.mohanty@falcon.com'],
-            ['name' => 'Gauri Shankar Rath', 'email' => 'gauri.rath@falcon.com'],
-            ['name' => 'Sailesh Patnaik', 'email' => 'sailesh.patnaik@falcon.com'],
-            ['name' => 'Anjan Mohanty', 'email' => 'anjan.mohanty@falcon.com'],
-            ['name' => 'Swadesh Sarangi', 'email' => 'swadesh.sarangi@falcon.com'],
-            ['name' => 'Kamala Kant Dash', 'email' => 'kamala.dash@falcon.com'],
-            ['name' => 'Gaurav Kaushik', 'email' => 'gaurav.kaushik@falcon.com'],
-            ['name' => 'Vikrant Gupta', 'email' => 'vikrant.gupta@falcon.com'],
-            ['name' => 'Jayanta Ghose', 'email' => 'jayanta.ghose@falcon.com'],
-            ['name' => 'Arun Kumar Mohanty', 'email' => 'arun.mohanty@falcon.com'],
-            ['name' => 'Sai Prasad Dash', 'email' => 'sai.dash@falcon.com'],
-            ['name' => 'Tapan Kumar Mohanty', 'email' => 'tapan.mohanty@falcon.com'],
-            ['name' => 'Tupakula Suresh Babu', 'email' => 'tupakula.babu@falcon.com'],
-            ['name' => 'Ashutosh Das', 'email' => 'ashutosh.das@falcon.com'],
-            ['name' => 'Snigdha Samir Mohapatra', 'email' => 'snigdha.mohapatra@falcon.com'],
-            ['name' => 'Chirag Bansal', 'email' => 'chirag.bansal@falcon.com'],
-            ['name' => 'Niranjan Mishra', 'email' => 'niranjan.mishra@falcon.com'],
-            ['name' => 'Biranchi Narayan Biswal', 'email' => 'biranchi.biswal@falcon.com'],
-            ['name' => 'Umesh Mohapatra', 'email' => 'umesh.mohapatra@falcon.com'],
-            ['name' => 'Susmita Dutta', 'email' => 'susmita.dutta@falcon.com'],
-            ['name' => 'Sunil Dora', 'email' => 'sunil.dora@falcon.com'],
-            ['name' => 'Syed Zubenoor Ali', 'email' => 'syed.ali@falcon.com'],
+            ['name' => 'shashwat', 'email' => 'shashwat@gcode.in'],
+            ['name' => 'Atharva', 'email' => 'atharva@gcode.in'],
+            ['name' => 'lavya', 'email' => 'lavya@gcode.in'],
         ];
 
-        $usersByEmail = [];
+        $employeeIds = [];
         foreach ($employeesData as $data) {
-            $user = User::create([
+            $employee = User::create([
                 'company_id' => $company->id,
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make('password'),
                 'role' => 'participant',
+                'email_verified_at' => now(),
                 'invitation_accepted_at' => now(),
             ]);
-            $usersByEmail[$user->email] = $user;
+            $employeeIds[] = $employee->id;
         }
 
-        // 5. Create Survey: Team Up
+        // 5. Create Survey: Team Up for GCODE
         $survey = Survey::create([
             'company_id' => $company->id,
             'title' => 'Team Up',
             'description' => "This assessment measures the change readiness individually and as part of a team.\r\nYou will respond to questions about yourself, others anonymously. Feel free to answer each of them openly and to the best of your knowledge as we are noting putting any report around who said what. the scores will always go as an average input of multiple people. \r\nPlease answer based on your actual experience and observations to provide an accurate reflection of CQ.",
             'status' => 'published',
             'published_at' => now(),
-            'created_by' => $srini->id,
+            'created_by' => $adminId ?? $manager->id,
         ]);
 
-        // 6. Create 14 Questions (11 Individual CQ + 3 Group Sync)
+        // 6. Create 14 Questions (11 Individual CQ + 3 Group Sync) - exact same as Falcon
         $questionsData = [
             [
                 'question_text' => 'Do you see life changing around - This Person?*',
@@ -270,13 +213,11 @@ class FalconGroupSeeder extends Seeder
             ],
         ];
 
-        $questionsByOrder = [];
         foreach ($questionsData as $qData) {
-            $question = Question::create(array_merge($qData, ['survey_id' => $survey->id]));
-            $questionsByOrder[$question->sort_order] = $question;
+            Question::create(array_merge($qData, ['survey_id' => $survey->id]));
         }
 
-        // 7. Attach all 24 participants to survey
-        $survey->participants()->attach(collect($usersByEmail)->pluck('id'));
+        // 7. Attach the 3 GCODE employees as survey participants (NO matrix, NO assessments)
+        $survey->participants()->attach($employeeIds);
     }
 }

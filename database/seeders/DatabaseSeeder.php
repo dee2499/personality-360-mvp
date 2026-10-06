@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ScoreCategorySeeder::class,
             FalconGroupSeeder::class,
+            GcodeSeeder::class,
         ]);
     }
 }
