@@ -151,7 +151,7 @@ class SurveyController extends Controller
 
         // If survey belongs to a company, automatically enroll all company employees into the cohort
         if ($companyId) {
-            $employeeIds = User::where('company_id', $companyId)->where('role', '!=', 'admin')->pluck('id');
+            $employeeIds = User::where('company_id', $companyId)->where('role', 'participant')->pluck('id');
             if ($employeeIds->isNotEmpty()) {
                 $survey->participants()->sync($employeeIds);
                 app(AssessmentGenerationService::class)->generateForSurvey($survey);
@@ -176,7 +176,7 @@ class SurveyController extends Controller
             'assessments.subject',
         ]);
 
-        $participantsQuery = User::where('role', '!=', 'admin');
+        $participantsQuery = User::where('role', 'participant');
         if ($survey->company_id) {
             $participantsQuery->where('company_id', $survey->company_id);
         }

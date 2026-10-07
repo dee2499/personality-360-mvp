@@ -37,7 +37,7 @@ class PeopleController extends Controller
             : Survey::all();
 
         $participants = User::query()
-            ->where('role', '!=', 'admin')
+            ->where('role', 'participant')
             ->when($managerCompanyId, fn ($q) => $q->where('company_id', $managerCompanyId))
             ->when($selectedSurvey, function ($query, $survey) {
                 $query->whereHas('surveys', fn ($q) => $q->where('surveys.id', $survey->id));

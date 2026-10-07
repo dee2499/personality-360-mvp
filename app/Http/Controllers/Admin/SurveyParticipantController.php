@@ -42,7 +42,7 @@ class SurveyParticipantController extends Controller
 
         if (! empty($validated['user_ids'])) {
             $query = User::whereIn('id', $validated['user_ids'])
-                ->where('role', '!=', 'admin');
+                ->where('role', 'participant');
 
             if ($request->user()->isManager()) {
                 $query->where('company_id', $request->user()->company_id);

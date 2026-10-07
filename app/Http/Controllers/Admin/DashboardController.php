@@ -26,7 +26,7 @@ class DashboardController extends Controller
             ->where('status', 'published')
             ->count();
         $totalParticipants = User::when($companyId, fn ($q) => $q->where('company_id', $companyId))
-            ->where('role', '!=', 'admin')
+            ->where('role', 'participant')
             ->count();
 
         $assessmentQuery = Assessment::has('survey')
