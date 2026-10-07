@@ -370,8 +370,8 @@
                     <!-- Active Survey Master Card (Matrix View) -->
                     <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-8">
                         <!-- Survey Header -->
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b border-slate-100">
-                            <div class="space-y-2">
+                        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 pb-6 border-b border-slate-100">
+                            <div class="flex-1 space-y-3">
                                 <div class="flex flex-wrap items-center gap-2">
                                     @if($survey->company)
                                         <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -402,13 +402,13 @@
                                 </h2>
 
                                 @if($survey->description)
-                                    <p class="text-xs text-slate-500 max-w-2xl leading-relaxed">
+                                    <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed max-w-3xl">
                                         {{ $survey->description }}
                                     </p>
                                 @endif
 
                                 <!-- Anonymous & Honest Ratings Notice Card -->
-                                <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-indigo-50/40 border border-emerald-200/80 shadow-2xs flex items-start gap-3 max-w-2xl">
+                                <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-indigo-50/40 border border-emerald-200/80 shadow-2xs flex items-start gap-3 max-w-3xl">
                                     <div class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                                         <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                                     </div>
@@ -422,23 +422,23 @@
                             </div>
 
                             <!-- CTA Actions -->
-                            <div class="shrink-0 flex flex-wrap items-center gap-2">
+                            <div class="shrink-0 flex flex-wrap lg:flex-col items-stretch sm:items-center lg:items-end gap-2.5 pt-1">
                                 @if($isCompleted)
                                     <a href="{{ route('participant.assessments.report', $survey) }}" 
-                                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition shadow-2xs">
+                                       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 transition shadow-2xs w-full sm:w-auto">
                                         <i data-lucide="file-bar-chart-2" class="w-4 h-4 text-indigo-600"></i>
                                         <span>Confidential CQ Report</span>
                                     </a>
                                 @endif
 
                                 <a href="{{ route('participant.surveys.group-insights', $survey) }}" 
-                                   class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+                                   class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition w-full sm:w-auto">
                                     <i data-lucide="users" class="w-4 h-4 text-slate-500"></i>
                                     <span>Team Insights</span>
                                 </a>
 
                                 <a href="{{ route('participant.surveys.take', $survey) }}" 
-                                   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-100 transition">
+                                   class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-100 transition w-full sm:w-auto">
                                     <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
                                     <span>{{ $isCompleted ? 'Review in 11-Question Wizard' : 'Get Started' }}</span>
                                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
