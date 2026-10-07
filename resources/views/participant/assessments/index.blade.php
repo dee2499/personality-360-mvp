@@ -71,6 +71,22 @@
                                     {{ $survey->description }}
                                 </p>
                             @endif
+
+                            <!-- Anonymous & Honest Ratings Notice Card -->
+                            <div class="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-indigo-50/40 border border-emerald-200/80 shadow-2xs flex items-start gap-3.5 max-w-3xl">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                </div>
+                                <div class="space-y-0.5 text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-black text-emerald-900 tracking-tight">100% Anonymous Peer Evaluations</span>
+                                        <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100/90 text-emerald-800 border border-emerald-200">Protected</span>
+                                    </div>
+                                    <p class="text-slate-700 leading-relaxed font-medium">
+                                        While rating for others and peers your are completely considered as anonymous. Only aggregated results of all will be shared, so please be honest and fearless while sharing your inputs.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Survey Specs Grid -->
@@ -373,6 +389,19 @@
                                         {{ $survey->description }}
                                     </p>
                                 @endif
+
+                                <!-- Anonymous & Honest Ratings Notice Card -->
+                                <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-indigo-50/40 border border-emerald-200/80 shadow-2xs flex items-start gap-3 max-w-2xl">
+                                    <div class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="space-y-0.5 text-xs">
+                                        <span class="font-black text-emerald-900 tracking-tight block">100% Anonymous Peer Evaluations</span>
+                                        <p class="text-slate-700 leading-relaxed font-medium text-[11px]">
+                                            While rating for others and peers your are completely considered as anonymous. Only aggregated results of all will be shared, so please be honest and fearless while sharing your inputs.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- CTA Actions -->
