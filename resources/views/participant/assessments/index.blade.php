@@ -145,7 +145,6 @@
                                 <div class="space-y-1 text-xs">
                                     <div class="flex items-center gap-2">
                                         <span class="font-bold text-indigo-950 text-sm tracking-tight">Your Transformation Journey</span>
-                                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 tracking-wider">Note</span>
                                     </div>
                                     <p class="text-slate-600 leading-relaxed font-normal text-xs sm:text-[13px]">
                                         Once you have completed taking the My CQ Pulse, you will be able to see and introspect your change readiness quotient of self and also can compare with peers. This can be a great start for your future transformation journey.
