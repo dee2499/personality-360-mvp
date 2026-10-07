@@ -154,13 +154,6 @@
                                         <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
                                         <span>{{ $isManager ? 'Team Directory' : 'People Directory' }}</span>
                                     </a>
-
-                                    <a href="{{ route('admin.assessments.index') }}" 
-                                       @click="mobileNavOpen = false"
-                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.assessments.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                        <i data-lucide="table" class="w-4 h-4 {{ request()->routeIs('admin.assessments.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                        <span>Assessments</span>
-                                    </a>
                                 </div>
                             </div>
 
@@ -325,12 +318,6 @@
                                    class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                     <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
                                     <span>{{ $isManager ? 'Team Directory' : 'People Directory' }}</span>
-                                </a>
-
-                                <a href="{{ route('admin.assessments.index') }}" 
-                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.assessments.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                    <i data-lucide="table" class="w-4 h-4 {{ request()->routeIs('admin.assessments.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                    <span>Assessments</span>
                                 </a>
                             </div>
                         </div>

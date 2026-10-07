@@ -29,20 +29,21 @@ class AdminSidebarNavigationTest extends TestCase
         // Check Mobile Menu Toggle Button
         $response->assertSee('Open sidebar menu');
 
-        // Check All Navigation Links moved to Sidebar
+        // Check Navigation Links in Sidebar
         $response->assertSee(route('admin.dashboard'));
         $response->assertSee(route('admin.companies.index'));
         $response->assertSee(route('admin.surveys.index'));
         $response->assertSee(route('admin.people.index'));
-        $response->assertSee(route('admin.assessments.index'));
         $response->assertSee(route('admin.categories.index'));
 
         // Check Categories & Companies specifically in navigation
         $response->assertSee('Companies');
         $response->assertSee('Surveys');
         $response->assertSee('People Directory');
-        $response->assertSee('Assessments');
         $response->assertSee('Categories');
+
+        // Assessments menu item is hidden from the sidebar to protect rating anonymity
+        $response->assertDontSee('<span>Assessments</span>', false);
     }
 
     public function test_participant_sees_participant_sidebar_and_mobile_menu(): void
