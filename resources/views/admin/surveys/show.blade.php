@@ -330,9 +330,7 @@
                                     <th class="py-3 px-6">Subject</th>
                                     <th class="py-3 px-6">Type</th>
                                     <th class="py-3 px-6">Status</th>
-                                    <th class="py-3 px-6">Score</th>
-                                    <th class="py-3 px-6">Category</th>
-                                    <th class="py-3 px-6 text-right">Action</th>
+                                    <th class="py-3 px-6">Completed Date</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -357,16 +355,8 @@
                                                 <span class="capitalize">{{ str_replace('_', ' ', $assessment->status) }}</span>
                                             </span>
                                         </td>
-                                        <td class="py-3.5 px-6 font-semibold text-slate-800">
-                                            {{ $assessment->total_score ? $assessment->total_score . ' / ' . $assessment->max_score : '—' }}
-                                        </td>
-                                        <td class="py-3.5 px-6">
-                                            {{ $assessment->category ?? '—' }}
-                                        </td>
-                                        <td class="py-3.5 px-6 text-right">
-                                            <a href="{{ route('admin.assessments.show', $assessment) }}" class="text-indigo-600 hover:text-indigo-800 font-semibold">
-                                                View
-                                            </a>
+                                        <td class="py-3.5 px-6 text-slate-500 text-[11px]">
+                                            {{ $assessment->completed_at ? $assessment->completed_at->format('M d, Y H:i') : '—' }}
                                         </td>
                                     </tr>
                                 @endforeach

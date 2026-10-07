@@ -56,52 +56,26 @@
                 </div>
             </div>
 
-            <!-- Score Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-                <!-- Score -->
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center text-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Score</span>
-                    <div class="mt-1 flex items-baseline gap-1">
-                        <span class="text-3xl font-black text-slate-900">{{ $assessment->total_score ?? '—' }}</span>
-                        <span class="text-xs text-slate-500 font-medium">/ {{ $assessment->max_score ?? (($assessment->survey?->questions?->count() ?? 0) * 10) }}</span>
-                    </div>
+            <!-- Confidentiality Notice & Status Summary -->
+            <div class="mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="lock" class="w-5 h-5"></i>
                 </div>
-
-                <!-- Percentage -->
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center text-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Percentage</span>
-                    <div class="mt-1">
-                        @if($assessment->percentage !== null)
-                            <span class="text-3xl font-black text-slate-900">{{ number_format($assessment->percentage, 2) }}%</span>
-                        @else
-                            <span class="text-3xl font-black text-slate-400">—</span>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Category -->
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center text-center">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Category</span>
-                    <div class="mt-1">
-                        @if($assessment->category)
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold {{ $categoryBadge }}">
-                                <span>{{ $categoryEmoji }}</span>
-                                <span>{{ $assessment->category }}</span>
-                            </span>
-                        @else
-                            <span class="text-xs font-medium text-slate-400">Pending</span>
-                        @endif
-                    </div>
+                <div>
+                    <h3 class="text-xs font-bold text-amber-900">Confidential Evaluation</h3>
+                    <p class="text-[11px] text-amber-700 leading-relaxed">
+                        To preserve the privacy and objectivity of the 360-degree feedback process, individual question ratings and exact numeric scores are strictly confidential and masked from all administrators and managers.
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- Section 18: Question by Question Breakdown -->
+        <!-- Section 18: Question Breakdown (Protected / Anonymous) -->
         <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
             <div class="px-6 sm:px-8 py-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                    <h2 class="text-base font-bold text-slate-900">Question Ratings</h2>
-                    <p class="text-xs text-slate-500">Each answer is scored on an integer scale from 1 (lowest) to 10 (highest)</p>
+                    <h2 class="text-base font-bold text-slate-900">Evaluation Questions</h2>
+                    <p class="text-xs text-slate-500">Evaluation survey question roster</p>
                 </div>
                 <span class="text-xs font-bold text-slate-400">
                     {{ count($questionsWithAnswers) }} Questions
@@ -112,8 +86,6 @@
                 @foreach($questionsWithAnswers as $index => $item)
                     @php
                         $qNum = str_pad($index + 1, 2, '0', STR_PAD_LEFT);
-                        $score = $item['score'];
-                        $pct = $score ? ($score / 10) * 100 : 0;
                     @endphp
                     <div class="p-6 sm:px-8 hover:bg-slate-50/50 transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -130,22 +102,12 @@
                                 </div>
                             </div>
 
-                            <!-- Rating Score Readout & Visualizer -->
-                            <div class="flex flex-col sm:items-end gap-1.5 shrink-0 min-w-[200px]">
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-lg font-black {{ $score ? 'text-slate-900' : 'text-slate-400' }}">
-                                        {{ $score ?? '—' }}
-                                    </span>
-                                    <span class="text-xs text-slate-400 font-medium">/ 10</span>
-                                </div>
-
-                                <!-- Visual Rating Scale Track (1-10) -->
-                                <div class="w-full flex items-center gap-1">
-                                    @for($i = 1; $i <= 10; $i++)
-                                        <div class="h-2 flex-1 rounded-full transition-all
-                                            {{ $score && $i <= $score ? 'bg-indigo-600' : 'bg-slate-100' }}"></div>
-                                    @endfor
-                                </div>
+                            <!-- Rating Score Masked Readout -->
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                                    <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    <span>Score Confidential</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -155,12 +117,12 @@
             <!-- Footer Summary -->
             <div class="p-6 sm:px-8 bg-slate-50 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-xs font-semibold text-slate-700">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                    <span>Total Score: {{ $assessment->total_score ?? 0 }} / {{ $assessment->max_score ?? (($assessment->survey?->questions?->count() ?? 0) * 10) }}</span>
+                    <i data-lucide="shield-check" class="w-4 h-4 text-indigo-600"></i>
+                    <span>Evaluation Status: <strong class="capitalize text-slate-900">{{ str_replace('_', ' ', $assessment->status) }}</strong></span>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span>Percentage: <strong class="text-slate-900">{{ number_format($assessment->percentage ?? 0, 2) }}%</strong></span>
-                    <span>Category: <strong class="text-indigo-600">{{ $assessment->category ?? 'Pending' }}</strong></span>
+                <div class="flex items-center gap-2 text-slate-500">
+                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                    <span>Aggregated results are only available via anonymized competency and cohort reports.</span>
                 </div>
             </div>
         </div>

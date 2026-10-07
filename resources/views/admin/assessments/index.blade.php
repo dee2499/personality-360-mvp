@@ -299,11 +299,8 @@
                                 <th class="py-3 px-6">Subject</th>
                                 <th class="py-3 px-6">Type</th>
                                 <th class="py-3 px-6">Survey</th>
-                                <th class="py-3 px-6">Score</th>
-                                <th class="py-3 px-6">Percentage</th>
-                                <th class="py-3 px-6">Category</th>
                                 <th class="py-3 px-6">Status</th>
-                                <th class="py-3 px-6 text-right">Action</th>
+                                <th class="py-3 px-6">Completed Date</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -341,45 +338,6 @@
                                             </a>
                                         @endif
                                     </td>
-                                    <td class="py-3.5 px-6 font-bold text-slate-800">
-                                        @if($assessment->isCompleted())
-                                            {{ $assessment->total_score }} / {{ $assessment->max_score }}
-                                        @else
-                                            <span class="text-slate-400 font-normal">—</span>
-                                        @endif
-                                    </td>
-                                    <td class="py-3.5 px-6 font-extrabold text-slate-900">
-                                        @if($assessment->isCompleted())
-                                            {{ number_format($assessment->percentage, 2) }}%
-                                        @else
-                                            <span class="text-slate-400 font-normal">—</span>
-                                        @endif
-                                    </td>
-                                    <td class="py-3.5 px-6">
-                                        @if($assessment->isCompleted() && $assessment->category)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold
-                                                {{ match($assessment->category) {
-                                                    'Apple' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-                                                    'Orange' => 'bg-orange-50 text-orange-700 border border-orange-200',
-                                                    'Tomato' => 'bg-rose-50 text-rose-700 border border-rose-200',
-                                                    'Lemon' => 'bg-amber-50 text-amber-700 border border-amber-200',
-                                                    'Cucumber' => 'bg-teal-50 text-teal-700 border border-teal-200',
-                                                    default => 'bg-slate-100 text-slate-700'
-                                                } }}">
-                                                <span>{{ match($assessment->category) {
-                                                    'Apple' => '🍏',
-                                                    'Orange' => '🍊',
-                                                    'Tomato' => '🍅',
-                                                    'Lemon' => '🍋',
-                                                    'Cucumber' => '🥒',
-                                                    default => '🎯'
-                                                } }}</span>
-                                                <span>{{ $assessment->category }}</span>
-                                            </span>
-                                        @else
-                                            <span class="text-slate-400 text-[11px]">—</span>
-                                        @endif
-                                    </td>
                                     <td class="py-3.5 px-6">
                                         <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold
                                             {{ match($assessment->status) {
@@ -395,12 +353,8 @@
                                             <span class="capitalize">{{ str_replace('_', ' ', $assessment->status) }}</span>
                                         </span>
                                     </td>
-                                    <td class="py-3.5 px-6 text-right">
-                                        <a href="{{ route('admin.assessments.show', $assessment) }}" 
-                                           class="inline-flex items-center gap-1 font-semibold text-indigo-600 hover:text-indigo-800">
-                                            <span>View Details</span>
-                                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                                        </a>
+                                    <td class="py-3.5 px-6 text-slate-500 text-[11px]">
+                                        {{ $assessment->completed_at ? $assessment->completed_at->format('M d, Y H:i') : '—' }}
                                     </td>
                                 </tr>
                             @endforeach
