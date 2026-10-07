@@ -59,12 +59,9 @@
                                 </span>
                             </div>
 
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                                    About ChangeQuo
-                                </h2>
-                                <span class="sr-only">{{ $survey->title }}</span>
-                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                About {{ $survey->title }}
+                            </h2>
 
                             @if($survey->description)
                                 <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-3xl">
