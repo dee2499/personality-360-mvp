@@ -6,16 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Assessment;
 use App\Models\Survey;
 use App\Models\User;
-use App\Services\AssessmentScoreService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __construct(
-        protected AssessmentScoreService $scoreService
-    ) {}
-
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -24,33 +19,6 @@ class DashboardController extends Controller
 
         if ($isManager && ! $companyId) {
             abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
-        }
-
-        // For manager, display Team CQ Sync report as the main dashboard
-        if ($isManager) {
-            $company = $user->company;
-            $selectedSurveyId = $request->query('survey_id');
-            $survey = $selectedSurveyId
-                ? Survey::where('company_id', $companyId)->find($selectedSurveyId)
-                : Survey::where('company_id', $companyId)->latest()->first();
-
-            if (! $survey) {
-                $survey = Survey::where('company_id', $companyId)->first();
-            }
-
-            if (! $survey) {
-                abort(404, 'No surveys found for your organization.');
-            }
-
-            $insights = $this->scoreService->calculateGroupInsights($survey);
-            $availableSurveys = Survey::where('company_id', $companyId)->orderBy('title')->get();
-
-            return view('admin.surveys.team-sync-report', [
-                'survey' => $survey,
-                'company' => $company,
-                'insights' => $insights,
-                'availableSurveys' => $availableSurveys,
-            ]);
         }
 
         $totalSurveys = Survey::when($companyId, fn ($q) => $q->where('company_id', $companyId))->count();
