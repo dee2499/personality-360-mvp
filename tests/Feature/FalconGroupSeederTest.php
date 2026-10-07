@@ -60,10 +60,10 @@ class FalconGroupSeederTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'atharva@gcode.in', 'company_id' => $gcode->id]);
         $this->assertDatabaseHas('users', ['email' => 'lavya@gcode.in', 'company_id' => $gcode->id]);
 
-        // 3. Verify Surveys (Team Up for Falcon Group and Team Up for GCODE)
+        // 3. Verify Surveys (ChangeQuo for Falcon Group and ChangeQuo for GCODE)
         $this->assertEquals(2, Survey::count());
-        $falconSurvey = Survey::where('company_id', $falcon->id)->where('title', 'Team Up')->first();
-        $gcodeSurvey = Survey::where('company_id', $gcode->id)->where('title', 'Team Up')->first();
+        $falconSurvey = Survey::where('company_id', $falcon->id)->where('title', 'ChangeQuo')->first();
+        $gcodeSurvey = Survey::where('company_id', $gcode->id)->where('title', 'ChangeQuo')->first();
 
         $this->assertNotNull($falconSurvey);
         $this->assertNotNull($gcodeSurvey);

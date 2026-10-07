@@ -116,10 +116,10 @@ class FalconGroupSeeder extends Seeder
             $usersByEmail[$user->email] = $user;
         }
 
-        // 5. Create Survey: Team Up
+        // 5. Create Survey: ChangeQuo
         $survey = Survey::create([
             'company_id' => $company->id,
-            'title' => 'Team Up',
+            'title' => 'ChangeQuo',
             'description' => "This assessment measures the change readiness individually and as part of a team.\r\nYou will respond to questions about yourself, others anonymously. Feel free to answer each of them openly and to the best of your knowledge as we are noting putting any report around who said what. the scores will always go as an average input of multiple people. \r\nPlease answer based on your actual experience and observations to provide an accurate reflection of CQ.",
             'status' => 'published',
             'published_at' => now(),
