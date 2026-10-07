@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Company;
+use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -74,5 +75,31 @@ class AdminSidebarNavigationTest extends TestCase
         $response->assertDontSee('Admin Console');
         $response->assertDontSee(route('admin.companies.index'));
         $response->assertDontSee(route('admin.categories.index'));
+    }
+
+    public function test_manager_sees_team_sync_dashboard_and_assessments_menu_item(): void
+    {
+        $company = Company::factory()->create();
+        $manager = User::factory()->create([
+            'role' => 'manager',
+            'company_id' => $company->id,
+        ]);
+        $survey = Survey::factory()->create([
+            'company_id' => $company->id,
+            'created_by' => $manager->id,
+            'title' => 'Falcon Change Survey',
+            'status' => 'published',
+        ]);
+
+        $response = $this->actingAs($manager)->get(route('admin.dashboard'));
+        $response->assertOk();
+
+        // Manager dashboard renders Team CQ Sync report
+        $response->assertSee('Team CQ Sync Report');
+        $response->assertSee('Falcon Change Survey');
+
+        // Manager sidebar sees Assessments menu item
+        $response->assertSee('Assessments');
+        $response->assertSee(route('admin.assessments.index'));
     }
 }
