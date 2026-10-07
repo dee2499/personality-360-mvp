@@ -37,10 +37,12 @@ class AdminSidebarNavigationTest extends TestCase
         $response->assertSee(route('admin.people.index'));
         $response->assertSee(route('admin.categories.index'));
 
-        // Check Categories & Companies specifically in navigation
-        $response->assertSee('Companies');
-        $response->assertSee('Surveys');
-        $response->assertSee('People Directory');
+        // Check Navigation items specifically in unified navigation
+        $response->assertSee('My Company');
+        $response->assertSee('Company Surveys');
+        $response->assertSee('Team Directory');
+        $response->assertSee('Survey Assessment');
+        $response->assertSee('All Companies');
         $response->assertSee('Categories');
 
         // Assessments menu item is hidden from the sidebar to protect rating anonymity
@@ -103,14 +105,14 @@ class AdminSidebarNavigationTest extends TestCase
         $responseAssessment->assertSee('Survey Assessment');
         $responseAssessment->assertSee('Recent Assessments');
 
-        // 3. Admin on /admin/dashboard should NOT see Survey Assessment menu link
+        // 3. Admin on /admin/dashboard should also see Survey Assessment link in unified menu
         $admin = User::factory()->create([
             'role' => 'admin',
             'company_id' => $company->id,
         ]);
         $responseAdmin = $this->actingAs($admin)->get(route('admin.dashboard'));
         $responseAdmin->assertOk();
-        $responseAdmin->assertDontSee(route('admin.survey-assessment'));
-        $responseAdmin->assertDontSee('Survey Assessment');
+        $responseAdmin->assertSee(route('admin.survey-assessment'));
+        $responseAdmin->assertSee('Survey Assessment');
     }
 }

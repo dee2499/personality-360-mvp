@@ -8,6 +8,7 @@ use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class AssessmentScoreService
 {
@@ -392,6 +393,21 @@ class AssessmentScoreService
      */
     public function calculateCompanyMetrics(Company $company, ?Survey $survey = null): array
     {
+        $surveyKey = $survey ? "survey_{$survey->id}_{$survey->updated_at?->timestamp}" : 'all';
+        $cacheKey = "company_metrics_{$company->id}_{$company->updated_at?->timestamp}_{$surveyKey}";
+
+        return Cache::remember($cacheKey, now()->addHours(6), function () use ($company, $survey) {
+            return $this->computeCompanyMetrics($company, $survey);
+        });
+    }
+
+    /**
+     * Internal raw calculation for calculateCompanyMetrics.
+     *
+     * @return array<string, mixed>
+     */
+    protected function computeCompanyMetrics(Company $company, ?Survey $survey = null): array
+    {
         $query = Assessment::query()
             ->has('survey')
             ->where(function ($q) use ($company) {
@@ -480,27 +496,41 @@ class AssessmentScoreService
      *
      * @return array<string, mixed>
      */
-    public function calculateChangeQuotientReport(User $subject, Survey $survey): array
-    {
-        // 1. Fetch 11 Individual Change Journey questions
-        $individualQuestions = $survey->questions()
-            ->where(function ($q) {
-                $q->where('type', 'individual')
-                    ->orWhereNull('type');
-            })
-            ->orderBy('sort_order')
-            ->take(11)
-            ->get();
+    public function calculateChangeQuotientReport(
+        User $subject,
+        Survey $survey,
+        ?\Illuminate\Support\Collection $preloadedQuestions = null,
+        ?\Illuminate\Support\Collection $preloadedAssessments = null,
+        ?array $preloadedSyncReport = null,
+        ?int $preloadedParticipantsCount = null
+    ): array {
+        // 1. Fetch 11 Individual Change Journey questions (use preloaded if provided)
+        if ($preloadedQuestions !== null) {
+            $individualQuestions = $preloadedQuestions;
+        } else {
+            $individualQuestions = $survey->questions()
+                ->where(function ($q) {
+                    $q->where('type', 'individual')
+                        ->orWhereNull('type');
+                })
+                ->orderBy('sort_order')
+                ->take(11)
+                ->get();
 
-        if ($individualQuestions->isEmpty()) {
-            $individualQuestions = $survey->questions()->orderBy('sort_order')->take(11)->get();
+            if ($individualQuestions->isEmpty()) {
+                $individualQuestions = $survey->questions()->orderBy('sort_order')->take(11)->get();
+            }
         }
 
         // 2. Fetch completed Self and Peer assessments for this subject in this survey
-        $allAssessments = $survey->assessments()
-            ->with(['answers'])
-            ->where('subject_id', $subject->id)
-            ->get();
+        if ($preloadedAssessments !== null) {
+            $allAssessments = $preloadedAssessments->where('subject_id', $subject->id);
+        } else {
+            $allAssessments = $survey->assessments()
+                ->with(['answers'])
+                ->where('subject_id', $subject->id)
+                ->get();
+        }
 
         $selfAssessment = $allAssessments->firstWhere('assessor_id', $subject->id);
         $selfIsCompleted = $selfAssessment && $selfAssessment->status === 'completed';
@@ -717,7 +747,7 @@ class AssessmentScoreService
         $recommendedActions = $this->generateTop3RecommendedActions($developmentAreas, $profileData['profile_name']);
 
         // 8. Group Sync Assessment (Separate from individual CQ)
-        $cqSync = $this->calculateGroupSyncScore($survey);
+        $cqSync = $preloadedSyncReport ?? $this->calculateGroupSyncScore($survey);
 
         // 9. Format 3 CQ metrics (CQ 1 Self, CQ 2 Others, CQ 3 Normalised/Moderated)
         // for profile meters and backward compatibility
@@ -741,6 +771,10 @@ class AssessmentScoreService
             $alignmentBadge = 'bg-blue-50 text-blue-800 border-blue-200';
             $alignmentInsight = "Your colleagues rated you {$absGap}% higher than your self-score ({$peerPercentage}% vs {$selfPercentage}%). You possess latent strengths you may be under-acknowledging.";
         }
+
+        $totalOtherParticipants = $preloadedParticipantsCount !== null
+            ? max(0, $preloadedParticipantsCount - 1)
+            : $survey->participants()->where('users.id', '!=', $subject->id)->count();
 
         $cq1 = [
             'name' => 'CQ 1 (Self)',
@@ -774,7 +808,7 @@ class AssessmentScoreService
             'badge' => $this->categoryService->getBadgeClass($this->categoryService->getCategory($peerPercentage)),
             'category_badge' => $this->categoryService->getBadgeClass($this->categoryService->getCategory($peerPercentage)),
             'completed_count' => $peerCompletedCount,
-            'total_count' => $survey->participants()->where('users.id', '!=', $subject->id)->count(),
+            'total_count' => $totalOtherParticipants,
             'description' => 'What others think about you: Consensus evaluation across colleagues who observed your change journey.',
         ];
 
@@ -1257,21 +1291,61 @@ class AssessmentScoreService
      */
     public function calculateGroupInsights(Survey $survey): array
     {
+        $cacheKey = "survey_group_insights_{$survey->id}_{$survey->updated_at?->timestamp}";
+
+        return Cache::remember($cacheKey, now()->addHours(6), function () use ($survey) {
+            return $this->computeGroupInsights($survey);
+        });
+    }
+
+    /**
+     * Internal raw computation for calculateGroupInsights.
+     *
+     * @return array<string, mixed>
+     */
+    protected function computeGroupInsights(Survey $survey): array
+    {
         $participants = $survey->participants()->get();
         $cohortSize = $participants->count();
-        $assessments = $survey->assessments()->with(['answers.question', 'assessor', 'subject'])->get();
+        $assessments = $survey->assessments()->with(['answers', 'assessor', 'subject'])->get();
         $totalAssessments = $assessments->count();
         $completedAssessments = $assessments->where('status', 'completed');
         $completedCount = $completedAssessments->count();
         $completionRate = $totalAssessments > 0 ? round(($completedCount / $totalAssessments) * 100, 1) : 0.0;
 
-        // 1. Calculate Individual CQ scores for all cohort participants
+        // Preload individual questions once for all participants
+        $individualQuestions = $survey->questions()
+            ->where(function ($q) {
+                $q->where('type', 'individual')
+                    ->orWhereNull('type');
+            })
+            ->orderBy('sort_order')
+            ->take(11)
+            ->get();
+
+        if ($individualQuestions->isEmpty()) {
+            $individualQuestions = $survey->questions()->orderBy('sort_order')->take(11)->get();
+        }
+
+        // 1. Preload Sync Report once
+        $syncReport = $this->calculateGroupSyncScore($survey);
+        $teamSyncScore = $syncReport['score'];
+        $teamSyncPercentage = $syncReport['percentage'];
+
+        // 2. Calculate Individual CQ scores for all cohort participants
         $individualCQScores = [];
         $selfPercentages = [];
         $peerPercentages = [];
 
         foreach ($participants as $participant) {
-            $cqReport = $this->calculateChangeQuotientReport($participant, $survey);
+            $cqReport = $this->calculateChangeQuotientReport(
+                $participant,
+                $survey,
+                $individualQuestions,
+                $assessments,
+                $syncReport,
+                $cohortSize
+            );
             if ($cqReport['overall_cq_score'] > 0) {
                 $individualCQScores[] = $cqReport['overall_cq_score'];
             }
@@ -1333,11 +1407,7 @@ class AssessmentScoreService
             $groupTransitionLabel = 'Change Driver → Champion';
         }
 
-        // 2. Team CQ Sync Score
-        $syncReport = $this->calculateGroupSyncScore($survey);
-        $teamSyncScore = $syncReport['score'];
-        $teamSyncPercentage = $syncReport['percentage'];
-
+        // 3. Team CQ Sync Score (already computed above)
         // Benchmarks (CQ: 8.0, CQ Sync: 8.0)
         $benchmarkCQ = 8.0;
         $benchmarkSync = 8.0;
@@ -1373,7 +1443,7 @@ class AssessmentScoreService
         } else {
             $matrixZone = 'risk';
             $matrixZoneName = 'Risk Zone';
-            $matrixZoneSubtitle = 'Low CQ, Low Sync: Both capability and alignment need significant attention.';
+            $matrixZoneSubtitle = 'Low CQ, Low Sync: Both ChangeQuo and alignment need significant attention.';
             $matrixBlindSpot = 'Pervasive resistance and siloed working patterns create friction and high vulnerability to change fatigue.';
             $matrixOpportunity = 'Re-establishing core psychological safety and shared purpose will unlock foundational momentum.';
         }
@@ -1597,7 +1667,7 @@ class AssessmentScoreService
         ];
 
         // 7. Competency Questions Breakdown (11 Individual Questions across all participants)
-        $questions = $survey->questions()->orderBy('sort_order')->take(11)->get();
+        $questions = $individualQuestions;
         $questionsData = [];
 
         foreach ($questions as $q) {
@@ -1682,8 +1752,29 @@ class AssessmentScoreService
                 'status' => $survey->sign_off_status ?? 'pending',
                 'lead' => $survey->sign_off_lead,
                 'notes' => $survey->sign_off_notes,
-                'signed_off_at' => $survey->signed_off_at,
+                'signed_off_at' => $survey->signed_off_at ? $survey->signed_off_at->format('d M Y, h:i A') : null,
             ],
+            'sign_offs' => $survey->signOffs()->with('user')->get()->map(function ($so) {
+                return [
+                    'id' => $so->id,
+                    'lead' => $so->sign_off_lead,
+                    'status' => $so->status,
+                    'notes' => $so->notes,
+                    'signed_off_at' => $so->signed_off_at ? $so->signed_off_at->format('d M Y, h:i A') : null,
+                    'user_name' => $so->user?->name,
+                ];
+            })->all(),
+            'has_approved_sign_off' => $survey->signOffs()->where('status', 'approved')->exists(),
+            'approved_sign_offs' => $survey->signOffs()->where('status', 'approved')->with('user')->get()->map(function ($so) {
+                return [
+                    'id' => $so->id,
+                    'lead' => $so->sign_off_lead,
+                    'status' => $so->status,
+                    'notes' => $so->notes,
+                    'signed_off_at' => $so->signed_off_at ? $so->signed_off_at->format('d M Y, h:i A') : null,
+                    'user_name' => $so->user?->name,
+                ];
+            })->all(),
             'confidentiality_guarantee' => 'This team report is completely anonymous with ZERO individual names exposed to protect psychological safety and focus on collective growth.',
         ];
     }

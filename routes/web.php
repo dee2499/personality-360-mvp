@@ -95,6 +95,8 @@ Route::prefix('admin')
         Route::get('surveys/{survey}/team-sync', [AdminSurveyController::class, 'teamSyncReport'])->name('surveys.team-sync');
         Route::get('surveys/{survey}/group-insights', [AdminSurveyController::class, 'groupInsights'])->name('surveys.group-insights');
         Route::post('surveys/{survey}/sign-off', [AdminSurveyController::class, 'signOff'])->name('surveys.sign-off');
+        Route::put('surveys/{survey}/sign-off/{signOff}', [AdminSurveyController::class, 'updateSignOff'])->name('surveys.sign-off.update');
+        Route::delete('surveys/{survey}/sign-off/{signOff}', [AdminSurveyController::class, 'destroySignOff'])->name('surveys.sign-off.destroy');
         Route::resource('surveys', AdminSurveyController::class);
         Route::post('surveys/{survey}/publish', [AdminSurveyController::class, 'publish'])->name('surveys.publish');
         Route::post('surveys/{survey}/unpublish', [AdminSurveyController::class, 'unpublish'])->name('surveys.unpublish');

@@ -132,7 +132,7 @@
                         class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0"
                         :class="activeTab === 'sync' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                     <i data-lucide="users" class="w-4 h-4"></i>
-                    <span>2. Team CQ Sync Report (3 Dimensions)</span>
+                    <span>2. Team Report (3 Dimensions)</span>
                 </button>
 
                 <button type="button" 
@@ -140,7 +140,7 @@
                         class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0"
                         :class="activeTab === 'capability' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                     <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-                    <span>3. Capability & Score Distribution</span>
+                    <span>3. ChangeQuo & Score Distribution</span>
                 </button>
             </div>
         </div>
@@ -589,71 +589,187 @@
                     </span>
                     <h3 class="text-lg font-black text-slate-900 mt-1">Leadership Action Plan Sign-Off</h3>
                     <p class="text-xs text-slate-500 mt-0.5">
-                        Formal executive validation of the 30-60-90 day team change enablement roadmap.
+                        Formal executive validation of the 30-60-90 day team change enablement roadmap. Add multiple status reviews & leadership notes.
                     </p>
                 </div>
 
                 @php
-                    $signOff = $insights['sign_off'] ?? [];
-                    $status = $signOff['status'] ?? 'pending';
+                    $signOffs = $insights['sign_offs'] ?? [];
+                    $latestSignOff = !empty($signOffs) ? $signOffs[0] : ($insights['sign_off'] ?? []);
+                    $latestStatus = $latestSignOff['status'] ?? 'pending';
+                    $hasApproved = !empty($insights['has_approved_sign_off']);
                 @endphp
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
-                    {{ match($status) {
-                        'approved' => 'bg-emerald-50 text-emerald-800 border border-emerald-200',
-                        'needs_review' => 'bg-amber-50 text-amber-800 border border-amber-200',
-                        default => 'bg-slate-100 text-slate-700 border border-slate-200'
-                    } }}">
-                    <i data-lucide="{{ $status === 'approved' ? 'check-circle-2' : 'clock' }}" class="w-3.5 h-3.5"></i>
-                    <span>Status: {{ ucwords(str_replace('_', ' ', $status)) }}</span>
-                </span>
+                <div class="flex items-center gap-2">
+                    @if($hasApproved)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            <span>Approved for Team</span>
+                        </span>
+                    @endif
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
+                        {{ match($latestStatus) {
+                            'approved' => 'bg-emerald-50 text-emerald-800 border border-emerald-200',
+                            'needs_review' => 'bg-amber-50 text-amber-800 border border-amber-200',
+                            default => 'bg-slate-100 text-slate-700 border border-slate-200'
+                        } }}">
+                        <i data-lucide="{{ $latestStatus === 'approved' ? 'check-circle-2' : 'clock' }}" class="w-3.5 h-3.5"></i>
+                        <span>Latest: {{ ucwords(str_replace('_', ' ', $latestStatus)) }}</span>
+                    </span>
+                </div>
             </div>
 
-            @if($status === 'approved')
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 flex items-start gap-3">
-                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
-                    <div>
-                        <h4 class="font-black text-sm">Action Plan Formally Approved</h4>
-                        <p class="mt-0.5">Signed off by <strong>{{ $signOff['lead'] }}</strong> on {{ $signOff['signed_off_at'] ? \Carbon\Carbon::parse($signOff['signed_off_at'])->format('d M Y, h:i A') : 'N/A' }}.</p>
-                        @if(!empty($signOff['notes']))
-                            <p class="mt-2 text-slate-700 bg-white/80 p-3 rounded-xl border border-emerald-200/60 font-mono text-[11px]">{{ $signOff['notes'] }}</p>
-                        @endif
+            <!-- Sign-Off History List (Multiple Notes & Statuses) -->
+            @if(!empty($signOffs))
+                <div class="space-y-3">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-slate-500">Sign-Off & Governance History ({{ count($signOffs) }})</h4>
+                    <div class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                        @foreach($signOffs as $item)
+                            <div x-data="{ editing: false }" class="p-4 rounded-2xl border text-xs flex flex-col gap-2.5 transition
+                                {{ $item['status'] === 'approved' 
+                                    ? 'bg-emerald-50/50 border-emerald-200 text-emerald-950' 
+                                    : ($item['status'] === 'needs_review' 
+                                        ? 'bg-amber-50/40 border-amber-200 text-amber-950' 
+                                        : 'bg-slate-50 border-slate-200 text-slate-800') }}">
+                                
+                                <div x-show="!editing" class="space-y-2.5">
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="{{ $item['status'] === 'approved' ? 'check-circle' : ($item['status'] === 'needs_review' ? 'alert-circle' : 'clock') }}" 
+                                               class="w-4 h-4 {{ $item['status'] === 'approved' ? 'text-emerald-600' : ($item['status'] === 'needs_review' ? 'text-amber-600' : 'text-slate-500') }} shrink-0"></i>
+                                            <span class="font-extrabold text-slate-900">{{ $item['lead'] }}</span>
+                                            @if(!empty($item['user_name']) && $item['user_name'] !== $item['lead'])
+                                                <span class="text-[10px] text-slate-400">by {{ $item['user_name'] }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold capitalize
+                                                {{ match($item['status']) {
+                                                    'approved' => 'bg-emerald-100 text-emerald-800',
+                                                    'needs_review' => 'bg-amber-100 text-amber-800',
+                                                    default => 'bg-slate-200 text-slate-700'
+                                                } }}">
+                                                {{ ucwords(str_replace('_', ' ', $item['status'])) }}
+                                            </span>
+                                            <span class="text-[11px] text-slate-400 font-medium">
+                                                @if(!empty($item['signed_off_at']))
+                                                    {{ is_string($item['signed_off_at']) ? $item['signed_off_at'] : ($item['signed_off_at'] instanceof \DateTimeInterface ? $item['signed_off_at']->format('d M Y, h:i A') : 'N/A') }}
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </span>
+
+                                            <div class="flex items-center gap-1 ml-2">
+                                                <button type="button" @click="editing = true; $nextTick(() => { if (window.lucide) window.lucide.createIcons(); })" 
+                                                        title="Edit this sign-off"
+                                                        class="p-1 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-white/80 transition cursor-pointer">
+                                                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                                                </button>
+                                                <form method="POST" action="{{ route('admin.surveys.sign-off.destroy', [$survey, $item['id']]) }}" 
+                                                      onsubmit="return confirm('Are you sure you want to delete this leadership sign-off entry?');" 
+                                                      class="inline-block">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            title="Delete this sign-off"
+                                                            class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if(!empty($item['notes']))
+                                        <div class="bg-white/90 p-3 rounded-xl border border-slate-200/80 text-[11px] text-slate-700 whitespace-pre-wrap leading-relaxed shadow-2xs">
+                                            {{ $item['notes'] }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div x-show="editing" x-cloak class="pt-1">
+                                    <form method="POST" action="{{ route('admin.surveys.sign-off.update', [$survey, $item['id']]) }}" class="space-y-3 bg-white p-4 rounded-xl border border-indigo-200 shadow-sm">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                                            <span class="font-bold text-xs text-indigo-900">Edit Sign-Off Note</span>
+                                            <button type="button" @click="editing = false" class="text-slate-400 hover:text-slate-600 text-[11px] font-bold cursor-pointer">Cancel</button>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                            <div>
+                                                <label class="block font-bold text-slate-700 mb-1">Executive Sponsor / Lead</label>
+                                                <input type="text" name="sign_off_lead" value="{{ $item['lead'] }}" required
+                                                       class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">
+                                            </div>
+                                            <div>
+                                                <label class="block font-bold text-slate-700 mb-1">Status</label>
+                                                <select name="sign_off_status" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">
+                                                    <option value="approved" {{ $item['status'] === 'approved' ? 'selected' : '' }}>Approved (Authorize Sprints)</option>
+                                                    <option value="needs_review" {{ $item['status'] === 'needs_review' ? 'selected' : '' }}>Needs Review (Revise Priorities)</option>
+                                                    <option value="pending" {{ $item['status'] === 'pending' ? 'selected' : '' }}>Pending Leadership Review</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block font-bold text-slate-700 mb-1 text-xs">Executive Notes & Guidance</label>
+                                            <textarea name="sign_off_notes" rows="3" required
+                                                      class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">{{ $item['notes'] }}</textarea>
+                                        </div>
+                                        <div class="flex items-center justify-end gap-2 pt-1">
+                                            <button type="button" @click="editing = false" 
+                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" 
+                                                    class="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow transition cursor-pointer">
+                                                Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.surveys.sign-off', $survey) }}" class="space-y-4">
+            <!-- Add New Sign-Off / Status Entry Form -->
+            <form method="POST" action="{{ route('admin.surveys.sign-off', $survey) }}" class="space-y-4 pt-2 border-t border-slate-100">
                 @csrf
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Add Sign-Off / Review Note</span>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Executive Sponsor / Leadership Lead</label>
                         <input type="text" name="sign_off_lead" 
-                               value="{{ old('sign_off_lead', $signOff['lead'] ?? Auth::user()->name) }}" 
+                               value="{{ old('sign_off_lead', Auth::user()->name) }}" 
                                required
                                placeholder="e.g. Sarah Jenkins (Head of Product)"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">
                     </div>
 
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">Approval Decision</label>
+                        <label class="block font-bold text-slate-700 mb-1">Decision / Status</label>
                         <select name="sign_off_status" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">
-                            <option value="approved" {{ old('sign_off_status', $status) === 'approved' ? 'selected' : '' }}>Approved (Authorize 30-60-90 Day Sprints)</option>
-                            <option value="needs_review" {{ old('sign_off_status', $status) === 'needs_review' ? 'selected' : '' }}>Needs Review (Revise Priorities)</option>
-                            <option value="pending" {{ old('sign_off_status', $status) === 'pending' ? 'selected' : '' }}>Pending Leadership Review</option>
+                            <option value="approved">Approved (Authorize 30-60-90 Day Sprints)</option>
+                            <option value="needs_review">Needs Review (Revise Priorities)</option>
+                            <option value="pending">Pending Leadership Review</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1 text-xs">Executive Notes & Guidance (Optional)</label>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Executive Notes & Guidance</label>
                     <textarea name="sign_off_notes" rows="3" 
-                              placeholder="Record strategic commentary or resource allocations for the enablement plan..."
-                              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">{{ old('sign_off_notes', $signOff['notes'] ?? '') }}</textarea>
+                              required
+                              placeholder="Record strategic commentary, feedback, or resource allocations for this review milestone..."
+                              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600">{{ old('sign_off_notes') }}</textarea>
                 </div>
 
                 <div class="flex justify-end pt-2">
                     <button type="submit" 
-                            class="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition cursor-pointer">
-                        Record Leadership Sign-Off
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition cursor-pointer">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Add Leadership Sign-Off Note</span>
                     </button>
                 </div>
             </form>

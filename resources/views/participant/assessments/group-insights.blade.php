@@ -126,7 +126,7 @@
                         class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0"
                         :class="activeTab === 'sync' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                     <i data-lucide="users" class="w-4 h-4"></i>
-                    <span>2. Team CQ Sync Report (3 Dimensions)</span>
+                    <span>2. Team Report (3 Dimensions)</span>
                 </button>
 
                 <button type="button" 
@@ -134,7 +134,7 @@
                         class="px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0"
                         :class="activeTab === 'capability' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
                     <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-                    <span>3. Capability & Score Distribution</span>
+                    <span>3. ChangeQuo & Score Distribution</span>
                 </button>
             </div>
         </div>
@@ -576,8 +576,10 @@
         <!-- LEADERSHIP SIGN-OFF STATUS (READ-ONLY FOR PARTICIPANTS)       -->
         <!-- ============================================================= -->
         @php
-            $signOff = $insights['sign_off'] ?? [];
-            $status = $signOff['status'] ?? 'pending';
+            $hasApproved = !empty($insights['has_approved_sign_off']);
+            $approvedSignOffs = $insights['approved_sign_offs'] ?? [];
+            $latestSignOff = !empty($insights['sign_offs']) ? $insights['sign_offs'][0] : ($insights['sign_off'] ?? []);
+            $status = $hasApproved ? 'approved' : ($latestSignOff['status'] ?? 'pending');
         @endphp
         <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 pb-4">
@@ -586,7 +588,7 @@
                         Action Plan Governance
                     </span>
                     <h3 class="text-base sm:text-lg font-black text-slate-900 mt-1">Leadership Enablement Sign-Off</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Executive sponsorship and validation status for the team roadmap.</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Executive sponsorship and validated action plan decisions for the team roadmap.</p>
                 </div>
 
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold
@@ -600,21 +602,40 @@
                 </span>
             </div>
 
-            @if($status === 'approved')
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 flex items-start gap-3">
-                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
-                    <div>
-                        <h4 class="font-black text-sm">Action Plan Formally Approved</h4>
-                        <p class="mt-0.5">Signed off by <strong>{{ $signOff['lead'] }}</strong> on {{ $signOff['signed_off_at'] ? \Carbon\Carbon::parse($signOff['signed_off_at'])->format('d M Y, h:i A') : 'N/A' }}.</p>
-                        @if(!empty($signOff['notes']))
-                            <p class="mt-2 text-slate-700 bg-white/80 p-3 rounded-xl border border-emerald-200/60 font-mono text-[11px]">{{ $signOff['notes'] }}</p>
-                        @endif
-                    </div>
+            @if($hasApproved)
+                <div class="space-y-3">
+                    <h4 class="text-xs font-black uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Approved Leadership Guidance ({{ count($approvedSignOffs) }})</span>
+                    </h4>
+
+                    @foreach($approvedSignOffs as $item)
+                        <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs text-emerald-950 flex flex-col gap-2 shadow-2xs">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-extrabold text-sm text-slate-900">{{ $item['lead'] }}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Approved</span>
+                                </div>
+                                <span class="text-[11px] text-slate-400 font-medium">
+                                    @if(!empty($item['signed_off_at']))
+                                        {{ is_string($item['signed_off_at']) ? $item['signed_off_at'] : ($item['signed_off_at'] instanceof \DateTimeInterface ? $item['signed_off_at']->format('d M Y, h:i A') : 'N/A') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </span>
+                            </div>
+                            @if(!empty($item['notes']))
+                                <div class="bg-white/90 p-3.5 rounded-xl border border-emerald-200/80 text-[11px] text-slate-700 whitespace-pre-wrap leading-relaxed">
+                                    {{ $item['notes'] }}
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
                 </div>
             @else
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-600 flex items-center gap-2">
                     <i data-lucide="clock" class="w-4 h-4 text-slate-400"></i>
-                    <span>The leadership action plan is currently being finalized by team leads.</span>
+                    <span>The leadership action plan is currently being finalized by team leads. Approved guidance will appear here.</span>
                 </div>
             @endif
         </div>

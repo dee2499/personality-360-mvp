@@ -157,7 +157,7 @@
             <g transform="translate(250, 360)">
                 <text font-size="13" font-weight="900" fill="#991b1b" letter-spacing="0.5">RISK ZONE</text>
                 <text y="18" font-size="11" font-weight="700" fill="#b91c1c">(Low CQ, Low Sync)</text>
-                <text y="48" font-size="11" font-weight="600" fill="#7f1d1d">Both capability and alignment</text>
+                <text y="48" font-size="11" font-weight="600" fill="#7f1d1d">Both ChangeQuo and alignment</text>
                 <text y="64" font-size="11" font-weight="600" fill="#7f1d1d">need significant attention.</text>
             </g>
 

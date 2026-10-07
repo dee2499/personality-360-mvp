@@ -158,7 +158,7 @@
                 <!-- Center: Report Title -->
                 <div class="flex-1 lg:px-6">
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-                        Team CQ Sync Report
+                        Team Report
                     </h1>
                     <p class="text-xs sm:text-sm font-medium text-slate-500 mt-1">
                         How well is your team aligned to see, agree and act on change together?
@@ -168,6 +168,13 @@
                 <!-- Right: Metadata & Confidential Tag -->
                 <div class="flex items-center gap-4 shrink-0 flex-wrap sm:flex-nowrap">
                     <div class="text-xs space-y-0.5 text-slate-600">
+                        @php
+                            $managerName = $company?->managers?->first()?->name 
+                                ?? $survey->company?->managers?->first()?->name 
+                                ?? $survey->creator?->name 
+                                ?? 'N/A';
+                        @endphp
+                        <div><span class="text-slate-400 font-semibold">Manager:</span> <strong class="text-slate-900">{{ $managerName }}</strong></div>
                         <div><span class="text-slate-400 font-semibold">Team:</span> <strong class="text-slate-900">{{ $survey->title }}</strong></div>
                         <div><span class="text-slate-400 font-semibold">Team Size:</span> <strong class="text-slate-900">{{ $insights['cohort_size'] }}</strong></div>
                         <div><span class="text-slate-400 font-semibold">Assessment Date:</span> <strong class="text-slate-900">{{ $survey->published_at ? $survey->published_at->format('d M Y') : now()->format('d M Y') }}</strong></div>

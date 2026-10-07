@@ -109,6 +109,16 @@ class Survey extends Model
         return $this->hasMany(Assessment::class);
     }
 
+    public function signOffs(): HasMany
+    {
+        return $this->hasMany(SurveySignOff::class)->latest('id');
+    }
+
+    public function approvedSignOffs(): HasMany
+    {
+        return $this->hasMany(SurveySignOff::class)->where('status', 'approved')->latest('id');
+    }
+
     public function isDraft(): bool
     {
         return $this->status === 'draft';

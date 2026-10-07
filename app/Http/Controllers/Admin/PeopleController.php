@@ -26,13 +26,13 @@ class PeopleController extends Controller
         $selectedSurvey = $selectedSurveyId ? Survey::find($selectedSurveyId) : null;
 
         $isManager = $request->user()->isManager();
-        $managerCompanyId = $isManager ? $request->user()->company_id : null;
+        $managerCompanyId = $isManager ? $request->user()->company_id : session('admin_selected_company_id');
 
         if ($isManager && ! $managerCompanyId) {
             abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
         }
 
-        $surveys = $isManager
+        $surveys = $managerCompanyId
             ? Survey::where('company_id', $managerCompanyId)->get()
             : Survey::all();
 

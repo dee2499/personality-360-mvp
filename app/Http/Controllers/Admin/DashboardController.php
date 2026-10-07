@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assessment;
+use App\Models\Company;
 use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentScoreService;
@@ -53,6 +54,33 @@ class DashboardController extends Controller
             ]);
         }
 
+        // For admin, display Team CQ Sync report of the selected company
+        $adminCompanyId = session('admin_selected_company_id');
+        $adminCompany = $adminCompanyId ? Company::find($adminCompanyId) : Company::first();
+
+        if ($adminCompany) {
+            $selectedSurveyId = $request->query('survey_id');
+            $survey = $selectedSurveyId
+                ? Survey::where('company_id', $adminCompany->id)->find($selectedSurveyId)
+                : Survey::where('company_id', $adminCompany->id)->latest()->first();
+
+            if (! $survey) {
+                $survey = Survey::where('company_id', $adminCompany->id)->first();
+            }
+
+            if ($survey) {
+                $insights = $this->scoreService->calculateGroupInsights($survey);
+                $availableSurveys = Survey::where('company_id', $adminCompany->id)->orderBy('title')->get();
+
+                return view('admin.surveys.team-sync-report', [
+                    'survey' => $survey,
+                    'company' => $adminCompany,
+                    'insights' => $insights,
+                    'availableSurveys' => $availableSurveys,
+                ]);
+            }
+        }
+
         return $this->renderOverviewDashboard($request);
     }
 
@@ -65,7 +93,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $isManager = $user->isManager();
-        $companyId = $isManager ? $user->company_id : null;
+        $companyId = $isManager ? $user->company_id : session('admin_selected_company_id');
 
         if ($isManager && ! $companyId) {
             abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
@@ -103,7 +131,7 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $company = $isManager ? $user->company : null;
+        $company = $isManager ? $user->company : ($companyId ? Company::find($companyId) : null);
 
         return view('admin.dashboard', compact(
             'totalSurveys',

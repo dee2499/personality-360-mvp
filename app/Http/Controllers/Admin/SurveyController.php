@@ -7,12 +7,14 @@ use App\Http\Requests\Admin\StoreSurveyRequest;
 use App\Models\Company;
 use App\Models\Question;
 use App\Models\Survey;
+use App\Models\SurveySignOff;
 use App\Models\User;
 use App\Services\AssessmentGenerationService;
 use App\Services\AssessmentScoreService;
 use App\Services\ChangeQuotientQuestionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class SurveyController extends Controller
@@ -52,6 +54,8 @@ class SurveyController extends Controller
                 } else {
                     $surveysQuery->where('company_id', $companyId);
                 }
+            } elseif (session()->has('admin_selected_company_id')) {
+                $surveysQuery->where('company_id', session('admin_selected_company_id'));
             }
         }
 
@@ -102,7 +106,7 @@ class SurveyController extends Controller
         $companies = $isManager
             ? Company::where('id', $managerCompanyId)->get()
             : Company::orderBy('name')->get();
-        $selectedCompanyId = $isManager ? $managerCompanyId : $request->query('company_id');
+        $selectedCompanyId = $isManager ? $managerCompanyId : ($request->query('company_id') ?? session('admin_selected_company_id'));
         $defaultQuestions = ChangeQuotientQuestionService::getDefaultQuestions();
 
         return view('admin.surveys.create', compact('defaultQuestions', 'companies', 'selectedCompanyId'));
@@ -316,6 +320,16 @@ class SurveyController extends Controller
             'sign_off_notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
+        // Create new sign-off history record
+        $survey->signOffs()->create([
+            'user_id' => $request->user()->id,
+            'sign_off_lead' => $validated['sign_off_lead'],
+            'status' => $validated['sign_off_status'],
+            'notes' => $validated['sign_off_notes'] ?? null,
+            'signed_off_at' => now(),
+        ]);
+
+        // Keep survey top-level status in sync
         $survey->update([
             'sign_off_lead' => $validated['sign_off_lead'],
             'sign_off_status' => $validated['sign_off_status'],
@@ -323,7 +337,92 @@ class SurveyController extends Controller
             'signed_off_at' => now(),
         ]);
 
+        // Clear cached insights so latest sign-off shows immediately
+        Cache::forget("survey_group_insights_{$survey->id}_{$survey->updated_at?->timestamp}");
+
         return redirect()->route('admin.surveys.group-insights', $survey)
-            ->with('success', 'Leadership sign-off has been successfully recorded for this survey.');
+            ->with('success', 'Leadership sign-off record added successfully.');
+    }
+
+    /**
+     * Update an existing leadership sign-off record.
+     */
+    public function updateSignOff(Request $request, Survey $survey, SurveySignOff $signOff): RedirectResponse
+    {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
+        if ($signOff->survey_id !== $survey->id) {
+            abort(404, 'Sign-off record not found for this survey.');
+        }
+
+        $validated = $request->validate([
+            'sign_off_lead' => ['required', 'string', 'max:255'],
+            'sign_off_status' => ['required', 'in:approved,pending,needs_review'],
+            'sign_off_notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $signOff->update([
+            'sign_off_lead' => $validated['sign_off_lead'],
+            'status' => $validated['sign_off_status'],
+            'notes' => $validated['sign_off_notes'] ?? null,
+            'signed_off_at' => now(),
+        ]);
+
+        // Keep survey top-level status in sync with latest sign-off
+        $latest = $survey->signOffs()->latest('id')->first();
+        if ($latest) {
+            $survey->update([
+                'sign_off_lead' => $latest->sign_off_lead,
+                'sign_off_status' => $latest->status,
+                'sign_off_notes' => $latest->notes,
+                'signed_off_at' => $latest->signed_off_at,
+            ]);
+        }
+
+        Cache::forget("survey_group_insights_{$survey->id}_{$survey->updated_at?->timestamp}");
+
+        return redirect()->route('admin.surveys.group-insights', $survey)
+            ->with('success', 'Leadership sign-off record updated successfully.');
+    }
+
+    /**
+     * Delete an existing leadership sign-off record.
+     */
+    public function destroySignOff(Request $request, Survey $survey, SurveySignOff $signOff): RedirectResponse
+    {
+        if ($request->user()->isManager() && $survey->company_id !== $request->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
+        if ($signOff->survey_id !== $survey->id) {
+            abort(404, 'Sign-off record not found for this survey.');
+        }
+
+        $signOff->delete();
+
+        // Sync survey top-level status with new latest sign-off
+        $latest = $survey->signOffs()->latest('id')->first();
+        if ($latest) {
+            $survey->update([
+                'sign_off_lead' => $latest->sign_off_lead,
+                'sign_off_status' => $latest->status,
+                'sign_off_notes' => $latest->notes,
+                'signed_off_at' => $latest->signed_off_at,
+            ]);
+        } else {
+            $survey->update([
+                'sign_off_lead' => null,
+                'sign_off_status' => 'pending',
+                'sign_off_notes' => null,
+                'signed_off_at' => null,
+            ]);
+        }
+
+        Cache::forget("survey_group_insights_{$survey->id}_{$survey->updated_at?->timestamp}");
+
+        return redirect()->route('admin.surveys.group-insights', $survey)
+            ->with('success', 'Leadership sign-off record deleted successfully.');
     }
 }

@@ -125,14 +125,14 @@
                                     Management
                                 </div>
                                 <div class="space-y-1">
-                                    @if($isAdmin)
-                                        <a href="{{ route('admin.companies.index') }}" 
+                                    @if($isAdmin && isset($activeCompany))
+                                        <a href="{{ route('admin.companies.show', $activeCompany->id) }}" 
                                            @click="mobileNavOpen = false"
-                                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                            <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                            <span>Companies</span>
+                                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.show') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                            <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.show') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                            <span>My Company</span>
                                         </a>
-                                    @elseif($currentUser->company_id)
+                                    @elseif($isManager && $currentUser->company_id)
                                         <a href="{{ route('admin.companies.show', $currentUser->company_id) }}" 
                                            @click="mobileNavOpen = false"
                                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
@@ -145,38 +145,43 @@
                                        @click="mobileNavOpen = false"
                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                         <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.surveys.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                        <span>{{ $isManager ? 'Company Surveys' : 'Surveys' }}</span>
+                                        <span>Company Surveys</span>
                                     </a>
 
                                     <a href="{{ route('admin.people.index') }}" 
                                        @click="mobileNavOpen = false"
                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                         <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                        <span>{{ $isManager ? 'Team Directory' : 'People Directory' }}</span>
-                                     </a>
+                                        <span>Team Directory</span>
+                                    </a>
 
-                                     @if($isManager)
-                                         <a href="{{ route('admin.survey-assessment') }}" 
-                                            @click="mobileNavOpen = false"
-                                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.survey-assessment') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                            <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.survey-assessment') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                            <span>Survey Assessment</span>
-                                        </a>
-                                    @endif
+                                    <a href="{{ route('admin.survey-assessment') }}" 
+                                       @click="mobileNavOpen = false"
+                                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.survey-assessment') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.survey-assessment') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                        <span>Survey Assessment</span>
+                                    </a>
                                 </div>
                             </div>
 
                             @if($isAdmin)
                                 <div>
                                     <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                        Configuration
+                                        Admin Actions
                                     </div>
                                     <div class="space-y-1">
+                                        <a href="{{ route('admin.companies.index') }}" 
+                                           @click="mobileNavOpen = false"
+                                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.index') || request()->routeIs('admin.companies.create') || request()->routeIs('admin.companies.edit') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                            <i data-lucide="layers" class="w-4 h-4 {{ request()->routeIs('admin.companies.index') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                            <span>All Companies</span>
+                                        </a>
+
                                         <a href="{{ route('admin.categories.index') }}" 
                                            @click="mobileNavOpen = false"
                                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                             <i data-lucide="sliders-horizontal" class="w-4 h-4 {{ request()->routeIs('admin.categories.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
-                                            <span>Categories</span>
+                                            <span>Categories & Recalculation</span>
                                         </a>
                                     </div>
                                 </div>
@@ -303,13 +308,13 @@
                                 Management
                             </div>
                             <div class="space-y-1">
-                                @if($isAdmin)
-                                    <a href="{{ route('admin.companies.index') }}" 
-                                       class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                        <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                        <span>Companies</span>
+                                @if($isAdmin && isset($activeCompany))
+                                    <a href="{{ route('admin.companies.show', $activeCompany->id) }}" 
+                                       class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.show') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.show') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                        <span>My Company</span>
                                     </a>
-                                @elseif($currentUser->company_id)
+                                @elseif($isManager && $currentUser->company_id)
                                     <a href="{{ route('admin.companies.show', $currentUser->company_id) }}" 
                                        class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                         <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('admin.companies.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
@@ -320,35 +325,39 @@
                                 <a href="{{ route('admin.surveys.index') }}" 
                                    class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.surveys.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                     <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.surveys.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                    <span>{{ $isManager ? 'Company Surveys' : 'Surveys' }}</span>
+                                    <span>Company Surveys</span>
                                 </a>
 
                                 <a href="{{ route('admin.people.index') }}" 
                                    class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                     <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                    <span>{{ $isManager ? 'Team Directory' : 'People Directory' }}</span>
+                                    <span>Team Directory</span>
                                 </a>
 
-                                @if($isManager)
-                                    <a href="{{ route('admin.survey-assessment') }}" 
-                                       class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.survey-assessment') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
-                                        <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.survey-assessment') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                        <span>Survey Assessment</span>
-                                    </a>
-                                @endif
+                                <a href="{{ route('admin.survey-assessment') }}" 
+                                   class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.survey-assessment') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.survey-assessment') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                    <span>Survey Assessment</span>
+                                </a>
                             </div>
                         </div>
 
                         @if($isAdmin)
                             <div>
                                 <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                    Configuration
+                                    Admin Actions
                                 </div>
                                 <div class="space-y-1">
+                                    <a href="{{ route('admin.companies.index') }}" 
+                                       class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.companies.index') || request()->routeIs('admin.companies.create') || request()->routeIs('admin.companies.edit') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="layers" class="w-4 h-4 {{ request()->routeIs('admin.companies.index') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                        <span>All Companies</span>
+                                    </a>
+
                                     <a href="{{ route('admin.categories.index') }}" 
                                        class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.categories.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                         <i data-lucide="sliders-horizontal" class="w-4 h-4 {{ request()->routeIs('admin.categories.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
-                                        <span>Categories</span>
+                                        <span>Categories & Recalculation</span>
                                     </a>
                                 </div>
                             </div>
@@ -452,6 +461,11 @@
                 </div>
 
                 <div class="flex items-center gap-2">
+                    @if($isAdmin && isset($activeCompany))
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 max-w-[120px] truncate">
+                            {{ $activeCompany->name }}
+                        </span>
+                    @endif
                     <a href="{{ route('profile.show') }}" class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 font-bold flex items-center justify-center text-xs border border-indigo-100">
                         {{ substr(auth()->user()->name, 0, 1) }}
                     </a>
@@ -460,12 +474,54 @@
 
             <!-- Desktop Sticky Header Bar -->
             <header class="sticky top-0 z-30 hidden lg:flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-xs px-8">
-                <div class="flex items-center gap-2.5 text-xs">
-                    <span class="font-bold uppercase tracking-wider text-slate-400">{{ $portalLabel }}</span>
-                    <span class="text-slate-300">/</span>
-                    <span class="font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100">
-                        {{ $currentSection }}
-                    </span>
+                <div class="flex items-center gap-4 text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="font-bold uppercase tracking-wider text-slate-400">{{ $portalLabel }}</span>
+                        <span class="text-slate-300">/</span>
+                        <span class="font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100">
+                            {{ $currentSection }}
+                        </span>
+                    </div>
+
+                    @if($isAdmin && isset($allCompanies) && $allCompanies->isNotEmpty())
+                        <div class="relative" x-data="{ open: false }">
+                            <button type="button" 
+                                    @click="open = !open" 
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 transition cursor-pointer shadow-2xs">
+                                <i data-lucide="building-2" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                <span>Company: <strong class="text-slate-900">{{ $activeCompany?->name ?? 'Select Company' }}</strong></span>
+                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 transition" :class="{ 'rotate-180': open }"></i>
+                            </button>
+
+                            <div x-show="open" 
+                                 @click.outside="open = false" 
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 class="absolute left-0 mt-2 w-64 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-40 py-1 divide-y divide-slate-100">
+                                
+                                <div class="px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/70">
+                                    Select Active Company
+                                </div>
+
+                                <div class="max-h-60 overflow-y-auto">
+                                    @foreach($allCompanies as $comp)
+                                        <a href="{{ request()->fullUrlWithQuery(['switch_company_id' => $comp->id]) }}" 
+                                           class="flex items-center justify-between px-3.5 py-2.5 text-xs hover:bg-indigo-50/60 transition {{ ($activeCompany?->id === $comp->id) ? 'bg-indigo-50/70 font-bold text-indigo-900' : 'text-slate-700' }}">
+                                            <span class="truncate">{{ $comp->name }}</span>
+                                            @if($activeCompany?->id === $comp->id)
+                                                <i data-lucide="check" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="flex items-center gap-4">
