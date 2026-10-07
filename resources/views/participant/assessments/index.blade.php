@@ -135,6 +135,24 @@
                                 <p class="text-[11px] text-slate-400">Score dial, rings & matrix</p>
                             </div>
                         </div>
+
+                        <!-- CQ Transformation Journey Note Card -->
+                        <div class="relative overflow-hidden rounded-2xl border border-indigo-100/80 bg-gradient-to-r from-indigo-50/70 via-slate-50/80 to-purple-50/50 p-4 sm:p-5 shadow-2xs">
+                            <div class="flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                                    <i data-lucide="sparkles" class="w-4.5 h-4.5"></i>
+                                </div>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-indigo-950 text-sm tracking-tight">Your Transformation Journey</span>
+                                        <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 tracking-wider">Note</span>
+                                    </div>
+                                    <p class="text-slate-600 leading-relaxed font-normal text-xs sm:text-[13px]">
+                                        Once you have completed taking the My CQ Pulse, you will be able to see and introspect your change readiness quotient of self and also can compare with peers. This can be a great start for your future transformation journey.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
