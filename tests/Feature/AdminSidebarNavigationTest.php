@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Company;
+use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -74,5 +75,42 @@ class AdminSidebarNavigationTest extends TestCase
         $response->assertDontSee('Admin Console');
         $response->assertDontSee(route('admin.companies.index'));
         $response->assertDontSee(route('admin.categories.index'));
+    }
+
+    public function test_manager_sees_team_sync_dashboard_and_survey_assessment_navigation(): void
+    {
+        $company = Company::factory()->create();
+        $manager = User::factory()->create([
+            'role' => 'manager',
+            'company_id' => $company->id,
+        ]);
+        Survey::factory()->create([
+            'company_id' => $company->id,
+            'created_by' => $manager->id,
+            'status' => 'active',
+        ]);
+
+        // 1. Manager on /admin/dashboard should see Team CQ Sync Report
+        $response = $this->actingAs($manager)->get(route('admin.dashboard'));
+        $response->assertOk();
+        $response->assertSee('Team CQ Sync');
+        $response->assertSee(route('admin.survey-assessment'));
+        $response->assertSee('Survey Assessment');
+
+        // 2. Manager on /admin/survey-assessment should see the overview assessment dashboard
+        $responseAssessment = $this->actingAs($manager)->get(route('admin.survey-assessment'));
+        $responseAssessment->assertOk();
+        $responseAssessment->assertSee('Survey Assessment');
+        $responseAssessment->assertSee('Recent Assessments');
+
+        // 3. Admin on /admin/dashboard should NOT see Survey Assessment menu link
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'company_id' => $company->id,
+        ]);
+        $responseAdmin = $this->actingAs($admin)->get(route('admin.dashboard'));
+        $responseAdmin->assertOk();
+        $responseAdmin->assertDontSee(route('admin.survey-assessment'));
+        $responseAdmin->assertDontSee('Survey Assessment');
     }
 }

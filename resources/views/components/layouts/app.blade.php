@@ -153,7 +153,16 @@
                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.people.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
                                         <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
                                         <span>{{ $isManager ? 'Team Directory' : 'People Directory' }}</span>
-                                    </a>
+                                     </a>
+
+                                     @if($isManager)
+                                         <a href="{{ route('admin.survey-assessment') }}" 
+                                            @click="mobileNavOpen = false"
+                                            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.survey-assessment') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                            <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.survey-assessment') ? 'text-indigo-600' : 'text-slate-400' }}"></i>
+                                            <span>Survey Assessment</span>
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
 
@@ -319,6 +328,14 @@
                                     <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.people.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
                                     <span>{{ $isManager ? 'Team Directory' : 'People Directory' }}</span>
                                 </a>
+
+                                @if($isManager)
+                                    <a href="{{ route('admin.survey-assessment') }}" 
+                                       class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition {{ request()->routeIs('admin.survey-assessment') ? 'bg-indigo-50 text-indigo-700 shadow-xs border border-indigo-100' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50' }}">
+                                        <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('admin.survey-assessment') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600' }}"></i>
+                                        <span>Survey Assessment</span>
+                                    </a>
+                                @endif
                             </div>
                         </div>
 

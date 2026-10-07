@@ -82,6 +82,7 @@ Route::prefix('admin')
     ->middleware(['auth', 'admin_or_manager'])
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/survey-assessment', [AdminDashboardController::class, 'surveyAssessment'])->name('survey-assessment');
 
         // Companies Management (B2B)
         Route::get('companies/{company}/team-sync', [AdminCompanyController::class, 'teamSyncReport'])->name('companies.team-sync');

@@ -12,7 +12,9 @@
                         <span class="text-xs text-slate-400 font-medium">Company Management Portal</span>
                     </div>
                 @endif
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900">{{ isset($company) ? $company->name . ' Dashboard' : 'Executive Dashboard' }}</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                    {{ request()->routeIs('admin.survey-assessment') ? 'Survey Assessment' : (isset($company) ? $company->name . ' Dashboard' : 'Executive Dashboard') }}
+                </h1>
                 <p class="text-xs text-slate-500 font-medium">Overview of surveys, participant evaluations, and 360-degree completion status</p>
             </div>
             <div class="flex items-center gap-2">
