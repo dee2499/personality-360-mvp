@@ -22,7 +22,7 @@
                                 Action Required
                             </span>
                             <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                                Ready to calculate your Change Quotient?
+                                My ChangeQuo
                             </h3>
                             <p class="text-xs sm:text-sm text-slate-600 max-w-lg leading-relaxed">
                                 Provide your ratings to unlock your personalized CQ leadership profile, self-perception matrix, and observer consensus ratings.
@@ -33,7 +33,7 @@
                             <a href="{{ route('participant.surveys.take', $survey) }}" 
                                class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-sm font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer">
                                 <i data-lucide="sparkles" class="w-5 h-5 text-indigo-200"></i>
-                                <span>Take Readiness Score</span>
+                                <span>Get Started</span>
                                 <i data-lucide="arrow-right" class="w-5 h-5 text-indigo-200"></i>
                             </a>
                         </div>
@@ -394,7 +394,7 @@
                                 <a href="{{ route('participant.surveys.take', $survey) }}" 
                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-100 transition">
                                     <i data-lucide="{{ $isCompleted ? 'eye' : 'sparkles' }}" class="w-4 h-4"></i>
-                                    <span>{{ $isCompleted ? 'Review in 11-Question Wizard' : 'Take Readiness Score' }}</span>
+                                    <span>{{ $isCompleted ? 'Review in 11-Question Wizard' : 'Get Started' }}</span>
                                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                                 </a>
                             </div>
@@ -415,7 +415,7 @@
                                 <a href="{{ route('participant.surveys.take', $survey) }}" 
                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-xs shrink-0">
                                     <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                                    <span>Take Readiness Score</span>
+                                    <span>Get Started</span>
                                 </a>
                             </div>
                         @endif
