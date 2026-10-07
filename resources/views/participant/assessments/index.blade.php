@@ -181,7 +181,7 @@
                         My Assessments
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
-                        Inspect your 360° competency question breakdown, self vs. peer consensus scores, and cohort evaluations.
+                        Inspect your 360° competency question breakdown and self vs. peer consensus scores.
                     </p>
                 </div>
 
@@ -802,54 +802,6 @@
                             </div>
                         @endif
 
-                        <!-- COHORT RATINGS MATRIX (Ratings Submitted for Team Members in this Survey) -->
-                        @if(!empty($givenRatingsBreakdown))
-                            <div class="space-y-3 pt-4 border-t border-slate-100">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
-                                        Cohort Evaluations for this Survey ({{ count($givenRatingsBreakdown) }} people):
-                                    </span>
-                                    <span class="text-slate-400 text-[11px]">
-                                        Row 1 is You (Self), followed by all colleagues
-                                    </span>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    @foreach($givenRatingsBreakdown as $row)
-                                        <div class="p-3.5 rounded-2xl border flex items-center justify-between gap-3 {{ $row['is_self'] ? 'bg-indigo-50/60 border-indigo-200 shadow-xs' : 'bg-slate-50/60 border-slate-200' }}">
-                                            <div class="flex items-center gap-2.5 truncate">
-                                                <div class="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 {{ $row['is_self'] ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-200 text-slate-700' }}">
-                                                    {{ substr($row['member']->name, 0, 1) }}
-                                                </div>
-                                                <div class="truncate">
-                                                    <div class="flex items-center gap-1.5">
-                                                        <span class="text-xs font-bold text-slate-900 truncate">
-                                                            {{ $row['is_self'] ? 'You (' . $row['member']->name . ')' : $row['member']->name }}
-                                                        </span>
-                                                    </div>
-                                                    <span class="text-[10px] text-slate-400 truncate block">{{ $row['member']->email }}</span>
-                                                </div>
-                                            </div>
-
-                                            <div class="shrink-0 text-right">
-                                                @if($row['is_completed'])
-                                                    <span class="text-[11px] font-extrabold text-slate-900 block font-mono">
-                                                        {{ $row['total_score'] }} / 110
-                                                    </span>
-                                                    <span class="text-[9px] font-bold text-emerald-600 block">
-                                                        {{ number_format($row['percentage'], 1) }}%
-                                                    </span>
-                                                @else
-                                                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full {{ $row['is_self'] ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600' }}">
-                                                        {{ $row['is_self'] ? '1st (Self)' : 'Pending' }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
                     </div>
                 @endif
             @endif
