@@ -35,13 +35,13 @@ class GcodeSeeder extends Seeder
             [
                 'company_id' => $company->id,
                 'name' => 'srini',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('gcode123'),
                 'role' => 'manager',
                 'email_verified_at' => now(),
                 'invitation_accepted_at' => now(),
             ]
         );
-        $manager->update(['company_id' => $company->id, 'role' => 'manager']);
+        $manager->update(['company_id' => $company->id, 'role' => 'manager', 'password' => Hash::make('gcode123')]);
 
         // 4. Create 3 GCODE Employees
         $employeesData = [
@@ -57,13 +57,13 @@ class GcodeSeeder extends Seeder
                 [
                     'company_id' => $company->id,
                     'name' => $data['name'],
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gcode123'),
                     'role' => 'participant',
                     'email_verified_at' => now(),
                     'invitation_accepted_at' => now(),
                 ]
             );
-            $employee->update(['company_id' => $company->id, 'role' => 'participant']);
+            $employee->update(['company_id' => $company->id, 'role' => 'participant', 'password' => Hash::make('gcode123')]);
             $employeeIds[] = $employee->id;
         }
 

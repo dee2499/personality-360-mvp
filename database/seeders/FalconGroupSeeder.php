@@ -43,7 +43,7 @@ class FalconGroupSeeder extends Seeder
             ['email' => 'srini@saipio.com'],
             [
                 'name' => 'Srinivas Patnaik',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Srini@ChangeQuo123'),
                 'role' => 'admin',
                 'company_id' => null,
                 'email_verified_at' => now(),
@@ -51,7 +51,7 @@ class FalconGroupSeeder extends Seeder
             ]
         );
         $srini->update([
-            'password' => Hash::make('password'),
+            'password' => Hash::make('Srini@ChangeQuo123'),
             'role' => 'admin',
             'company_id' => null,
         ]);
@@ -69,7 +69,7 @@ class FalconGroupSeeder extends Seeder
             'company_id' => $company->id,
             'name' => 'Srini',
             'email' => 'srini@falcon.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('falcon123'),
             'role' => 'manager',
             'email_verified_at' => now(),
             'invitation_accepted_at' => now(),
@@ -109,7 +109,7 @@ class FalconGroupSeeder extends Seeder
                 'company_id' => $company->id,
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => Hash::make('password'),
+                'password' => Hash::make('falcon123'),
                 'role' => 'participant',
                 'invitation_accepted_at' => now(),
             ]);
