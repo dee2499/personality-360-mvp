@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -48,15 +50,18 @@ class LoginRequest extends FormRequest
         $password = $this->input('password');
         $remember = $this->boolean('remember');
 
-        // Check if credentials match either email or username
-        $attemptEmail = Auth::attempt(['email' => $loginInput, 'password' => $password], $remember);
-        $attemptUsername = false;
+        // Check if credentials match either email or username (case-insensitive)
+        $user = User::whereRaw('LOWER(email) = ?', [strtolower($loginInput)])
+            ->orWhereRaw('LOWER(username) = ?', [strtolower($loginInput)])
+            ->first();
 
-        if (! $attemptEmail) {
-            $attemptUsername = Auth::attempt(['username' => $loginInput, 'password' => $password], $remember);
+        $authenticated = false;
+        if ($user && Hash::check($password, $user->password)) {
+            Auth::login($user, $remember);
+            $authenticated = true;
         }
 
-        if (! $attemptEmail && ! $attemptUsername) {
+        if (! $authenticated) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
