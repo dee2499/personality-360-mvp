@@ -1,15 +1,15 @@
 <x-layouts.app>
     <div class="space-y-6">
         <!-- Header & Top Actions -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="min-w-0">
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900">Score Categories & Rating Tiers</h1>
-                <p class="text-xs text-slate-500 font-medium">Configure percentage brackets and fruit/vegetable performance names (e.g., Apple, Orange, Tomato, Lemon, Cucumber)</p>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Configure percentage brackets and fruit/vegetable performance names (e.g., Apple, Orange, Tomato, Lemon, Cucumber)</p>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0 flex-nowrap">
                 <!-- Reset Defaults -->
-                <form method="POST" action="{{ route('admin.categories.reset-defaults') }}" class="inline">
+                <form method="POST" action="{{ route('admin.categories.reset-defaults') }}" class="inline-flex m-0">
                     @csrf
                     <button type="submit" 
                             data-confirm="true"
@@ -17,14 +17,14 @@
                             data-confirm-message="This will reset all categories to the standard 5 tiers: Apple (0-20%), Orange (>20-40%), Tomato (>40-60%), Lemon (>60-80%), and Cucumber (>80-100%)."
                             data-confirm-btn="Reset Categories"
                             data-confirm-type="warning"
-                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs cursor-pointer">
+                            class="inline-flex items-center whitespace-nowrap gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs cursor-pointer">
                         <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-500"></i>
                         <span>Reset Defaults</span>
                     </button>
                 </form>
 
                 <!-- Recalculate -->
-                <form method="POST" action="{{ route('admin.categories.recalculate') }}" class="inline">
+                <form method="POST" action="{{ route('admin.categories.recalculate') }}" class="inline-flex m-0">
                     @csrf
                     <button type="submit" 
                             data-confirm="true"
@@ -32,7 +32,7 @@
                             data-confirm-message="This will re-evaluate all completed assessment percentages against the current category brackets."
                             data-confirm-btn="Recalculate All"
                             data-confirm-type="primary"
-                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition shadow-2xs cursor-pointer">
+                            class="inline-flex items-center whitespace-nowrap gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition shadow-2xs cursor-pointer">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-indigo-600"></i>
                         <span>Recalculate Scores</span>
                     </button>
@@ -40,7 +40,7 @@
 
                 <!-- Create Category -->
                 <a href="{{ route('admin.categories.create') }}" 
-                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
+                   class="inline-flex items-center whitespace-nowrap gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
                     <span>Add Category</span>
                 </a>
