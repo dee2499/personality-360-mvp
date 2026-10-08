@@ -42,7 +42,7 @@ $admin = \App\Models\User::firstOrCreate(
     ["email" => "srini@saipio.com"],
     ["name" => "Srinivas Patnaik", "role" => "admin", "email_verified_at" => now()]
 );
-$admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@ChangeQuo123"), "role" => "admin"]);
+$admin->update(["password" => \Illuminate\Support\Facades\Hash::make("admin@change123"), "role" => "admin"]);
 
 // 2. All Falcon Users (Manager + Employees) -> falcon123
 \App\Models\User::where("email", "like", "%@falcon%")
