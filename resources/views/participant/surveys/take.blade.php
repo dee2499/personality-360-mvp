@@ -320,25 +320,32 @@
                         <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white leading-snug" x-text="q.question_text"></h2>
                         
                         <!-- Meaningful 1-Score and 10-Score Descriptions (ANCHORS) -->
-                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 border border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs">1</span>
-                                <div>
-                                    <span class="block text-[10px] uppercase font-bold text-rose-300 tracking-wider">Score 1 Anchor:</span>
-                                    <span class="font-bold text-white text-sm" x-text="q.min_score_description"></span>
-                                </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/10 text-xs space-y-2.5 sm:space-y-0">
+                            <!-- Mobile Scale Indicator Bar -->
+                            <div class="flex sm:hidden items-center justify-between px-1 text-[10px] font-extrabold uppercase tracking-wider">
+                                <span class="text-rose-300">Min (1)</span>
+                                <span class="text-slate-300">⟵ Scale 1 to 10 ⟶</span>
+                                <span class="text-emerald-300">Max (10)</span>
                             </div>
 
-                            <div class="hidden sm:block text-slate-400 font-bold text-xs uppercase tracking-wider">
-                                ⟵ Scale 1 to 10 ⟶
-                            </div>
-
-                            <div class="flex items-center gap-2 sm:text-right">
-                                <div>
-                                    <span class="block text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Score 10 Anchor:</span>
-                                    <span class="font-bold text-white text-sm" x-text="q.max_score_description"></span>
+                            <!-- Anchors Row (2-Col Grid on Mobile, Flex on Desktop) -->
+                            <div class="grid grid-cols-2 gap-2 sm:gap-4 sm:flex sm:items-center sm:justify-between">
+                                <!-- Score 1 Anchor -->
+                                <div class="flex items-center gap-2 bg-black/15 sm:bg-transparent rounded-xl p-2.5 sm:p-0">
+                                    <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs">1</span>
+                                    <span class="font-bold text-white text-xs sm:text-sm leading-snug break-words" x-text="q.min_score_description"></span>
                                 </div>
-                                <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs">10</span>
+
+                                <!-- Center Scale on Desktop -->
+                                <div class="hidden sm:block text-slate-400 font-bold text-xs uppercase tracking-wider text-center shrink-0">
+                                    ⟵ Scale 1 to 10 ⟶
+                                </div>
+
+                                <!-- Score 10 Anchor -->
+                                <div class="flex items-center gap-2 bg-black/15 sm:bg-transparent rounded-xl p-2.5 sm:p-0 sm:text-right">
+                                    <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs order-first sm:order-last">10</span>
+                                    <span class="font-bold text-white text-xs sm:text-sm leading-snug break-words order-last sm:order-first flex-1 sm:flex-initial" x-text="q.max_score_description"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -462,25 +469,32 @@
                         </p>
 
                         <!-- Meaningful 1-Score and 10-Score Descriptions (ANCHORS) -->
-                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 border border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs">1</span>
-                                <div>
-                                    <span class="block text-[10px] uppercase font-bold text-rose-300 tracking-wider">Score 1 Anchor:</span>
-                                    <span class="font-bold text-white text-sm" x-text="q.min_score_description"></span>
-                                </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/10 text-xs space-y-2.5 sm:space-y-0">
+                            <!-- Mobile Scale Indicator Bar -->
+                            <div class="flex sm:hidden items-center justify-between px-1 text-[10px] font-extrabold uppercase tracking-wider">
+                                <span class="text-rose-300">Min (1)</span>
+                                <span class="text-slate-300">⟵ Scale 1 to 10 ⟶</span>
+                                <span class="text-emerald-300">Max (10)</span>
                             </div>
 
-                            <div class="hidden sm:block text-slate-400 font-bold text-xs uppercase tracking-wider">
-                                ⟵ Scale 1 to 10 ⟶
-                            </div>
-
-                            <div class="flex items-center gap-2 sm:text-right">
-                                <div>
-                                    <span class="block text-[10px] uppercase font-bold text-emerald-300 tracking-wider">Score 10 Anchor:</span>
-                                    <span class="font-bold text-white text-sm" x-text="q.max_score_description"></span>
+                            <!-- Anchors Row (2-Col Grid on Mobile, Flex on Desktop) -->
+                            <div class="grid grid-cols-2 gap-2 sm:gap-4 sm:flex sm:items-center sm:justify-between">
+                                <!-- Score 1 Anchor -->
+                                <div class="flex items-center gap-2 bg-black/15 sm:bg-transparent rounded-xl p-2.5 sm:p-0">
+                                    <span class="w-6 h-6 rounded-lg bg-rose-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs">1</span>
+                                    <span class="font-bold text-white text-xs sm:text-sm leading-snug break-words" x-text="q.min_score_description"></span>
                                 </div>
-                                <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs">10</span>
+
+                                <!-- Center Scale on Desktop -->
+                                <div class="hidden sm:block text-slate-400 font-bold text-xs uppercase tracking-wider text-center shrink-0">
+                                    ⟵ Scale 1 to 10 ⟶
+                                </div>
+
+                                <!-- Score 10 Anchor -->
+                                <div class="flex items-center gap-2 bg-black/15 sm:bg-transparent rounded-xl p-2.5 sm:p-0 sm:text-right">
+                                    <span class="w-6 h-6 rounded-lg bg-emerald-500 text-white font-black flex items-center justify-center shrink-0 text-xs shadow-xs order-first sm:order-last">10</span>
+                                    <span class="font-bold text-white text-xs sm:text-sm leading-snug break-words order-last sm:order-first flex-1 sm:flex-initial" x-text="q.max_score_description"></span>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -59,15 +59,30 @@
                                 </span>
                             </div>
 
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                                About {{ $survey->title }}
-                            </h2>
-
-                            @if($survey->description)
-                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-3xl">
-                                    {{ $survey->description }}
-                                </p>
+                            @if(!empty($survey->context))
+                                <!-- Survey Context Card -->
+                                <div class="rounded-2xl bg-indigo-50/50 border border-indigo-100 border-l-4 border-l-indigo-600 p-4 sm:p-5 max-w-3xl shadow-2xs">
+                                    <div class="flex items-center gap-1.5 text-indigo-900 text-xs font-bold uppercase tracking-wider">
+                                        <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+                                        <span>Survey Context</span>
+                                    </div>
+                                    <p class="mt-1 text-xs sm:text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
+                                        {{ trim($survey->context) }}
+                                    </p>
+                                </div>
                             @endif
+
+                            <div class="space-y-1.5">
+                                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                    About {{ $survey->title }}
+                                </h2>
+
+                                @if($survey->description)
+                                    <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-3xl">
+                                        {{ $survey->description }}
+                                    </p>
+                                @endif
+                            </div>
 
                             <!-- Anonymous & Honest Ratings Notice Card -->
                             <div class="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/50 to-indigo-50/40 border border-emerald-200/80 shadow-2xs flex items-start gap-3.5 max-w-3xl">

@@ -21,6 +21,7 @@ class StoreSurveyRequest extends FormRequest
             'company_id' => ['nullable', 'exists:companies,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'context' => ['nullable', 'string'],
             'questions' => ['nullable', 'array'],
             'questions.*' => ['required', 'string', 'max:500'],
         ];

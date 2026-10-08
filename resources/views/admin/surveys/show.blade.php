@@ -282,26 +282,67 @@
             <!-- Questions List -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs divide-y divide-slate-100">
                 @foreach($survey->questions as $index => $question)
-                    <div class="p-4 sm:px-6 flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
+                    <div class="p-4 sm:px-6 flex items-center justify-between gap-4"
+                         x-data="{ editing: false, questionText: {{ json_encode($question->question_text) }} }">
+                        
+                        <!-- View Mode -->
+                        <div x-show="!editing" class="flex items-center gap-3 flex-1 min-w-0">
                             <span class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 font-mono text-xs font-bold flex items-center justify-center shrink-0">
                                 {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                             </span>
-                            <span class="text-sm font-medium text-slate-800">{{ $question->question_text }}</span>
+                            <span class="text-sm font-medium text-slate-800 break-words" x-text="questionText"></span>
                         </div>
 
-                        <form method="POST" action="{{ route('admin.surveys.questions.destroy', [$survey, $question]) }}"
-                              data-confirm="true"
-                              data-confirm-title="Delete Question"
-                              data-confirm-message="Are you sure you want to delete this question? Any submitted ratings for this question will be removed."
-                              data-confirm-btn="Delete Question"
-                              data-confirm-type="danger">
+                        <!-- Edit Mode Inline Form -->
+                        <form x-show="editing" x-cloak
+                              method="POST" 
+                              action="{{ route('admin.surveys.questions.update', [$survey, $question]) }}" 
+                              class="flex-1 flex items-center gap-2 sm:gap-3 min-w-0">
                             @csrf
-                            @method('DELETE')
-                            <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition cursor-pointer" title="Delete question">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            @method('PUT')
+                            <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                                {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+                            </span>
+                            <input type="text" 
+                                   name="question_text" 
+                                   x-model="questionText" 
+                                   required 
+                                   class="flex-1 rounded-xl border border-indigo-300 px-3.5 py-1.5 text-xs sm:text-sm bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <button type="submit" 
+                                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition cursor-pointer">
+                                    Save
+                                </button>
+                                <button type="button" 
+                                        @click="editing = false; questionText = {{ json_encode($question->question_text) }}"
+                                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                    Cancel
+                                </button>
+                            </div>
                         </form>
+
+                        <!-- Action Buttons in View Mode -->
+                        <div x-show="!editing" class="flex items-center gap-1 shrink-0">
+                            <button type="button" 
+                                    @click="editing = true; $nextTick(() => $el.closest('[x-data]').querySelector('input')?.focus())" 
+                                    class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg transition cursor-pointer" 
+                                    title="Edit question">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+
+                            <form method="POST" action="{{ route('admin.surveys.questions.destroy', [$survey, $question]) }}"
+                                  data-confirm="true"
+                                  data-confirm-title="Delete Question"
+                                  data-confirm-message="Are you sure you want to delete this question? Any submitted ratings for this question will be removed."
+                                  data-confirm-btn="Delete Question"
+                                  data-confirm-type="danger">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition cursor-pointer" title="Delete question">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 @endforeach
             </div>

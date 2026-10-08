@@ -1,6 +1,6 @@
 <x-layouts.app>
     <div class="max-w-3xl mx-auto space-y-6" x-data="{
-        questions: {{ json_encode($defaultQuestions) }},
+        questions: {{ json_encode(old('questions', array_column($defaultQuestions, 'question_text'))) }},
         addQuestion() {
             this.questions.push('');
         },
@@ -64,6 +64,19 @@
                     <textarea name="description" id="description" rows="3"
                               placeholder="Provide guidance to respondents regarding this evaluation..."
                               class="mt-1.5 block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">{{ old('description', 'Comprehensive 360-degree personality and self-assessment survey. Please rate yourself and each peer on a scale of 1 to 10.') }}</textarea>
+                </div>
+
+                <div>
+                    <label for="context" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        Context
+                    </label>
+                    <textarea name="context" id="context" rows="3"
+                              placeholder="Provide context on this survey before respondents begin (e.g. why this assessment is taking place, organizational goals, etc.)..."
+                              class="mt-1.5 block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 @error('context') border-rose-500 @enderror">{{ old('context') }}</textarea>
+                    <p class="mt-1 text-[11px] text-slate-400">This context will be shown to participants on their assessment start page before they begin.</p>
+                    @error('context')
+                        <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 

@@ -24,6 +24,7 @@ class Survey extends Model
         'company_id',
         'title',
         'description',
+        'context',
         'status',
         'sign_off_status',
         'sign_off_lead',

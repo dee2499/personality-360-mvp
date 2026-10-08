@@ -122,6 +122,7 @@ class SurveyController extends Controller
             'company_id' => $companyId,
             'title' => $request->string('title'),
             'description' => $request->string('description'),
+            'context' => $request->input('context'),
             'status' => 'published',
             'published_at' => now(),
             'created_by' => $request->user()->id,
@@ -203,6 +204,8 @@ class SurveyController extends Controller
             abort(403, 'You are not authorized to access surveys outside your company.');
         }
 
+        $survey->load(['questions' => fn ($q) => $q->orderBy('sort_order')]);
+
         return view('admin.surveys.edit', compact('survey'));
     }
 
@@ -215,12 +218,30 @@ class SurveyController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'context' => ['nullable', 'string'],
+            'questions' => ['nullable', 'array'],
+            'questions.*.id' => ['nullable', 'integer'],
+            'questions.*.question_text' => ['required_with:questions', 'string', 'max:500'],
         ]);
 
-        $survey->update($validated);
+        $survey->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'context' => $validated['context'] ?? null,
+        ]);
+
+        if (! empty($validated['questions'])) {
+            foreach ($validated['questions'] as $qData) {
+                if (! empty($qData['id']) && ! empty($qData['question_text'])) {
+                    $survey->questions()->where('id', $qData['id'])->update([
+                        'question_text' => trim($qData['question_text']),
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.surveys.show', $survey)
-            ->with('success', 'Survey details updated successfully.');
+            ->with('success', 'Survey details and questions updated successfully.');
     }
 
     public function destroy(Survey $survey, Request $request): RedirectResponse
