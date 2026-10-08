@@ -44,11 +44,12 @@ $admin = \App\Models\User::firstOrCreate(
 );
 $admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@ChangeQuo123"), "role" => "admin"]);
 
-// 2. All Falcon Users (Manager + 25 Employees) -> falcon123
+// 2. All Falcon Users (Manager + Employees) -> falcon123
 \App\Models\User::where("email", "like", "%@falcon%")
     ->orWhere("email", "like", "%@falconmarine.co.in")
     ->orWhere("email", "like", "%@falconfeeds.in")
     ->orWhere("email", "like", "%@falconrealestate.in")
+    ->orWhere("email", "like", "%@falconholdings.co.in")
     ->orWhere("email", "chiragb7@gmail.com")
     ->orWhere("username", "like", "%@falcon")
     ->orWhere("username", "like", "%@Falcon")
