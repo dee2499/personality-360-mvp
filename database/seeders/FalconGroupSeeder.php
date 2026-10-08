@@ -64,10 +64,11 @@ class FalconGroupSeeder extends Seeder
             'description' => 'Leadership CQ Score & CQ Sync Score (Change readiness & Adaptability)',
         ]);
 
-        // 4. Create Falcon Manager: Srini (srini@falcon.com)
+        // 4. Create Falcon Manager: Srini (srini@falcon.com, username: srini@falcon)
         User::create([
             'company_id' => $company->id,
             'name' => 'Srini',
+            'username' => 'srini@falcon',
             'email' => 'srini@falcon.com',
             'password' => Hash::make('falcon123'),
             'role' => 'manager',
