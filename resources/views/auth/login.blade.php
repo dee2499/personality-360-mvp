@@ -20,16 +20,16 @@
 
                 <div>
                     <label for="email" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                        Email Address
+                        Email Address or Username
                     </label>
                     <div class="mt-1.5">
                         <input id="email" 
                                name="email" 
-                               type="email" 
-                               autocomplete="email" 
+                               type="text" 
+                               autocomplete="username" 
                                required 
                                value="{{ old('email') }}"
-                               placeholder="you@company.com"
+                               placeholder="you@company.com or username"
                                class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('email') border-rose-500 @enderror">
                     </div>
                     @error('email')

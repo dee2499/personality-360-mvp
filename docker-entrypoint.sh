@@ -45,9 +45,11 @@ $admin = \App\Models\User::firstOrCreate(
 $admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@ChangeQuo123"), "role" => "admin"]);
 
 // 2. All Falcon Users (Manager + 24 Employees) -> falcon123
-\App\Models\User::where("email", "like", "%@falcon.com")->update([
-    "password" => \Illuminate\Support\Facades\Hash::make("falcon123")
-]);
+\App\Models\User::where("email", "like", "%@falcon.com")
+    ->orWhere("username", "like", "%@falcon")
+    ->update([
+        "password" => \Illuminate\Support\Facades\Hash::make("falcon123")
+    ]);
 
 // 3. All GCODE Users (Manager + 3 Employees) -> gcode123
 \App\Models\User::where("email", "like", "%@gcode.in")->update([

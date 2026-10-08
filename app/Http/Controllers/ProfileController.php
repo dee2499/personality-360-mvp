@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -20,23 +21,30 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's personal details (first name and last name).
-     * Email cannot be changed.
+     * Update the user's personal details (first name, last name, and optional email).
      */
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],
+            'email' => [
+                'nullable',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($request->user()->id),
+            ],
         ]);
 
         $fullName = trim($validated['first_name'].' '.($validated['last_name'] ?? ''));
 
         $request->user()->update([
             'name' => $fullName,
+            'email' => $validated['email'] ?? null,
         ]);
 
-        return back()->with('success', 'Your name has been updated successfully.');
+        return back()->with('success', 'Your profile details have been updated successfully.');
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Hash;
 
 return new class extends Migration
 {
@@ -44,7 +45,7 @@ return new class extends Migration
             if ($user) {
                 $user->update([
                     'email' => $newEmail,
-                    'password' => \Illuminate\Support\Facades\Hash::make('falcon123'),
+                    'password' => Hash::make('falcon123'),
                 ]);
             }
         }

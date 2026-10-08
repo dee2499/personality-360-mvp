@@ -36,10 +36,14 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-xs">
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                    <span class="block text-slate-400 font-medium">Username</span>
+                    <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->username ?: '— (None)' }}</span>
+                </div>
                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                     <span class="block text-slate-400 font-medium">Email Address</span>
-                    <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->email }}</span>
+                    <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->email ?: '— (Not set)' }}</span>
                 </div>
                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                     <span class="block text-slate-400 font-medium">Organization / Company</span>
@@ -52,7 +56,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
             <div>
                 <h3 class="text-lg font-bold text-slate-900">Personal Information</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Update your first name and last name. Your registered email address cannot be changed.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Update your first name, last name, and contact email address.</p>
             </div>
 
             <form method="POST" action="{{ route('profile.update') }}" class="space-y-5">
@@ -99,17 +103,20 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="profile_email" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                            Email Address <span class="text-slate-400 font-normal lowercase">(cannot be changed)</span>
+                            Email Address
                         </label>
                         <div class="mt-1.5">
                             <input id="profile_email" 
+                                   name="email"
                                    type="email" 
-                                   value="{{ $user->email }}" 
-                                   disabled 
-                                   readonly
-                                   class="block w-full rounded-xl border border-slate-200 bg-slate-100/80 px-3.5 py-2.5 text-sm text-slate-500 cursor-not-allowed select-none">
+                                   value="{{ old('email', $user->email) }}" 
+                                   placeholder="your.email@company.com"
+                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('email') border-rose-500 @enderror">
                         </div>
-                        <p class="mt-1.5 text-[11px] text-slate-400">Your email address cannot be changed.</p>
+                        @error('email')
+                            <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1.5 text-[11px] text-slate-400">You can add or update your email address for account notifications.</p>
                     </div>
 
                     <div>
@@ -131,7 +138,7 @@
                     <button type="submit" 
                             class="inline-flex items-center justify-center gap-2 py-2.5 px-6 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
                         <i data-lucide="check" class="w-4 h-4"></i>
-                        <span>Save Name Changes</span>
+                        <span>Save Changes</span>
                     </button>
                 </div>
             </form>
