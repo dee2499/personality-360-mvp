@@ -20,11 +20,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxml2-dev \
     libzip-dev \
     libicu-dev \
+    libpq-dev \
     zip \
     unzip \
     sqlite3 \
     libsqlite3-dev \
-    && docker-php-ext-install pdo pdo_sqlite pdo_mysql mbstring bcmath opcache zip intl \
+    && docker-php-ext-install pdo pdo_sqlite pdo_mysql pdo_pgsql mbstring bcmath opcache zip intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Suppress Apache FQDN warning

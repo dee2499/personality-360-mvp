@@ -260,149 +260,12 @@
                 </div>
             </div>
 
-            <!-- 3. Middle Row: 3 Visual Charts (Maturity Gauge, Growth Journey, 3 Dimensions) -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                
+            <!-- 3. Visual Charts: Row 1 - Maturity Level & 3 Dimensions (2-Column Grid) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                 <!-- Column 1: Team CQ Sync Maturity Level (5-Sector Speedometer Gauge) -->
                 <x-team-sync-maturity-gauge :score="$syncScore" :maturity-level="$sync['maturity_level'] ?? null" />
 
-                <!-- Column 2: Team CQ Sync Growth Journey (S-Curve Chart) -->
-                <div class="p-5 sm:p-6 rounded-3xl border border-slate-200 bg-white shadow-2xs flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-sm font-black text-slate-900 tracking-tight">Team CQ Sync Growth Journey</h3>
-                        <p class="text-[11px] text-slate-500 mt-0.5">Your current position and path to the benchmark</p>
-                    </div>
-
-                    <!-- S-Curve Chart Area -->
-                    <div class="w-full relative py-2">
-                        <svg viewBox="0 0 500 240" class="w-full h-auto overflow-visible">
-                            <defs>
-                                <!-- Area gradient under curve -->
-                                <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#EF4444" stop-opacity="0.15"/>
-                                    <stop offset="25%" stop-color="#FB923C" stop-opacity="0.2"/>
-                                    <stop offset="50%" stop-color="#10B981" stop-opacity="0.25"/>
-                                    <stop offset="75%" stop-color="#F59E0B" stop-opacity="0.25"/>
-                                    <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.35"/>
-                                </linearGradient>
-
-                                <!-- Line gradient along curve -->
-                                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#EF4444"/>
-                                    <stop offset="25%" stop-color="#FB923C"/>
-                                    <stop offset="50%" stop-color="#10B981"/>
-                                    <stop offset="75%" stop-color="#F59E0B"/>
-                                    <stop offset="100%" stop-color="#3B82F6"/>
-                                </linearGradient>
-
-                                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6" />
-                                </marker>
-                            </defs>
-
-                            <!-- Background Grid Lines -->
-                            <line x1="45" y1="35" x2="480" y2="35" stroke="#F1F5F9" stroke-width="1"/>
-                            <line x1="45" y1="67" x2="480" y2="67" stroke="#F1F5F9" stroke-width="1"/>
-                            <line x1="45" y1="99" x2="480" y2="99" stroke="#F1F5F9" stroke-width="1"/>
-                            <line x1="45" y1="131" x2="480" y2="131" stroke="#F1F5F9" stroke-width="1"/>
-                            <line x1="45" y1="163" x2="480" y2="163" stroke="#F1F5F9" stroke-width="1"/>
-                            <line x1="45" y1="195" x2="480" y2="195" stroke="#CBD5E1" stroke-width="1.5"/>
-
-                            <!-- Y Axis Label -->
-                            <text x="-115" y="14" transform="rotate(-90)" text-anchor="middle" font-size="8" font-weight="700" fill="#94A3B8">CQ Sync Score</text>
-
-                            <!-- Y-Axis Value Labels -->
-                            <text x="35" y="38" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">10</text>
-                            <text x="35" y="70" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">8</text>
-                            <text x="35" y="102" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">6</text>
-                            <text x="35" y="134" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">4</text>
-                            <text x="35" y="166" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">2</text>
-                            <text x="35" y="198" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">0</text>
-
-                            <!-- Gradient Area Fill beneath S-Curve -->
-                            <path d="M 50,195 L 60,185 C 130,175 190,145 270,105 C 340,70 410,48 465,36 L 465,195 Z" fill="url(#curveGradient)"/>
-
-                            <!-- Main S-Curve Line -->
-                            <path d="M 50,186 C 130,175 190,145 270,105 C 340,70 410,48 470,36" fill="none" stroke="url(#lineGrad)" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow)"/>
-
-                            <!-- Milestones on Curve -->
-                            <!-- Point 1: Divergent (x≈65, y≈184) -->
-                            <circle cx="65" cy="184" r="5" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
-
-                            <!-- Point 2: Fragmented (x≈150, y≈155) -->
-                            <circle cx="150" cy="155" r="5" fill="#FB923C" stroke="#FFFFFF" stroke-width="2"/>
-
-                            <!-- Point 3: Current Score Milestone -->
-                            <g>
-                                <!-- Callout Box -->
-                                <rect x="{{ $currentX - 28 }}" y="{{ $currentY - 32 }}" width="56" height="22" rx="6" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.2"/>
-                                <text x="{{ $currentX }}" y="{{ $currentY - 22 }}" text-anchor="middle" font-size="7" font-weight="800" fill="#065F46">Current</text>
-                                <text x="{{ $currentX }}" y="{{ $currentY - 13 }}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#047857">{{ number_format($syncScore, 1) }}</text>
-                                <!-- Arrow pointer down -->
-                                <polygon points="{{ $currentX - 4 }},{{ $currentY - 10 }} {{ $currentX + 4 }},{{ $currentY - 10 }} {{ $currentX }},{{ $currentY - 5 }}" fill="#047857"/>
-                                <!-- Dot on curve -->
-                                <circle cx="{{ $currentX }}" cy="{{ $currentY }}" r="6" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>
-                            </g>
-
-                            <!-- Point 4: Next Target Milestone -->
-                            <g>
-                                <!-- Callout Box -->
-                                <rect x="{{ $targetX - 30 }}" y="{{ $targetY - 32 }}" width="60" height="22" rx="6" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.2"/>
-                                <text x="{{ $targetX }}" y="{{ $targetY - 22 }}" text-anchor="middle" font-size="7" font-weight="800" fill="#92400E">Next Target</text>
-                                <text x="{{ $targetX }}" y="{{ $targetY - 13 }}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#B45309">{{ number_format($nextTarget, 1) }}</text>
-                                <polygon points="{{ $targetX - 4 }},{{ $targetY - 10 }} {{ $targetX + 4 }},{{ $targetY - 10 }} {{ $targetX }},{{ $targetY - 5 }}" fill="#B45309"/>
-                                <circle cx="{{ $targetX }}" cy="{{ $targetY }}" r="6" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2.5"/>
-                            </g>
-
-                            <!-- Point 5: Benchmark Milestone -->
-                            <g>
-                                <!-- Callout Box -->
-                                <rect x="{{ $benchmarkX - 30 }}" y="{{ $benchmarkY - 32 }}" width="60" height="22" rx="6" fill="#DBEAFE" stroke="#BFDBFE" stroke-width="1.2"/>
-                                <text x="{{ $benchmarkX }}" y="{{ $benchmarkY - 22 }}" text-anchor="middle" font-size="7" font-weight="800" fill="#1E40AF">Benchmark</text>
-                                <text x="{{ $benchmarkX }}" y="{{ $benchmarkY - 13 }}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#1D4ED8">8.0</text>
-                                <polygon points="{{ $benchmarkX - 4 }},{{ $benchmarkY - 10 }} {{ $benchmarkX + 4 }},{{ $benchmarkY - 10 }} {{ $benchmarkX }},{{ $benchmarkY - 5 }}" fill="#1D4ED8"/>
-                                <circle cx="{{ $benchmarkX }}" cy="{{ $benchmarkY }}" r="6" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2.5"/>
-                            </g>
-
-                            <!-- X Axis Stage Labels -->
-                            <text x="65" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Divergent</text>
-                            <text x="65" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">1.0 – 2.0</text>
-
-                            <text x="150" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Fragmented</text>
-                            <text x="150" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">2.1 – 4.0</text>
-
-                            <text x="245" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Aligned</text>
-                            <text x="245" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">4.1 – 6.0</text>
-
-                            <text x="345" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Synchronised</text>
-                            <text x="345" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">6.1 – 8.0</text>
-
-                            <text x="445" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Unified</text>
-                            <text x="445" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">8.1 – 10.0</text>
-                        </svg>
-                    </div>
-
-                    <!-- Bottom Journey Slider -->
-                    <div class="pt-3 border-t border-slate-100">
-                        <!-- Gradient Bar -->
-                        <div class="h-2 w-full rounded-full bg-gradient-to-r from-rose-500 via-emerald-500 to-blue-500 opacity-80"></div>
-                        <div class="flex items-center justify-between text-[10px] mt-1.5 font-bold">
-                            <div class="text-left text-rose-700">
-                                <span class="uppercase tracking-wider block font-black">Low Synchronisation</span>
-                                <span class="text-slate-400 font-normal">Different views, inconsistent action</span>
-                            </div>
-                            <div class="text-center text-slate-500 uppercase tracking-widest text-[9px]">
-                                Team Development Journey
-                            </div>
-                            <div class="text-right text-blue-700">
-                                <span class="uppercase tracking-wider block font-black">High Synchronisation</span>
-                                <span class="text-slate-400 font-normal">Shared understanding, collective action</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 3: Team View across 3 CQ Sync Dimensions -->
+                <!-- Column 2: Team View across 3 CQ Sync Dimensions -->
                 <div class="p-5 sm:p-6 rounded-3xl border border-slate-200 bg-white shadow-2xs flex flex-col justify-between">
                     <div>
                         <h3 class="text-sm font-black text-slate-900 tracking-tight">Team View across the 3 CQ Sync Dimensions</h3>
@@ -496,7 +359,142 @@
                         </span>
                     </div>
                 </div>
+            </div>
 
+            <!-- Visual Charts: Row 2 - Team CQ Sync Growth Journey (Full Width) -->
+            <div class="w-full p-5 sm:p-6 rounded-3xl border border-slate-200 bg-white shadow-2xs flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-black text-slate-900 tracking-tight">Team CQ Sync Growth Journey</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Your current position and path to the benchmark</p>
+                </div>
+
+                <!-- S-Curve Chart Area -->
+                <div class="w-full relative py-4">
+                    <svg viewBox="0 0 500 240" class="w-full h-auto overflow-visible max-h-[320px]">
+                        <defs>
+                            <!-- Area gradient under curve -->
+                            <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#EF4444" stop-opacity="0.15"/>
+                                <stop offset="25%" stop-color="#FB923C" stop-opacity="0.2"/>
+                                <stop offset="50%" stop-color="#10B981" stop-opacity="0.25"/>
+                                <stop offset="75%" stop-color="#F59E0B" stop-opacity="0.25"/>
+                                <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.35"/>
+                            </linearGradient>
+
+                            <!-- Line gradient along curve -->
+                            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#EF4444"/>
+                                <stop offset="25%" stop-color="#FB923C"/>
+                                <stop offset="50%" stop-color="#10B981"/>
+                                <stop offset="75%" stop-color="#F59E0B"/>
+                                <stop offset="100%" stop-color="#3B82F6"/>
+                            </linearGradient>
+
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#3B82F6" />
+                            </marker>
+                        </defs>
+
+                        <!-- Background Grid Lines -->
+                        <line x1="45" y1="35" x2="480" y2="35" stroke="#F1F5F9" stroke-width="1"/>
+                        <line x1="45" y1="67" x2="480" y2="67" stroke="#F1F5F9" stroke-width="1"/>
+                        <line x1="45" y1="99" x2="480" y2="99" stroke="#F1F5F9" stroke-width="1"/>
+                        <line x1="45" y1="131" x2="480" y2="131" stroke="#F1F5F9" stroke-width="1"/>
+                        <line x1="45" y1="163" x2="480" y2="163" stroke="#F1F5F9" stroke-width="1"/>
+                        <line x1="45" y1="195" x2="480" y2="195" stroke="#CBD5E1" stroke-width="1.5"/>
+
+                        <!-- Y Axis Label -->
+                        <text x="-115" y="14" transform="rotate(-90)" text-anchor="middle" font-size="8" font-weight="700" fill="#94A3B8">CQ Sync Score</text>
+
+                        <!-- Y-Axis Value Labels -->
+                        <text x="35" y="38" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">10</text>
+                        <text x="35" y="70" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">8</text>
+                        <text x="35" y="102" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">6</text>
+                        <text x="35" y="134" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">4</text>
+                        <text x="35" y="166" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">2</text>
+                        <text x="35" y="198" text-anchor="end" font-size="8" font-weight="700" fill="#94A3B8">0</text>
+
+                        <!-- Gradient Area Fill beneath S-Curve -->
+                        <path d="M 50,195 L 60,185 C 130,175 190,145 270,105 C 340,70 410,48 465,36 L 465,195 Z" fill="url(#curveGradient)"/>
+
+                        <!-- Main S-Curve Line -->
+                        <path d="M 50,186 C 130,175 190,145 270,105 C 340,70 410,48 470,36" fill="none" stroke="url(#lineGrad)" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrow)"/>
+
+                        <!-- Milestones on Curve -->
+                        <!-- Point 1: Divergent (x≈65, y≈184) -->
+                        <circle cx="65" cy="184" r="5" fill="#EF4444" stroke="#FFFFFF" stroke-width="2"/>
+
+                        <!-- Point 2: Fragmented (x≈150, y≈155) -->
+                        <circle cx="150" cy="155" r="5" fill="#FB923C" stroke="#FFFFFF" stroke-width="2"/>
+
+                        <!-- Point 3: Current Score Milestone -->
+                        <g>
+                            <!-- Callout Box -->
+                            <rect x="{{ $currentX - 28 }}" y="{{ $currentY - 32 }}" width="56" height="22" rx="6" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1.2"/>
+                            <text x="{{ $currentX }}" y="{{ $currentY - 22 }}" text-anchor="middle" font-size="7" font-weight="800" fill="#065F46">Current</text>
+                            <text x="{{ $currentX }}" y="{{ $currentY - 13 }}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#047857">{{ number_format($syncScore, 1) }}</text>
+                            <!-- Arrow pointer down -->
+                            <polygon points="{{ $currentX - 4 }},{{ $currentY - 10 }} {{ $currentX + 4 }},{{ $currentY - 10 }} {{ $currentX }},{{ $currentY - 5 }}" fill="#047857"/>
+                            <!-- Dot on curve -->
+                            <circle cx="{{ $currentX }}" cy="{{ $currentY }}" r="6" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>
+                        </g>
+
+                        <!-- Point 4: Next Target Milestone -->
+                        <g>
+                            <!-- Callout Box -->
+                            <rect x="{{ $targetX - 30 }}" y="{{ $targetY - 32 }}" width="60" height="22" rx="6" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1.2"/>
+                            <text x="{{ $targetX }}" y="{{ $targetY - 22 }}" text-anchor="middle" font-size="7" font-weight="800" fill="#92400E">Next Target</text>
+                            <text x="{{ $targetX }}" y="{{ $targetY - 13 }}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#B45309">{{ number_format($nextTarget, 1) }}</text>
+                            <polygon points="{{ $targetX - 4 }},{{ $targetY - 10 }} {{ $targetX + 4 }},{{ $targetY - 10 }} {{ $targetX }},{{ $targetY - 5 }}" fill="#B45309"/>
+                            <circle cx="{{ $targetX }}" cy="{{ $targetY }}" r="6" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2.5"/>
+                        </g>
+
+                        <!-- Point 5: Benchmark Milestone -->
+                        <g>
+                            <!-- Callout Box -->
+                            <rect x="{{ $benchmarkX - 30 }}" y="{{ $benchmarkY - 32 }}" width="60" height="22" rx="6" fill="#DBEAFE" stroke="#BFDBFE" stroke-width="1.2"/>
+                            <text x="{{ $benchmarkX }}" y="{{ $benchmarkY - 22 }}" text-anchor="middle" font-size="7" font-weight="800" fill="#1E40AF">Benchmark</text>
+                            <text x="{{ $benchmarkX }}" y="{{ $benchmarkY - 13 }}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#1D4ED8">8.0</text>
+                            <polygon points="{{ $benchmarkX - 4 }},{{ $benchmarkY - 10 }} {{ $benchmarkX + 4 }},{{ $benchmarkY - 10 }} {{ $benchmarkX }},{{ $benchmarkY - 5 }}" fill="#1D4ED8"/>
+                            <circle cx="{{ $benchmarkX }}" cy="{{ $benchmarkY }}" r="6" fill="#3B82F6" stroke="#FFFFFF" stroke-width="2.5"/>
+                        </g>
+
+                        <!-- X Axis Stage Labels -->
+                        <text x="65" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Divergent</text>
+                        <text x="65" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">1.0 – 2.0</text>
+
+                        <text x="150" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Fragmented</text>
+                        <text x="150" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">2.1 – 4.0</text>
+
+                        <text x="245" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Aligned</text>
+                        <text x="245" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">4.1 – 6.0</text>
+
+                        <text x="345" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Synchronised</text>
+                        <text x="345" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">6.1 – 8.0</text>
+
+                        <text x="445" y="210" text-anchor="middle" font-size="7" font-weight="800" fill="#475569">Unified</text>
+                        <text x="445" y="218" text-anchor="middle" font-size="6" font-weight="600" fill="#94A3B8">8.1 – 10.0</text>
+                    </svg>
+                </div>
+
+                <!-- Bottom Journey Slider -->
+                <div class="pt-3 border-t border-slate-100">
+                    <!-- Gradient Bar -->
+                    <div class="h-2 w-full rounded-full bg-gradient-to-r from-rose-500 via-emerald-500 to-blue-500 opacity-80"></div>
+                    <div class="flex items-center justify-between text-[10px] mt-1.5 font-bold">
+                        <div class="text-left text-rose-700">
+                            <span class="uppercase tracking-wider block font-black">Low Synchronisation</span>
+                            <span class="text-slate-400 font-normal">Different views, inconsistent action</span>
+                        </div>
+                        <div class="text-center text-slate-500 uppercase tracking-widest text-[9px]">
+                            Team Development Journey
+                        </div>
+                        <div class="text-right text-blue-700">
+                            <span class="uppercase tracking-wider block font-black">High Synchronisation</span>
+                            <span class="text-slate-400 font-normal">Shared understanding, collective action</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 4. Bottom Row: 3 Commentary Panels (Key Insights, What This Means, Top Recommendations) -->
