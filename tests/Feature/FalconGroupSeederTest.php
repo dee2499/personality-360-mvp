@@ -38,11 +38,11 @@ class FalconGroupSeederTest extends TestCase
         $this->assertNotNull($falcon);
         $this->assertNotNull($gcode);
 
-        // 2. Verify Users: 1 Admin, 2 Managers (1 Falcon, 1 GCODE), 28 Participants (24 Falcon, 4 GCODE) = 31 Total Users
-        $this->assertEquals(31, User::count());
+        // 2. Verify Users: 1 Admin, 2 Managers (1 Falcon, 1 GCODE), 31 Participants (27 Falcon, 4 GCODE) = 34 Total Users
+        $this->assertEquals(34, User::count());
         $this->assertEquals(1, User::where('role', 'admin')->count());
         $this->assertEquals(2, User::where('role', 'manager')->count());
-        $this->assertEquals(28, User::where('role', 'participant')->count());
+        $this->assertEquals(31, User::where('role', 'participant')->count());
 
         // Verify Master Admin
         $this->assertDatabaseHas('users', ['email' => 'srini@saipio.com', 'role' => 'admin', 'company_id' => null]);
@@ -51,8 +51,9 @@ class FalconGroupSeederTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'srini@falcon.com', 'role' => 'manager', 'company_id' => $falcon->id]);
         $this->assertDatabaseHas('users', ['email' => 'srini@gcode.in', 'role' => 'manager', 'company_id' => $gcode->id]);
 
-        // Verify Falcon Employees
-        $this->assertEquals(24, User::where('role', 'participant')->where('company_id', $falcon->id)->count());
+        // Verify Falcon Employees (27 members including Alok, Ayushi, Srinivas)
+        $this->assertEquals(27, User::where('role', 'participant')->where('company_id', $falcon->id)->count());
+        $this->assertDatabaseHas('users', ['username' => 'srinivas@falcon', 'email' => 'srinivas@falcon.com', 'company_id' => $falcon->id]);
 
         // Verify GCODE Employees
         $this->assertEquals(4, User::where('role', 'participant')->where('company_id', $gcode->id)->count());
@@ -69,7 +70,7 @@ class FalconGroupSeederTest extends TestCase
         $this->assertNotNull($falconSurvey);
         $this->assertNotNull($gcodeSurvey);
 
-        $this->assertEquals(24, $falconSurvey->participants()->count());
+        $this->assertEquals(27, $falconSurvey->participants()->count());
         $this->assertEquals(4, $gcodeSurvey->participants()->count());
 
         // 4. Verify Questions (14 each = 28 total: 11 individual + 3 group_sync each)

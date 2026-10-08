@@ -57,6 +57,27 @@ $admin->update(["password" => \Illuminate\Support\Facades\Hash::make("admin@chan
         "password" => \Illuminate\Support\Facades\Hash::make("falcon123")
     ]);
 
+// 2b. Ensure Falcon Member: Srinivas Patnaik (srinivas@falcon)
+$falconCo = \App\Models\Company::where("name", "like", "%Falcon%")->first();
+if ($falconCo) {
+    $sp = \App\Models\User::firstOrNew(["email" => "srinivas@falcon.com"]);
+    $sp->fill([
+        "company_id" => $falconCo->id,
+        "name" => "Srinivas Patnaik",
+        "username" => "srinivas@falcon",
+        "role" => "participant",
+        "password" => \Illuminate\Support\Facades\Hash::make("falcon123"),
+        "email_verified_at" => now(),
+        "invitation_accepted_at" => now(),
+    ]);
+    $sp->save();
+
+    $fSurvey = \App\Models\Survey::where("company_id", $falconCo->id)->where("title", "ChangeQuo")->first();
+    if ($fSurvey) {
+        $fSurvey->participants()->syncWithoutDetaching([$sp->id]);
+    }
+}
+
 // 3. All GCODE Users (Manager + 4 Employees) -> gcode123
 \App\Models\User::where("email", "like", "%@gcode.in")->update([
     "password" => \Illuminate\Support\Facades\Hash::make("gcode123")
