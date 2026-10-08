@@ -263,7 +263,7 @@ class FalconGroupSeeder extends Seeder
                 'question_text' => 'Do you believe everyone in this group is aligned and committed to taking the actions needed to make the change happen? (Consider as a group and respond)',
                 'type' => 'group_sync',
                 'dimension' => 'Act Together',
-                'min_score_description' => 'not aligned not committed',
+                'min_score_description' => 'Not aligned not committed',
                 'max_score_description' => 'Aligned and Committed',
                 'peer_question_text' => null,
                 'sort_order' => 14,

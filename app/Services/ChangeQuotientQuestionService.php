@@ -148,7 +148,7 @@ class ChangeQuotientQuestionService
                 'peer_question_text' => null,
                 'dimension' => 'Act Together',
                 'type' => 'group_sync',
-                'min_score_description' => 'not aligned not committed',
+                'min_score_description' => 'Not aligned not committed',
                 'max_score_description' => 'Aligned and Committed',
                 'sort_order' => 14,
             ],
