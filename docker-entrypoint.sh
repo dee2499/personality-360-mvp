@@ -35,16 +35,27 @@ if [ "$FALCON_EXISTS" != "1" ]; then
     php artisan db:seed --force
 fi
 
-# Always ensure master admin credentials and seeders are up to date
+# Always ensure master admin, Falcon, and GCODE credentials and seeders are up to date
 php artisan tinker --execute '
+// 1. Super Admin
 $admin = \App\Models\User::firstOrCreate(
     ["email" => "srini@saipio.com"],
     ["name" => "Srinivas Patnaik", "role" => "admin", "email_verified_at" => now()]
 );
 $admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@ChangeQuo123"), "role" => "admin"]);
+
+// 2. All Falcon Users (Manager + 24 Employees) -> falcon123
+\App\Models\User::where("email", "like", "%@falcon.com")->update([
+    "password" => \Illuminate\Support\Facades\Hash::make("falcon123")
+]);
+
+// 3. All GCODE Users (Manager + 3 Employees) -> gcode123
+\App\Models\User::where("email", "like", "%@gcode.in")->update([
+    "password" => \Illuminate\Support\Facades\Hash::make("gcode123")
+]);
 ' 2>/dev/null || true
 
-# Ensure GCODE company, manager, employees, and survey are seeded and passwords updated
+# Ensure GCODE company, manager, employees, and survey are seeded
 php artisan db:seed --class=GcodeSeeder --force || true
 
 # Ensure default score categories are seeded
