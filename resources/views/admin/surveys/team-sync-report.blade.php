@@ -130,20 +130,8 @@
                 <!-- Left: changequo logo -->
                 <div class="flex items-center gap-3 shrink-0">
                     <!-- Butterfly Icon -->
-                    <div class="w-12 h-12 flex items-center justify-center text-purple-700 shrink-0">
-                        <svg class="w-11 h-11" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Left Wing upper -->
-                            <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
-                            <!-- Left Wing lower -->
-                            <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
-                            <!-- Right Wing upper -->
-                            <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
-                            <!-- Right Wing lower -->
-                            <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
-                            <!-- Butterfly Body -->
-                            <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
-                            <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
-                        </svg>
+                    <div class="w-12 h-12 flex items-center justify-center shrink-0">
+                        <img src="{{ asset('logo.png') }}" alt="ChangeQuo" class="w-11 h-11 object-contain">
                     </div>
                     <div>
                         <div class="text-2xl font-black tracking-tight text-purple-950 leading-none">

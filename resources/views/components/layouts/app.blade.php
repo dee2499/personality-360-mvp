@@ -7,6 +7,10 @@
 
     <title>{{ $title ?? 'Change Quo Assessment' }} — Change Quo</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -77,14 +81,7 @@
                     <div class="flex items-center justify-between px-6 pb-4 border-b border-slate-100">
                         <a href="{{ $isStaff ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2 font-bold group">
                             <div class="w-8 h-8 flex items-center justify-center shrink-0">
-                                <svg class="w-7 h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
-                                    <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
-                                    <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
-                                    <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
-                                    <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
-                                    <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
-                                </svg>
+                                <img src="{{ asset('logo.png') }}" alt="ChangeQuo" class="w-7 h-7 object-contain">
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-lg font-black tracking-tight text-purple-950 leading-none">
@@ -266,14 +263,7 @@
             <div class="flex h-16 shrink-0 items-center justify-between px-6 border-b border-slate-100">
                 <a href="{{ $isAdmin ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-2.5 font-bold group">
                     <div class="w-9 h-9 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
-                            <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
-                            <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
-                            <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
-                            <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
-                            <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
-                        </svg>
+                        <img src="{{ asset('logo.png') }}" alt="ChangeQuo" class="w-8 h-8 object-contain">
                     </div>
                     <div class="flex flex-col">
                         <span class="text-xl font-black tracking-tight text-purple-950 leading-none">
@@ -447,14 +437,7 @@
                     </button>
                     <a href="{{ $isStaff ? route('admin.dashboard') : route('participant.assessments.index') }}" class="flex items-center gap-1.5 font-bold text-sm">
                         <div class="w-6 h-6 flex items-center justify-center shrink-0">
-                            <svg class="w-6 h-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
-                                <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
-                                <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
-                                <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
-                                <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
-                                <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
-                            </svg>
+                            <img src="{{ asset('logo.png') }}" alt="ChangeQuo" class="w-6 h-6 object-contain">
                         </div>
                         <span class="tracking-tight font-black text-purple-950">change<span class="text-purple-600">quo</span></span>
                     </a>
@@ -625,14 +608,7 @@
                     <div class="flex items-center gap-3">
                         <a href="{{ url('/') }}" class="flex items-center gap-2.5 font-bold group">
                             <div class="w-9 h-9 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                <svg class="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M48 48 C38 20, 10 15, 8 32 C6 48, 30 50, 48 50 Z" fill="#7C3AED" opacity="0.95"/>
-                                    <path d="M48 52 C32 54, 16 66, 20 80 C24 92, 42 78, 48 56 Z" fill="#9333EA" opacity="0.85"/>
-                                    <path d="M52 48 C62 20, 90 15, 92 32 C94 48, 70 50, 52 50 Z" fill="#7C3AED" opacity="0.95"/>
-                                    <path d="M52 52 C68 54, 84 66, 80 80 C76 92, 58 78, 52 56 Z" fill="#9333EA" opacity="0.85"/>
-                                    <ellipse cx="50" cy="50" rx="3" ry="22" fill="#581C87"/>
-                                    <circle cx="50" cy="24" r="3.5" fill="#581C87"/>
-                                </svg>
+                                <img src="{{ asset('logo.png') }}" alt="ChangeQuo" class="w-8 h-8 object-contain">
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-xl font-black tracking-tight text-purple-950 leading-none">
