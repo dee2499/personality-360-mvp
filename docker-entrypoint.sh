@@ -28,12 +28,21 @@ chmod 664 /var/www/html/database/database.sqlite
 # Run database migrations
 php artisan migrate --force
 
-# Seed database if Falcon Group does not exist or if database has no users
+# Ensure database is seeded and admin credentials exist
 FALCON_EXISTS=$(php artisan tinker --execute 'echo \App\Models\Company::where("name", "like", "%Falcon%")->exists() ? "1" : "0";' 2>/dev/null || echo "0")
 if [ "$FALCON_EXISTS" != "1" ]; then
     echo "Falcon Group not found. Seeding initial database..."
     php artisan db:seed --force
 fi
+
+# Always ensure master admin credentials and seeders are up to date
+php artisan tinker --execute '
+$admin = \App\Models\User::firstOrCreate(
+    ["email" => "srini@saipio.com"],
+    ["name" => "Srinivas Patnaik", "role" => "admin", "email_verified_at" => now()]
+);
+$admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@ChangeQuo123"), "role" => "admin"]);
+' 2>/dev/null || true
 
 # Ensure GCODE company and survey are seeded if not already present
 GCODE_EXISTS=$(php artisan tinker --execute 'echo \App\Models\Company::where("name", "GCODE")->exists() ? "1" : "0";' 2>/dev/null || echo "0")
