@@ -44,12 +44,8 @@ $admin = \App\Models\User::firstOrCreate(
 $admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@ChangeQuo123"), "role" => "admin"]);
 ' 2>/dev/null || true
 
-# Ensure GCODE company and survey are seeded if not already present
-GCODE_EXISTS=$(php artisan tinker --execute 'echo \App\Models\Company::where("name", "GCODE")->exists() ? "1" : "0";' 2>/dev/null || echo "0")
-if [ "$GCODE_EXISTS" != "1" ]; then
-    echo "GCODE not found. Seeding GCODE company, manager, employees, and survey..."
-    php artisan db:seed --class=GcodeSeeder --force
-fi
+# Ensure GCODE company, manager, employees, and survey are seeded and passwords updated
+php artisan db:seed --class=GcodeSeeder --force || true
 
 # Ensure default score categories are seeded
 php artisan db:seed --class=ScoreCategorySeeder --force
