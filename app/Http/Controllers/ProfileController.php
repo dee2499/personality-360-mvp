@@ -35,6 +35,10 @@ class ProfileController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($request->user()->id),
             ],
+            'designation' => ['nullable', 'string', 'max:100'],
+            'department' => ['nullable', 'string', 'max:100'],
+            'division' => ['nullable', 'string', 'max:100'],
+            'age' => ['nullable', 'integer', 'min:16', 'max:100'],
         ]);
 
         $fullName = trim($validated['first_name'].' '.($validated['last_name'] ?? ''));
@@ -42,6 +46,10 @@ class ProfileController extends Controller
         $request->user()->update([
             'name' => $fullName,
             'email' => $validated['email'] ?? null,
+            'designation' => $validated['designation'] ?? null,
+            'department' => $validated['department'] ?? null,
+            'division' => $validated['division'] ?? null,
+            'age' => $validated['age'] ?? null,
         ]);
 
         return back()->with('success', 'Your profile details have been updated successfully.');

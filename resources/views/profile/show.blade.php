@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-xs">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-xs">
                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                     <span class="block text-slate-400 font-medium">Username</span>
                     <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->username ?: '— (None)' }}</span>
@@ -46,8 +46,14 @@
                     <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->email ?: '— (Not set)' }}</span>
                 </div>
                 <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                    <span class="block text-slate-400 font-medium">Organization / Company</span>
-                    <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->company?->name ?? 'System Organization' }}</span>
+                    <span class="block text-slate-400 font-medium">Designation</span>
+                    <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">{{ $user->designation ?: '— (Not set)' }}</span>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                    <span class="block text-slate-400 font-medium">Department / Division</span>
+                    <span class="font-bold text-slate-800 text-sm mt-0.5 block truncate">
+                        {{ $user->department ?: '—' }} {{ $user->division ? "({$user->division})" : '' }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -56,7 +62,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
             <div>
                 <h3 class="text-lg font-bold text-slate-900">Personal Information</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Update your first name, last name, and contact email address.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Update your personal details, email address, and organizational information.</p>
             </div>
 
             <form method="POST" action="{{ route('profile.update') }}" class="space-y-5">
@@ -131,6 +137,79 @@
                                    class="block w-full rounded-xl border border-slate-200 bg-slate-100/80 px-3.5 py-2.5 text-sm text-slate-500 cursor-not-allowed select-none">
                         </div>
                         <p class="mt-1.5 text-[11px] text-slate-400">Assigned by organization administration.</p>
+                    </div>
+                </div>
+
+                <!-- Professional & Organizational Details (Optional) -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+                    <div>
+                        <label for="designation" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                            Designation <span class="text-slate-400 font-normal lowercase">(optional)</span>
+                        </label>
+                        <div class="mt-1.5">
+                            <input id="designation" 
+                                   name="designation"
+                                   type="text" 
+                                   value="{{ old('designation', $user->designation) }}" 
+                                   placeholder="e.g. CFO, AGM"
+                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('designation') border-rose-500 @enderror">
+                        </div>
+                        @error('designation')
+                            <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="department" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                            Department <span class="text-slate-400 font-normal lowercase">(optional)</span>
+                        </label>
+                        <div class="mt-1.5">
+                            <input id="department" 
+                                   name="department"
+                                   type="text" 
+                                   value="{{ old('department', $user->department) }}" 
+                                   placeholder="e.g. Finance, Operations"
+                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('department') border-rose-500 @enderror">
+                        </div>
+                        @error('department')
+                            <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="division" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                            Division <span class="text-slate-400 font-normal lowercase">(optional)</span>
+                        </label>
+                        <div class="mt-1.5">
+                            <input id="division" 
+                                   name="division"
+                                   type="text" 
+                                   value="{{ old('division', $user->division) }}" 
+                                   placeholder="e.g. Marine, Feed"
+                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('division') border-rose-500 @enderror">
+                        </div>
+                        @error('division')
+                            <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="age" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                            Age <span class="text-slate-400 font-normal lowercase">(optional)</span>
+                        </label>
+                        <div class="mt-1.5">
+                            <input id="age" 
+                                   name="age"
+                                   type="number" 
+                                   min="16"
+                                   max="100"
+                                   value="{{ old('age', $user->age) }}" 
+                                   placeholder="e.g. 45"
+                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('age') border-rose-500 @enderror">
+                        </div>
+                        @error('age')
+                            <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
