@@ -21,7 +21,7 @@ class SurveyContextFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('name="context"', false);
         $response->assertSee('Context');
-        $response->assertSee('Do you see life changing around you?');
+        $response->assertSee('Do you see life changing around - This Person? (Respond to all names given below)');
         $response->assertDontSee('[object Object]');
     }
 

@@ -25,7 +25,7 @@ class ChangeQuotientQuestionService
         return [
             // 11 Individual CQ Journey Questions
             [
-                'question_text' => 'Do you see life changing around you?',
+                'question_text' => 'Do you see life changing around - This Person? (Respond to all names given below)',
                 'peer_question_text' => 'Do you see life changing around - This Person?',
                 'dimension' => 'Awareness of Change',
                 'type' => 'individual',
@@ -34,7 +34,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 1,
             ],
             [
-                'question_text' => 'In the recent past, do you know which are top 3 things thats changing for you?',
+                'question_text' => 'In the recent past, do you know which are top 3 things thats changing for you? (Respond to all names given below)',
                 'peer_question_text' => 'In the recent past, do you know which are top 3 things thats changing for this person?',
                 'dimension' => 'Understanding Key Changes',
                 'type' => 'individual',
@@ -43,7 +43,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 2,
             ],
             [
-                'question_text' => 'The changes that you have observed in recent past have occurred by situation or by your own choice?',
+                'question_text' => 'The changes that you have observed in recent past have occurred by situation or by your own choice? (Respond to all names given below)',
                 'peer_question_text' => 'The changes observed in recent past have occurred by situation or by this person\'s own choice?',
                 'dimension' => 'Choice vs Circumstance',
                 'type' => 'individual',
@@ -52,7 +52,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 3,
             ],
             [
-                'question_text' => 'How much control you think, you have on these changes thats coming your way?',
+                'question_text' => 'How much control you think, you have on these changes thats coming your way? (Respond to all names given below)',
                 'peer_question_text' => 'How much control does this person have on the changes coming their way?',
                 'dimension' => 'Control Over Change',
                 'type' => 'individual',
@@ -61,7 +61,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 4,
             ],
             [
-                'question_text' => 'Do you know on how to manage the new changes that you are experiencing in recent past?',
+                'question_text' => 'Do you know on how to manage the new changes that you are experiencing in recent past? (Respond to all names given below)',
                 'peer_question_text' => 'Does this person know how to manage the new changes they are experiencing?',
                 'dimension' => 'Managing Change Knowledge',
                 'type' => 'individual',
@@ -70,7 +70,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 5,
             ],
             [
-                'question_text' => 'What is your confidence level to independently manage the new changes coming your way?',
+                'question_text' => 'What is your confidence level to independently manage the new changes coming your way? (Respond to all names given below)',
                 'peer_question_text' => 'What is this person\'s confidence level to independently manage new changes?',
                 'dimension' => 'Confidence in Change',
                 'type' => 'individual',
@@ -79,7 +79,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 6,
             ],
             [
-                'question_text' => 'Did you speak to your friend, mentor, colleague or family member who can help you adopt the new changes?',
+                'question_text' => 'Did you speak to your friend, mentor, colleague or family member who can help you adopt the new changes? (Respond to all names given below)',
                 'peer_question_text' => 'Does this person speak to mentors, colleagues, or others who can help them adopt new changes?',
                 'dimension' => 'Seeking Support',
                 'type' => 'individual',
@@ -88,7 +88,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 7,
             ],
             [
-                'question_text' => 'Do you have a clear plan by now on what all actions that you need to take and by when?',
+                'question_text' => 'Do you have a clear plan by now on what all actions that you need to take and by when? (Respond to all names given below)',
                 'peer_question_text' => 'Does this person have a clear plan on what actions they need to take and by when?',
                 'dimension' => 'Action Planning',
                 'type' => 'individual',
@@ -97,7 +97,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 8,
             ],
             [
-                'question_text' => 'Have you started implementing your plan of actions to drive your change?',
+                'question_text' => 'Have you started implementing your plan of actions to drive your change? (Respond to all names given below)',
                 'peer_question_text' => 'Has this person started implementing their plan of actions to drive change?',
                 'dimension' => 'Implementing Plan',
                 'type' => 'individual',
@@ -106,7 +106,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 9,
             ],
             [
-                'question_text' => 'Do you see any improvements or results coming from your implemented actions as per your plan?',
+                'question_text' => 'Do you see any improvements or results coming from your implemented actions as per your plan? (Respond to all names given below)',
                 'peer_question_text' => 'Do you see improvements or results coming from this person\'s implemented actions?',
                 'dimension' => 'Seeing Results',
                 'type' => 'individual',
@@ -115,7 +115,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 10,
             ],
             [
-                'question_text' => 'Have you ever tried supporting a friend or family in any of the above mentioned questions in recent past?',
+                'question_text' => 'Have you ever tried supporting a friend or family in any of the above mentioned questions in recent past?*',
                 'peer_question_text' => 'Has this person supported colleagues or friends through change in the recent past?',
                 'dimension' => 'Supporting Others',
                 'type' => 'individual',

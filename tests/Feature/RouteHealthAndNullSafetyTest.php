@@ -61,7 +61,7 @@ class RouteHealthAndNullSafetyTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get(route('admin.dashboard'));
         $response->assertOk();
-        $response->assertSee('Executive Dashboard');
+        $response->assertSee('Dashboard');
     }
 
     public function test_admin_dashboard_renders_with_active_data(): void

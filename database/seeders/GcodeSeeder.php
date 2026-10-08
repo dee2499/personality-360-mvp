@@ -85,7 +85,7 @@ class GcodeSeeder extends Seeder
         // 6. Create 14 Questions (11 Individual CQ + 3 Group Sync) - exact same as Falcon
         $questionsData = [
             [
-                'question_text' => 'Do you see life changing around - This Person?*',
+                'question_text' => 'Do you see life changing around - This Person? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Awareness of Change',
                 'min_score_description' => 'No Change',
@@ -95,7 +95,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'In the recent past, do you know which are top 3 things thats changing for you?*',
+                'question_text' => 'In the recent past, do you know which are top 3 things thats changing for you? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Understanding Key Changes',
                 'min_score_description' => 'No Idea at all',
@@ -105,7 +105,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'The changes that you have observed in recent past have occurred by situation or by your own choice?*',
+                'question_text' => 'The changes that you have observed in recent past have occurred by situation or by your own choice? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Choice vs Circumstance',
                 'min_score_description' => 'By Situation',
@@ -115,7 +115,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'How much control you think, you have on these changes thats coming your way?*',
+                'question_text' => 'How much control you think, you have on these changes thats coming your way? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Control Over Change',
                 'min_score_description' => 'No Control',
@@ -125,7 +125,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Do you know on how to manage the new changes that you are experiencing in recent past?*',
+                'question_text' => 'Do you know on how to manage the new changes that you are experiencing in recent past? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Managing Change Knowledge',
                 'min_score_description' => 'Dont Know',
@@ -135,7 +135,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'What is your confidence level to independently manage the new changes coming your way?*',
+                'question_text' => 'What is your confidence level to independently manage the new changes coming your way? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Confidence in Change',
                 'min_score_description' => 'Not Confident',
@@ -145,7 +145,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Did you speak to your friend, mentor, colleague or family member who can help you adopt the new changes?*',
+                'question_text' => 'Did you speak to your friend, mentor, colleague or family member who can help you adopt the new changes? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Seeking Support',
                 'min_score_description' => 'Not sure whom to reach',
@@ -155,7 +155,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Do you have a clear plan by now on what all actions that you need to take and by when?*',
+                'question_text' => 'Do you have a clear plan by now on what all actions that you need to take and by when? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Action Planning',
                 'min_score_description' => 'Not yet ready',
@@ -165,7 +165,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Have you started implementing your plan of actions to drive your change?*',
+                'question_text' => 'Have you started implementing your plan of actions to drive your change? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Implementing Plan',
                 'min_score_description' => 'Still Exploring',
@@ -175,7 +175,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Do you see any improvements or results coming from your implemented actions as per your plan?*',
+                'question_text' => 'Do you see any improvements or results coming from your implemented actions as per your plan? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Seeing Results',
                 'min_score_description' => 'Not Yet',

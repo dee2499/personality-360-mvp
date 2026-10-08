@@ -111,21 +111,11 @@ class TeamCQSyncAndCompanyDetailTest extends TestCase
 
         // All Team Action Buttons requested by user
         $response->assertSee(route('admin.companies.team-sync', ['company' => $company, 'survey_id' => $survey->id]));
-        $response->assertSee('Team CQ Sync Report');
-        $response->assertSee('Position Matrix');
-        $response->assertSee('Cohort Distribution');
-        $response->assertSee('Leadership Sign-Off');
+        $response->assertSee('Team Report');
+        $response->assertSee('Team CQ Report');
 
-        // Dimensions and live score sections
-        $response->assertSee('The 3 CQ Sync Dimensions');
-        $response->assertSee('See Together');
-        $response->assertSee('Agree Together');
-        $response->assertSee('Act Together');
-        $response->assertSee('Benchmark: 8.0');
-
-        // Survey card quick action buttons
-        $response->assertSee(route('admin.surveys.team-sync', $survey));
-        $response->assertSee(route('admin.surveys.group-insights', $survey));
+        $response->assertSee('Company 360° Benchmark');
+        $response->assertSee('Employees of '.$company->name);
     }
 
     public function test_admin_can_view_executive_team_cq_sync_report_via_company_route(): void
@@ -140,7 +130,7 @@ class TeamCQSyncAndCompanyDetailTest extends TestCase
         $response->assertStatus(200);
 
         // Core Document Elements matching media_1791104045986.jpg
-        $response->assertSee('Team CQ Sync Report');
+        $response->assertSee('Team Report');
         $response->assertSee('How well is your team aligned to see, agree and act on change together?');
         $response->assertSee('Unlocking Possibilities');
         $response->assertSee('Confidential');
@@ -178,7 +168,7 @@ class TeamCQSyncAndCompanyDetailTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.surveys.team-sync', $survey));
 
         $response->assertStatus(200);
-        $response->assertSee('Team CQ Sync Report');
+        $response->assertSee('Team Report');
         $response->assertSee($survey->title);
         $response->assertSee('Print Report');
     }

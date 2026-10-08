@@ -245,7 +245,7 @@ class ChangeQuotientReportAndGroupInsightsTest extends TestCase
         $followUp = $this->actingAs($data['admin'])->get(route('admin.surveys.group-insights', $data['survey']));
         $followUp->assertOk();
         $followUp->assertSee('Chief People Officer Sarah Vance');
-        $followUp->assertSee('Status: Approved');
+        $followUp->assertSee('Latest: Approved');
     }
 
     public function test_sign_off_validation_requires_lead_and_valid_status(): void

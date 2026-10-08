@@ -54,8 +54,6 @@ class SurveyController extends Controller
                 } else {
                     $surveysQuery->where('company_id', $companyId);
                 }
-            } elseif (session()->has('admin_selected_company_id')) {
-                $surveysQuery->where('company_id', session('admin_selected_company_id'));
             }
         }
 
