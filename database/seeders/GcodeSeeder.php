@@ -227,7 +227,7 @@ class GcodeSeeder extends Seeder
         ];
 
         foreach ($questionsData as $qData) {
-            Question::firstOrCreate(
+            Question::updateOrCreate(
                 [
                     'survey_id' => $survey->id,
                     'sort_order' => $qData['sort_order'],

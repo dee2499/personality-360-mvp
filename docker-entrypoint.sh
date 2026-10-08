@@ -69,6 +69,25 @@ php artisan db:seed --class=GcodeSeeder --force || true
 # Ensure default score categories are seeded
 php artisan db:seed --class=ScoreCategorySeeder --force
 
+# Ensure all survey questions are synced with latest default wording
+php artisan tinker --execute '
+$defaultQuestions = \App\Services\ChangeQuotientQuestionService::getDefaultQuestions();
+foreach (\App\Models\Survey::all() as $survey) {
+    foreach ($defaultQuestions as $index => $dq) {
+        $sort = $index + 1;
+        $q = \App\Models\Question::where("survey_id", $survey->id)->where("sort_order", $sort)->first();
+        if ($q) {
+            $q->update([
+                "question_text" => $dq["question_text"],
+                "peer_question_text" => $dq["peer_question_text"] ?? null,
+                "min_score_description" => $dq["min_score_description"],
+                "max_score_description" => $dq["max_score_description"],
+            ]);
+        }
+    }
+}
+' 2>/dev/null || true
+
 # Re-apply ownership after migrate and seed to ensure www-data can write to SQLite and locks
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
