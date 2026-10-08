@@ -43,11 +43,12 @@ class GcodeSeeder extends Seeder
         );
         $manager->update(['company_id' => $company->id, 'role' => 'manager', 'password' => Hash::make('gcode123')]);
 
-        // 4. Create 3 GCODE Employees
+        // 4. Create 4 GCODE Employees
         $employeesData = [
             ['name' => 'shashwat', 'email' => 'shashwat@gcode.in'],
             ['name' => 'Atharva', 'email' => 'atharva@gcode.in'],
             ['name' => 'lavya', 'email' => 'lavya@gcode.in'],
+            ['name' => 'connect', 'email' => 'connect@gcode.in'],
         ];
 
         $employeeIds = [];

@@ -51,7 +51,7 @@ $admin->update(["password" => \Illuminate\Support\Facades\Hash::make("Srini@Chan
         "password" => \Illuminate\Support\Facades\Hash::make("falcon123")
     ]);
 
-// 3. All GCODE Users (Manager + 3 Employees) -> gcode123
+// 3. All GCODE Users (Manager + 4 Employees) -> gcode123
 \App\Models\User::where("email", "like", "%@gcode.in")->update([
     "password" => \Illuminate\Support\Facades\Hash::make("gcode123")
 ]);
