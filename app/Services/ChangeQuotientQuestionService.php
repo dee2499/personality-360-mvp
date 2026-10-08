@@ -25,8 +25,8 @@ class ChangeQuotientQuestionService
         return [
             // 11 Individual CQ Journey Questions
             [
-                'question_text' => 'Do you see life changing around - This Person? (Respond to all names given below)',
-                'peer_question_text' => 'Do you see life changing around - This Person?',
+                'question_text' => 'Do you see life changing around? (Respond to all names given below)',
+                'peer_question_text' => 'Do you see life changing around?',
                 'dimension' => 'Awareness of Change',
                 'type' => 'individual',
                 'min_score_description' => 'No Change',
@@ -115,7 +115,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 10,
             ],
             [
-                'question_text' => 'Have you ever tried supporting a friend or family in any of the above mentioned questions in recent past?*',
+                'question_text' => 'Have you ever tried supporting a friend or family in any of the above mentioned questions in recent past? (Respond to all names given below)',
                 'peer_question_text' => 'Has this person supported colleagues or friends through change in the recent past?',
                 'dimension' => 'Supporting Others',
                 'type' => 'individual',
@@ -126,7 +126,7 @@ class ChangeQuotientQuestionService
 
             // 3 Group Sync Questions (My Views - About our Group)
             [
-                'question_text' => 'Do you believe everyone in this group has a common understanding of the key changes that are happening around us?',
+                'question_text' => 'Do you believe everyone in this group has a common understanding of the key changes that are happening around us? (Consider as a group and respond)',
                 'peer_question_text' => null,
                 'dimension' => 'See Together',
                 'type' => 'group_sync',
@@ -135,7 +135,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 12,
             ],
             [
-                'question_text' => 'Do you believe everyone in this group is aligned on what needs to change and the direction we need to take?',
+                'question_text' => 'Do you believe everyone in this group is aligned on what needs to change and the direction we need to take? (Consider as a group and respond)',
                 'peer_question_text' => null,
                 'dimension' => 'Agree Together',
                 'type' => 'group_sync',
@@ -144,7 +144,7 @@ class ChangeQuotientQuestionService
                 'sort_order' => 13,
             ],
             [
-                'question_text' => 'Do you believe everyone in this group is aligned and committed to taking the actions needed to make the change happen?',
+                'question_text' => 'Do you believe everyone in this group is aligned and committed to taking the actions needed to make the change happen? (Consider as a group and respond)',
                 'peer_question_text' => null,
                 'dimension' => 'Act Together',
                 'type' => 'group_sync',

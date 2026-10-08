@@ -85,12 +85,12 @@ class GcodeSeeder extends Seeder
         // 6. Create 14 Questions (11 Individual CQ + 3 Group Sync) - exact same as Falcon
         $questionsData = [
             [
-                'question_text' => 'Do you see life changing around - This Person? (Respond to all names given below)',
+                'question_text' => 'Do you see life changing around? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Awareness of Change',
                 'min_score_description' => 'No Change',
                 'max_score_description' => 'Lot of Change',
-                'peer_question_text' => 'Do you see life changing around - This Person?',
+                'peer_question_text' => 'Do you see life changing around?',
                 'sort_order' => 1,
                 'is_active' => true,
             ],
@@ -185,7 +185,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Have you ever tried supporting a friend or family in any of the above mentioned questions in recent past?*',
+                'question_text' => 'Have you ever tried supporting a friend or family in any of the above mentioned questions in recent past? (Respond to all names given below)',
                 'type' => 'individual',
                 'dimension' => 'Supporting Others',
                 'min_score_description' => 'Concentrating on myself',
@@ -195,7 +195,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Do you believe everyone in this group has a common understanding of the key changes that are happening around us?',
+                'question_text' => 'Do you believe everyone in this group has a common understanding of the key changes that are happening around us? (Consider as a group and respond)',
                 'type' => 'group_sync',
                 'dimension' => 'See Together',
                 'min_score_description' => 'No Common Understanding',
@@ -205,7 +205,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Do you believe everyone in this group is aligned on what needs to change and the direction we need to take?',
+                'question_text' => 'Do you believe everyone in this group is aligned on what needs to change and the direction we need to take? (Consider as a group and respond)',
                 'type' => 'group_sync',
                 'dimension' => 'Agree Together',
                 'min_score_description' => 'I dont think so',
@@ -215,7 +215,7 @@ class GcodeSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'question_text' => 'Do you believe everyone in this group is aligned and committed to taking the actions needed to make the change happen?',
+                'question_text' => 'Do you believe everyone in this group is aligned and committed to taking the actions needed to make the change happen? (Consider as a group and respond)',
                 'type' => 'group_sync',
                 'dimension' => 'Act Together',
                 'min_score_description' => 'not aligned not committed',
