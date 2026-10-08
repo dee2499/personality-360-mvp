@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: personality-360-mvp
+    name: changequo
     runtime: docker
     plan: free
     region: oregon
@@ -8,6 +8,8 @@ services:
     envVars:
       - key: APP_NAME
         value: "Change Quo"
+      - key: APP_URL
+        value: "https://changequo.onrender.com"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
