@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,13 +23,53 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's personal details (first name, last name, and optional email).
+     * Check if a username is available.
+     */
+    public function checkUsername(Request $request): JsonResponse
+    {
+        $username = trim((string) $request->query('username', ''));
+
+        if ($username === '') {
+            return response()->json([
+                'available' => true,
+                'message' => '',
+            ]);
+        }
+
+        $taken = User::whereRaw('LOWER(username) = ?', [strtolower($username)])
+            ->where('id', '!=', $request->user()->id)
+            ->exists();
+
+        return response()->json([
+            'available' => ! $taken,
+            'message' => $taken ? 'This username is already taken. Please choose another.' : 'Username is available!',
+        ]);
+    }
+
+    /**
+     * Update the user's personal details (first name, last name, username, and optional email).
      */
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],
+            'username' => [
+                'nullable',
+                'string',
+                'max:100',
+                Rule::unique('users', 'username')->ignore($request->user()->id),
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value) {
+                        $taken = User::whereRaw('LOWER(username) = ?', [strtolower(trim($value))])
+                            ->where('id', '!=', $request->user()->id)
+                            ->exists();
+                        if ($taken) {
+                            $fail('This username is already taken. Please choose another one.');
+                        }
+                    }
+                },
+            ],
             'email' => [
                 'nullable',
                 'string',
@@ -45,6 +87,7 @@ class ProfileController extends Controller
 
         $request->user()->update([
             'name' => $fullName,
+            'username' => ! empty($validated['username']) ? trim($validated['username']) : null,
             'email' => $validated['email'] ?? null,
             'designation' => $validated['designation'] ?? null,
             'department' => $validated['department'] ?? null,

@@ -108,6 +108,36 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
+                        <div class="flex items-center justify-between">
+                            <label for="username" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                                Username
+                            </label>
+                            <span id="username_badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
+                        </div>
+                        <div class="mt-1.5 relative">
+                            <input id="username" 
+                                   name="username"
+                                   type="text" 
+                                   value="{{ old('username', $user->username) }}" 
+                                   placeholder="e.g. harish@falcon"
+                                   autocomplete="username"
+                                   class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition @error('username') border-rose-500 @enderror">
+                            <div id="username_spinner" class="absolute right-3.5 top-3 hidden">
+                                <svg class="animate-spin h-4 w-4 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        @error('username')
+                            <p class="mt-1.5 text-xs text-rose-600 font-medium">{{ $message }}</p>
+                        @enderror
+                        <p id="username_hint" class="mt-1.5 text-[11px] text-slate-400">
+                            You can sign in using this username. Must be unique.
+                        </p>
+                    </div>
+
+                    <div>
                         <label for="profile_email" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                             Email Address
                         </label>
@@ -124,20 +154,20 @@
                         @enderror
                         <p class="mt-1.5 text-[11px] text-slate-400">You can add or update your email address for account notifications.</p>
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                            Organization / Role <span class="text-slate-400 font-normal lowercase">(read-only)</span>
-                        </label>
-                        <div class="mt-1.5">
-                            <input type="text" 
-                                   value="{{ $user->company?->name ?? 'System Organization' }} ({{ ucfirst($user->role) }})" 
-                                   disabled 
-                                   readonly
-                                   class="block w-full rounded-xl border border-slate-200 bg-slate-100/80 px-3.5 py-2.5 text-sm text-slate-500 cursor-not-allowed select-none">
-                        </div>
-                        <p class="mt-1.5 text-[11px] text-slate-400">Assigned by organization administration.</p>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                        Organization / Role <span class="text-slate-400 font-normal lowercase">(read-only)</span>
+                    </label>
+                    <div class="mt-1.5">
+                        <input type="text" 
+                               value="{{ $user->company?->name ?? 'System Organization' }} ({{ ucfirst($user->role) }})" 
+                               disabled 
+                               readonly
+                               class="block w-full rounded-xl border border-slate-200 bg-slate-100/80 px-3.5 py-2.5 text-sm text-slate-500 cursor-not-allowed select-none">
                     </div>
+                    <p class="mt-1.5 text-[11px] text-slate-400">Assigned by organization administration.</p>
                 </div>
 
                 <!-- Professional & Organizational Details (Optional) -->
@@ -214,7 +244,8 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" 
+                    <button id="save_profile_btn"
+                            type="submit" 
                             class="inline-flex items-center justify-center gap-2 py-2.5 px-6 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
                         <i data-lucide="check" class="w-4 h-4"></i>
                         <span>Save Changes</span>
@@ -291,4 +322,73 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const usernameInput = document.getElementById('username');
+            const badge = document.getElementById('username_badge');
+            const hint = document.getElementById('username_hint');
+            const spinner = document.getElementById('username_spinner');
+            const saveBtn = document.getElementById('save_profile_btn');
+            const currentUsername = @json($user->username ?? '');
+
+            let timeout = null;
+
+            if (usernameInput) {
+                usernameInput.addEventListener('input', function () {
+                    const val = usernameInput.value.trim();
+
+                    clearTimeout(timeout);
+
+                    if (val === '' || val.toLowerCase() === currentUsername.toLowerCase()) {
+                        badge.classList.add('hidden');
+                        badge.textContent = '';
+                        spinner.classList.add('hidden');
+                        hint.textContent = 'You can sign in using this username. Must be unique.';
+                        hint.className = 'mt-1.5 text-[11px] text-slate-400';
+                        usernameInput.classList.remove('border-rose-500', 'border-emerald-500');
+                        if (saveBtn) saveBtn.disabled = false;
+                        return;
+                    }
+
+                    spinner.classList.remove('hidden');
+                    badge.classList.add('hidden');
+
+                    timeout = setTimeout(async function () {
+                        try {
+                            const response = await fetch(`{{ route('profile.check-username') }}?username=` + encodeURIComponent(val), {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            });
+                            const data = await response.json();
+                            spinner.classList.add('hidden');
+                            badge.classList.remove('hidden');
+
+                            if (data.available) {
+                                badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
+                                badge.textContent = 'Available';
+                                hint.textContent = '✓ This username is available!';
+                                hint.className = 'mt-1.5 text-[11px] text-emerald-600 font-medium';
+                                usernameInput.classList.remove('border-rose-500');
+                                usernameInput.classList.add('border-emerald-500');
+                                if (saveBtn) saveBtn.disabled = false;
+                            } else {
+                                badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700';
+                                badge.textContent = 'Already Taken';
+                                hint.textContent = '✕ This username is already in use. Please choose another.';
+                                hint.className = 'mt-1.5 text-[11px] text-rose-600 font-medium';
+                                usernameInput.classList.remove('border-emerald-500');
+                                usernameInput.classList.add('border-rose-500');
+                                if (saveBtn) saveBtn.disabled = true;
+                            }
+                        } catch (e) {
+                            spinner.classList.add('hidden');
+                        }
+                    }, 300);
+                });
+            }
+        });
+    </script>
 </x-layouts.app>
