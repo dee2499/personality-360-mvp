@@ -114,7 +114,8 @@ chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 chmod 664 /var/www/html/database/database.sqlite
 
-# Optimization caches
+# Optimization and application cache
+php artisan cache:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

@@ -8,7 +8,6 @@ use App\Models\Question;
 use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 
 class AssessmentScoreService
 {
@@ -393,12 +392,7 @@ class AssessmentScoreService
      */
     public function calculateCompanyMetrics(Company $company, ?Survey $survey = null): array
     {
-        $surveyKey = $survey ? "survey_{$survey->id}_{$survey->updated_at?->timestamp}" : 'all';
-        $cacheKey = "company_metrics_{$company->id}_{$company->updated_at?->timestamp}_{$surveyKey}";
-
-        return Cache::remember($cacheKey, now()->addHours(6), function () use ($company, $survey) {
-            return $this->computeCompanyMetrics($company, $survey);
-        });
+        return $this->computeCompanyMetrics($company, $survey);
     }
 
     /**
@@ -1291,11 +1285,7 @@ class AssessmentScoreService
      */
     public function calculateGroupInsights(Survey $survey): array
     {
-        $cacheKey = "survey_group_insights_{$survey->id}_{$survey->updated_at?->timestamp}";
-
-        return Cache::remember($cacheKey, now()->addHours(6), function () use ($survey) {
-            return $this->computeGroupInsights($survey);
-        });
+        return $this->computeGroupInsights($survey);
     }
 
     /**

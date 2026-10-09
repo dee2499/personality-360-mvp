@@ -15,6 +15,7 @@ use App\Services\AssessmentScoreService;
 use App\Services\ChangeQuotientQuestionService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -275,7 +276,11 @@ class AssessmentController extends Controller
 
             // Automatically compute total score, percentage, and category
             $this->scoreService->calculateAssessmentScore($assessment);
+
+            $assessment->survey?->touch();
         });
+
+        Cache::flush();
 
         $subjectName = $assessment->isSelfAssessment() ? 'your self-assessment' : "assessment of {$assessment->subject->name}";
 
@@ -438,7 +443,12 @@ class AssessmentController extends Controller
                     );
                 }
             }
+
+            // 3. Touch survey timestamp to invalidate any listeners and ensure real-time recaching
+            $survey->touch();
         });
+
+        Cache::flush();
 
         return redirect()->route('participant.assessments.report', $survey)
             ->with('success', "Great job! All evaluations and Group Sync ratings for '{$survey->title}' have been successfully submitted.");
