@@ -68,6 +68,12 @@
             </a>
 
             <div class="flex items-center gap-3">
+                <a href="{{ route('admin.surveys.export-pdf', ['survey' => $survey, 'auto_print' => 1]) }}" target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-2xs transition">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Download Report PDF</span>
+                </a>
+
                 <a href="{{ route('admin.surveys.team-sync', $survey) }}" 
                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 shadow-2xs transition">
                     <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-600"></i>
@@ -80,8 +86,8 @@
                 </span>
                 
                 <a href="#sign-off-panel" 
-                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-2xs transition">
-                    <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-2xs transition">
+                    <i data-lucide="check-square" class="w-3.5 h-3.5 text-indigo-600"></i>
                     <span>Leadership Sign-Off</span>
                 </a>
             </div>

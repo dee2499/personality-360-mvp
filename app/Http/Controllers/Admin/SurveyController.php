@@ -326,6 +326,21 @@ class SurveyController extends Controller
     }
 
     /**
+     * Export complete executive report (Summary, 2x2 Matrix, 3 Dimensions, Score Distribution) as a PDF document.
+     */
+    public function exportPdf(Survey $survey, AssessmentScoreService $scoreService): View
+    {
+        if (request()->user()->isManager() && $survey->company_id !== request()->user()->company_id) {
+            abort(403, 'You are not authorized to access surveys outside your company.');
+        }
+
+        $insights = $scoreService->calculateGroupInsights($survey);
+        $company = $survey->company;
+
+        return view('admin.surveys.export-pdf', compact('survey', 'company', 'insights'));
+    }
+
+    /**
      * Record leadership sign-off for the survey group action plan.
      */
     public function signOff(Request $request, Survey $survey): RedirectResponse

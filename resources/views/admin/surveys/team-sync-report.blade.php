@@ -108,6 +108,12 @@
             </div>
 
             <div class="flex items-center gap-2">
+                <a href="{{ route('admin.surveys.export-pdf', ['survey' => $survey, 'auto_print' => 1]) }}" target="_blank"
+                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Download Report PDF</span>
+                </a>
+
                 <button type="button" onclick="window.print()"
                         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-2xs transition cursor-pointer">
                     <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-500"></i>
@@ -115,8 +121,8 @@
                 </button>
 
                 <a href="{{ route('admin.surveys.group-insights', ['survey' => $survey, 'tab' => 'summary']) }}" 
-                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-2xs transition">
-                    <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 shadow-2xs transition">
+                    <i data-lucide="compass" class="w-3.5 h-3.5 text-indigo-600"></i>
                     <span>Position Matrix</span>
                 </a>
             </div>

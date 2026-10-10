@@ -18,8 +18,15 @@
                 <p class="text-xs text-slate-500 font-medium">Overview of surveys, participant evaluations, and 360-degree completion status</p>
             </div>
             <div class="flex items-center gap-2">
+                @if($surveys->isNotEmpty())
+                    <a href="{{ route('admin.surveys.export-pdf', ['survey' => $surveys->first(), 'auto_print' => 1]) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Download Report PDF</span>
+                    </a>
+                @endif
                 <a href="{{ route('admin.surveys.create') }}" 
-                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition">
+                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition">
                     <i data-lucide="plus-circle" class="w-4 h-4"></i>
                     <span>Create Survey</span>
                 </a>
@@ -235,6 +242,12 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
+                                <a href="{{ route('admin.surveys.export-pdf', ['survey' => $survey, 'auto_print' => 1]) }}" target="_blank" 
+                                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition"
+                                   title="Download Report PDF">
+                                    <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                                    <span>PDF</span>
+                                </a>
                                 <a href="{{ route('admin.surveys.show', $survey) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition">
                                     <span>Manage</span>
                                     <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>

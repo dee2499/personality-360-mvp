@@ -46,6 +46,12 @@
 
                 <!-- Action Controls (Publish / Unpublish / Edit / Insights) -->
                 <div class="flex flex-wrap items-center gap-2 shrink-0">
+                    <a href="{{ route('admin.surveys.export-pdf', ['survey' => $survey, 'auto_print' => 1]) }}" target="_blank"
+                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition cursor-pointer">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span>Download Report PDF</span>
+                    </a>
+
                     <a href="{{ route('admin.surveys.group-insights', $survey) }}" 
                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
                         <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
