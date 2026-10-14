@@ -554,7 +554,15 @@
                                                 </div>
                                             </td>
                                             <td class="py-4 px-6 text-slate-600">
-                                                {{ $employee->email }}
+                                                <div class="font-medium text-slate-900">{{ $employee->email ?: '—' }}</div>
+                                                @if($employee->username)
+                                                    <div class="text-[10px] text-slate-500 font-mono">@<span>{{ $employee->username }}</span></div>
+                                                @endif
+                                                @if($employee->designation || $employee->department)
+                                                    <div class="text-[10px] text-indigo-600 font-medium">
+                                                        {{ $employee->designation }}{{ $employee->designation && $employee->department ? ' • ' : '' }}{{ $employee->department }}
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td class="py-4 px-6">
                                                 @if($employee->isManager())
@@ -651,11 +659,23 @@
                         <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
                             {{ $company->name }}
                         </span>
-                        <h3 class="text-lg font-black text-slate-900 mt-1">Invite Employee</h3>
+                        <h3 class="text-lg font-black text-slate-900 mt-1">Add / Invite Employee</h3>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">Fill in user details. Providing either username or email creates the user.</p>
                     </div>
-                    <button type="button" @click="showInviteModal = false" class="text-slate-400 hover:text-slate-700">
+                    <button type="button" @click="showInviteModal = false" class="text-slate-400 hover:text-slate-700 cursor-pointer">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
+                </div>
+
+                <!-- Password Info Callout -->
+                <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl text-xs flex items-center justify-between gap-2">
+                    <span class="text-indigo-950 font-semibold flex items-center gap-1.5">
+                        <i data-lucide="key" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+                        Default Initial Password:
+                    </span>
+                    <span class="font-mono font-black text-indigo-700 bg-white px-2.5 py-0.5 rounded-lg border border-indigo-200">
+                        {{ $company->defaultUserPassword() }}
+                    </span>
                 </div>
 
                 <form method="POST" action="{{ route('admin.companies.invite', $company) }}" class="space-y-4">
@@ -665,7 +685,7 @@
                         <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-1">
                             <span class="font-bold flex items-center gap-1.5 text-rose-900">
                                 <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>
-                                Could not invite employee:
+                                Could not add employee:
                             </span>
                             <ul class="list-disc list-inside space-y-0.5 text-[11px] text-rose-700 pl-1">
                                 @foreach($errors->all() as $error)
@@ -675,9 +695,10 @@
                         </div>
                     @endif
 
+                    <!-- Full Name -->
                     <div>
                         <label for="invite_name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                            Employee Full Name <span class="text-rose-500">*</span>
+                            Full Name <span class="text-rose-500">*</span>
                         </label>
                         <div class="mt-1">
                             <input id="invite_name" 
@@ -693,24 +714,45 @@
                         @enderror
                     </div>
 
-                    <div>
-                        <label for="invite_email" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                            Work Email Address <span class="text-rose-500">*</span>
-                        </label>
-                        <div class="mt-1">
-                            <input id="invite_email" 
-                                   name="email" 
-                                   type="email" 
-                                   required 
-                                   value="{{ old('email') }}"
-                                   placeholder="e.g. jdoe@company.com"
-                                   class="block w-full rounded-xl border {{ $errors->has('email') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }} px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
+                    <!-- Username & Email Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="invite_username" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                                Username
+                            </label>
+                            <div class="mt-1">
+                                <input id="invite_username" 
+                                       name="username" 
+                                       type="text" 
+                                       value="{{ old('username') }}"
+                                       placeholder="e.g. {{ strtolower(preg_replace('/[^a-zA-Z0-9]/', '', preg_split('/[\s_-]+/', trim($company->name))[0] ?? 'user')) }}_john"
+                                       class="block w-full rounded-xl border {{ $errors->has('username') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }} px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
+                            </div>
+                            @error('username')
+                                <p class="mt-1 text-[11px] text-rose-600 font-semibold">{{ $message }}</p>
+                            @enderror
                         </div>
-                        @error('email')
-                            <p class="mt-1 text-xs text-rose-600 font-semibold">{{ $message }}</p>
-                        @enderror
-                    </div>
 
+                        <div>
+                            <label for="invite_email" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                                Email Address
+                            </label>
+                            <div class="mt-1">
+                                <input id="invite_email" 
+                                       name="email" 
+                                       type="email" 
+                                       value="{{ old('email') }}"
+                                       placeholder="e.g. jdoe@company.com"
+                                       class="block w-full rounded-xl border {{ $errors->has('email') ? 'border-rose-400 bg-rose-50/30' : 'border-slate-300' }} px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
+                            </div>
+                            @error('email')
+                                <p class="mt-1 text-[11px] text-rose-600 font-semibold">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 italic">Provide either Username or Email (or both). User is created if either is entered.</p>
+
+                    <!-- Role Selection -->
                     @if(auth()->user()->isAdmin())
                         <div>
                             <label for="invite_role" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
@@ -719,26 +761,52 @@
                             <div class="mt-1">
                                 <select id="invite_role" 
                                         name="role" 
-                                        class="block w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
+                                        class="block w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white focus:border-indigo-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-600/20 transition">
                                     <option value="participant" {{ old('role') === 'participant' ? 'selected' : '' }}>Participant (Survey & Assessment Access)</option>
                                     <option value="manager" {{ old('role') === 'manager' ? 'selected' : '' }}>Company Manager (Full Company Console & Survey Management)</option>
                                 </select>
                             </div>
-                            <p class="mt-1 text-[11px] text-slate-400">Managers have access to view and manage all data, surveys, and reports for this company.</p>
                         </div>
                     @else
                         <input type="hidden" name="role" value="participant">
                     @endif
 
+                    <!-- Demographic Profile Metadata -->
+                    <div class="pt-3 border-t border-slate-100 space-y-3">
+                        <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Profile Details (Optional)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label for="invite_designation" class="block text-[11px] font-semibold text-slate-600">Designation</label>
+                                <input id="invite_designation" name="designation" type="text" value="{{ old('designation') }}" placeholder="e.g. CFO, AGM, Lead"
+                                       class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 transition">
+                            </div>
+                            <div>
+                                <label for="invite_department" class="block text-[11px] font-semibold text-slate-600">Department</label>
+                                <input id="invite_department" name="department" type="text" value="{{ old('department') }}" placeholder="e.g. Finance & Accounts"
+                                       class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 transition">
+                            </div>
+                            <div>
+                                <label for="invite_division" class="block text-[11px] font-semibold text-slate-600">Division</label>
+                                <input id="invite_division" name="division" type="text" value="{{ old('division') }}" placeholder="e.g. Marine, Feed"
+                                       class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 transition">
+                            </div>
+                            <div>
+                                <label for="invite_age" class="block text-[11px] font-semibold text-slate-600">Age</label>
+                                <input id="invite_age" name="age" type="number" min="15" max="100" value="{{ old('age') }}" placeholder="e.g. 42"
+                                       class="mt-1 block w-full rounded-xl border border-slate-300 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 transition">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
                         <button type="button" @click="showInviteModal = false"
-                                class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                                class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
                             Cancel
                         </button>
                         <button type="submit" 
-                                class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition">
-                            <i data-lucide="send" class="w-4 h-4"></i>
-                            <span>Send Invitation</span>
+                                class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-100 transition cursor-pointer">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            <span>Add Employee</span>
                         </button>
                     </div>
                 </form>

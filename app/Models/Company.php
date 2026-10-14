@@ -50,4 +50,14 @@ class Company extends Model
     {
         return $this->hasMany(Survey::class);
     }
+
+    /**
+     * Compute default initial password for company users (e.g. "Falcon Group" -> falcon123, "GCODE" -> gcode123).
+     */
+    public function defaultUserPassword(): string
+    {
+        $prefix = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', preg_split('/[\s_-]+/', trim($this->name))[0] ?? ''));
+
+        return ($prefix ?: 'changequo').'123';
+    }
 }

@@ -204,22 +204,39 @@ class CompanyController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'username' => ['nullable', 'string', 'max:255', 'unique:users,username', 'required_without:email'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email', 'required_without:username'],
             'role' => ['nullable', 'string'],
+            'designation' => ['nullable', 'string', 'max:255'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'division' => ['nullable', 'string', 'max:255'],
+            'age' => ['nullable', 'integer', 'min:15', 'max:100'],
+        ], [
+            'username.required_without' => 'Please provide either a username or an email address.',
+            'email.required_without' => 'Please provide either an email address or a username.',
         ]);
 
         $requestedRole = $validated['role'] ?? 'participant';
         $role = in_array($requestedRole, ['participant', 'manager'], true) ? $requestedRole : 'participant';
         $token = Str::random(40);
+        $plainPassword = $company->defaultUserPassword();
+        $hasEmail = ! empty($validated['email']);
 
         $user = User::create([
             'company_id' => $company->id,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
+            'name' => trim($validated['name']),
+            'username' => ! empty($validated['username']) ? trim($validated['username']) : null,
+            'email' => $hasEmail ? trim($validated['email']) : null,
             'role' => $role,
-            'password' => Hash::make(Str::random(32)),
-            'invitation_token' => $token,
-            'invitation_sent_at' => now(),
+            'password' => Hash::make($plainPassword),
+            'designation' => ! empty($validated['designation']) ? trim($validated['designation']) : null,
+            'department' => ! empty($validated['department']) ? trim($validated['department']) : null,
+            'division' => ! empty($validated['division']) ? trim($validated['division']) : null,
+            'age' => ! empty($validated['age']) ? (int) $validated['age'] : null,
+            'invitation_token' => $hasEmail ? $token : null,
+            'invitation_sent_at' => $hasEmail ? now() : null,
+            'invitation_accepted_at' => null,
+            'email_verified_at' => now(),
         ]);
 
         // Auto-enroll employee into existing surveys belonging to this company
@@ -231,27 +248,36 @@ class CompanyController extends Controller
         $emailSent = false;
         $emailError = null;
 
-        try {
-            $user->notify(new EmployeeInvitationNotification($token, $company->name));
-            $emailSent = true;
-        } catch (\Throwable $e) {
-            $emailError = $e->getMessage();
-            Log::error('Failed sending invitation email to '.$user->email.': '.$e->getMessage());
+        if ($hasEmail) {
+            try {
+                $user->notify(new EmployeeInvitationNotification($token, $company->name));
+                $emailSent = true;
+            } catch (\Throwable $e) {
+                $emailError = $e->getMessage();
+                Log::error('Failed sending invitation email to '.$user->email.': '.$e->getMessage());
+            }
         }
 
         $activationUrl = route('invitation.show', ['token' => $token]);
-
-        $redirect = redirect()->route('admin.companies.show', $company)
-            ->with('invitation_link', $activationUrl)
-            ->with('invited_employee', $user->name);
-
         $roleLabel = $role === 'manager' ? 'Company Manager' : 'Employee';
 
-        if ($emailSent) {
-            return $redirect->with('success', "{$roleLabel} '{$user->name}' added to {$company->name}! Invitation email sent to {$user->email}.");
+        $redirect = redirect()->route('admin.companies.show', $company)
+            ->with('invited_employee', $user->name)
+            ->with('default_password', $plainPassword);
+
+        if ($hasEmail) {
+            $redirect->with('invitation_link', $activationUrl);
+
+            if ($emailSent) {
+                return $redirect->with('success', "{$roleLabel} '{$user->name}' added to {$company->name}! Password set to '{$plainPassword}'. Invitation email sent to {$user->email}.");
+            }
+
+            return $redirect->with('warning', "{$roleLabel} '{$user->name}' added with password '{$plainPassword}', but email delivery failed: {$emailError}. You can share the login credentials or invitation link directly.");
         }
 
-        return $redirect->with('warning', "{$roleLabel} '{$user->name}' added, but email delivery failed: {$emailError}. You can use the activation link below to activate their account.");
+        $loginIdentifier = $user->username ?: $user->name;
+
+        return $redirect->with('success', "{$roleLabel} '{$user->name}' added to {$company->name} successfully! Login credentials — Username: {$loginIdentifier} • Password: {$plainPassword}");
     }
 
     /**

@@ -184,13 +184,33 @@
                     @endif
 
                     <!-- Or create a new participant -->
-                    <div class="pt-3 border-t border-slate-100">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Or Register & Add New Member:</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <input type="text" name="new_name" placeholder="Full Name (e.g. Alice)" 
+                    <div class="pt-3 border-t border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <label class="block text-xs font-semibold text-slate-700">Or Register & Add New Member:</label>
+                            @php
+                                $surveyCompanyPwd = $survey->company ? $survey->company->defaultUserPassword() : 'changequo123';
+                            @endphp
+                            <span class="text-[11px] text-slate-500 font-medium">
+                                Initial password: <strong class="font-mono text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">{{ $surveyCompanyPwd }}</strong>
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <input type="text" name="new_name" placeholder="Full Name (required)" 
                                    class="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
-                            <input type="email" name="new_email" placeholder="Email Address (e.g. alice@example.com)" 
+                            <input type="text" name="new_username" placeholder="Username (e.g. user@{{ $survey->company ? strtolower(preg_replace('/[^a-zA-Z0-9]/', '', preg_split('/[\s_-]+/', trim($survey->company->name))[0] ?? 'falcon')) : 'falcon' }})" 
                                    class="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                            <input type="email" name="new_email" placeholder="Email (optional if username provided)" 
+                                   class="rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <input type="text" name="new_designation" placeholder="Designation (e.g. CFO)" 
+                                   class="rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                            <input type="text" name="new_department" placeholder="Department (e.g. Operations)" 
+                                   class="rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                            <input type="text" name="new_division" placeholder="Division (e.g. Marine)" 
+                                   class="rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
+                            <input type="number" name="new_age" min="15" max="100" placeholder="Age (e.g. 42)" 
+                                   class="rounded-xl border border-slate-300 px-2.5 py-1.5 text-xs focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20">
                         </div>
                     </div>
 
@@ -220,7 +240,7 @@
                             <thead>
                                 <tr class="bg-slate-50/75 border-b border-slate-100 text-slate-400 uppercase font-semibold tracking-wider text-[10px]">
                                     <th class="py-3 px-6">Name</th>
-                                    <th class="py-3 px-6">Email</th>
+                                    <th class="py-3 px-6">Email / Username</th>
                                     <th class="py-3 px-6">Assessments Given</th>
                                     <th class="py-3 px-6">Assessments Received</th>
                                     <th class="py-3 px-6 text-right">Action</th>
@@ -239,7 +259,18 @@
                                                 {{ $participant->name }}
                                             </a>
                                         </td>
-                                        <td class="py-3.5 px-6 text-slate-600">{{ $participant->email }}</td>
+                                        <td class="py-3.5 px-6 text-slate-600">
+                                            @if($participant->email)
+                                                <span>{{ $participant->email }}</span>
+                                                @if($participant->username)
+                                                    <span class="block text-[11px] text-slate-400 font-mono">@{{ $participant->username }}</span>
+                                                @endif
+                                            @elseif($participant->username)
+                                                <span class="font-mono text-slate-700">@{{ $participant->username }}</span>
+                                            @else
+                                                <span class="text-slate-400">—</span>
+                                            @endif
+                                        </td>
                                         <td class="py-3.5 px-6 font-medium text-slate-800">
                                             <span class="text-indigo-600 font-bold">{{ $givenCount }}</span> / {{ $expectedCount }} completed
                                         </td>

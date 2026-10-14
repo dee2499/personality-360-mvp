@@ -25,16 +25,31 @@ class SurveyParticipantController extends Controller
             'user_ids' => ['nullable', 'array'],
             'user_ids.*' => ['exists:users,id'],
             'new_name' => ['nullable', 'string', 'max:255'],
+            'new_username' => ['nullable', 'string', 'max:255', 'unique:users,username'],
             'new_email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
+            'new_designation' => ['nullable', 'string', 'max:255'],
+            'new_department' => ['nullable', 'string', 'max:255'],
+            'new_division' => ['nullable', 'string', 'max:255'],
+            'new_age' => ['nullable', 'integer', 'min:15', 'max:100'],
         ]);
 
-        if (! empty($validated['new_name']) && ! empty($validated['new_email'])) {
+        if (! empty($validated['new_name']) && (! empty($validated['new_email']) || ! empty($validated['new_username']))) {
+            $company = $survey->company;
+            $plainPassword = $company ? $company->defaultUserPassword() : 'changequo123';
+
             $newUser = User::create([
                 'company_id' => $survey->company_id,
-                'name' => $validated['new_name'],
-                'email' => $validated['new_email'],
-                'password' => Hash::make('password'),
+                'name' => trim($validated['new_name']),
+                'username' => ! empty($validated['new_username']) ? trim($validated['new_username']) : null,
+                'email' => ! empty($validated['new_email']) ? trim($validated['new_email']) : null,
+                'password' => Hash::make($plainPassword),
                 'role' => 'participant',
+                'designation' => ! empty($validated['new_designation']) ? trim($validated['new_designation']) : null,
+                'department' => ! empty($validated['new_department']) ? trim($validated['new_department']) : null,
+                'division' => ! empty($validated['new_division']) ? trim($validated['new_division']) : null,
+                'age' => ! empty($validated['new_age']) ? (int) $validated['new_age'] : null,
+                'email_verified_at' => now(),
+                'invitation_accepted_at' => now(),
             ]);
 
             $survey->participants()->syncWithoutDetaching([$newUser->id]);
