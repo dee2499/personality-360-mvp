@@ -263,10 +263,10 @@
                                             @if($participant->email)
                                                 <span>{{ $participant->email }}</span>
                                                 @if($participant->username)
-                                                    <span class="block text-[11px] text-slate-400 font-mono">@{{ $participant->username }}</span>
+                                                    <span class="block text-[11px] text-slate-400 font-mono">{{ '@' . $participant->username }}</span>
                                                 @endif
                                             @elseif($participant->username)
-                                                <span class="font-mono text-slate-700">@{{ $participant->username }}</span>
+                                                <span class="font-mono text-slate-700">{{ '@' . $participant->username }}</span>
                                             @else
                                                 <span class="text-slate-400">—</span>
                                             @endif

@@ -142,6 +142,11 @@ class AdminUserCreationTest extends TestCase
         $this->assertTrue(Hash::check('falcon123', $user->password));
         $this->assertTrue($survey->participants()->where('users.id', $user->id)->exists());
 
+        // Verify survey page renders username properly without raw Blade tags
+        $showPage = $this->actingAs($admin)->get(route('admin.surveys.show', $survey));
+        $showPage->assertSee('@bobbuilder');
+        $showPage->assertDontSee('{{ $participant->username }}');
+
         // Verify login
         auth()->logout();
         $loginResponse = $this->post(route('login'), [
