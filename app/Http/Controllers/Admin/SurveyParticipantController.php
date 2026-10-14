@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assessment;
 use App\Models\Survey;
 use App\Models\User;
 use App\Services\AssessmentGenerationService;
@@ -83,6 +84,14 @@ class SurveyParticipantController extends Controller
         }
 
         $survey->participants()->detach($participant->id);
+
+        Assessment::where('survey_id', $survey->id)
+            ->where(function ($q) use ($participant) {
+                $q->where('assessor_id', $participant->id)
+                    ->orWhere('subject_id', $participant->id);
+            })->delete();
+
+        app(AssessmentGenerationService::class)->generateForSurvey($survey);
 
         return back()->with('success', "Participant '{$participant->name}' removed from survey.");
     }

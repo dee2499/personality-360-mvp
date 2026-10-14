@@ -34,6 +34,10 @@ class AssessmentController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isAdmin() || $user->isManager()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // 1. Identify all surveys assigned to the user or belonging to their company
         $surveys = Survey::query()
             ->where(function ($q) use ($user) {
@@ -46,8 +50,8 @@ class AssessmentController extends Controller
             ->with(['questions', 'participants', 'company'])
             ->get();
 
-        // 2. Auto-enroll user into their company surveys and sync assessments (Admins are strictly excluded)
-        if (! $user->isAdmin()) {
+        // 2. Auto-enroll user into their company surveys and sync assessments (Admins & Managers strictly excluded)
+        if ($user->isParticipant()) {
             foreach ($surveys as $s) {
                 if (! $s->participants()->where('users.id', $user->id)->exists()) {
                     $s->participants()->syncWithoutDetaching([$user->id]);
@@ -236,6 +240,10 @@ class AssessmentController extends Controller
      */
     public function show(Request $request, Assessment $assessment): RedirectResponse
     {
+        if (! $request->user()->isParticipant()) {
+            abort(403, 'Managers and Administrators cannot take part in surveys.');
+        }
+
         if ($assessment->assessor_id !== $request->user()->id && ! $request->user()->isAdmin()) {
             abort(403, 'You are not authorized to view this assessment.');
         }
@@ -248,6 +256,10 @@ class AssessmentController extends Controller
      */
     public function submit(SubmitAssessmentRequest $request, Assessment $assessment): RedirectResponse
     {
+        if (! $request->user()->isParticipant()) {
+            abort(403, 'Managers and Administrators cannot take part in surveys.');
+        }
+
         if ($assessment->isCompleted()) {
             return redirect()->route('participant.assessments.show', $assessment)
                 ->with('info', 'This assessment has already been completed and submitted.');
@@ -298,15 +310,19 @@ class AssessmentController extends Controller
     {
         $user = $request->user();
 
-        // 1. If survey belongs to user's company, auto-enroll participant user if not yet attached (Admins are strictly excluded)
-        if (! $user->isAdmin() && $survey->company_id && $user->company_id === $survey->company_id && ! $survey->participants()->where('users.id', $user->id)->exists()) {
+        if (! $user->isParticipant()) {
+            abort(403, 'Managers and Administrators cannot take part in surveys.');
+        }
+
+        // 1. If survey belongs to user's company, auto-enroll participant user if not yet attached
+        if ($survey->company_id && $user->company_id === $survey->company_id && ! $survey->participants()->where('users.id', $user->id)->exists()) {
             $survey->participants()->syncWithoutDetaching([$user->id]);
         }
 
         $isParticipant = $survey->participants()->where('users.id', $user->id)->exists();
         $hasAssessments = Assessment::where('survey_id', $survey->id)->where('assessor_id', $user->id)->exists();
 
-        if (! $isParticipant && ! $hasAssessments && ! $user->isAdmin()) {
+        if (! $isParticipant && ! $hasAssessments) {
             abort(403, 'You are not assigned to this survey cohort.');
         }
 
@@ -383,6 +399,10 @@ class AssessmentController extends Controller
     public function submitSurveyMatrix(Request $request, Survey $survey): RedirectResponse
     {
         $user = $request->user();
+
+        if (! $user->isParticipant()) {
+            abort(403, 'Managers and Administrators cannot take part in surveys.');
+        }
 
         $answersData = $request->input('answers', []); // [subject_id => [question_id => score]]
         $groupSyncData = $request->input('group_sync', []); // [question_id => score]

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assessment;
 use App\Models\Company;
 use App\Models\Survey;
 use App\Models\User;
@@ -239,10 +240,12 @@ class CompanyController extends Controller
             'email_verified_at' => now(),
         ]);
 
-        // Auto-enroll employee into existing surveys belonging to this company
-        foreach ($company->surveys as $survey) {
-            $survey->participants()->syncWithoutDetaching([$user->id]);
-            app(AssessmentGenerationService::class)->generateForSurvey($survey);
+        // Auto-enroll employee into existing surveys belonging to this company ONLY if participant
+        if ($role === 'participant') {
+            foreach ($company->surveys as $survey) {
+                $survey->participants()->syncWithoutDetaching([$user->id]);
+                app(AssessmentGenerationService::class)->generateForSurvey($survey);
+            }
         }
 
         $emailSent = false;
@@ -301,9 +304,31 @@ class CompanyController extends Controller
             'role' => ['required', 'string', 'in:participant,manager'],
         ]);
 
-        $employee->update(['role' => $validated['role']]);
+        $newRole = $validated['role'];
+        $employee->update(['role' => $newRole]);
 
-        $roleTitle = $validated['role'] === 'manager' ? 'Company Manager' : 'Participant';
+        if ($newRole === 'manager') {
+            // Managers CANNOT take part in surveys: remove from all survey cohorts and delete their assessments
+            $surveys = $employee->surveys()->get();
+            $employee->surveys()->detach();
+
+            Assessment::where(function ($q) use ($employee) {
+                $q->where('assessor_id', $employee->id)
+                    ->orWhere('subject_id', $employee->id);
+            })->delete();
+
+            // Refresh / resync cohort pairings for affected surveys so counts stay accurate
+            foreach ($surveys as $survey) {
+                app(AssessmentGenerationService::class)->generateForSurvey($survey);
+            }
+        } elseif ($newRole === 'participant') {
+            foreach ($company->surveys as $survey) {
+                $survey->participants()->syncWithoutDetaching([$employee->id]);
+                app(AssessmentGenerationService::class)->generateForSurvey($survey);
+            }
+        }
+
+        $roleTitle = $newRole === 'manager' ? 'Company Manager' : 'Participant';
 
         return redirect()->route('admin.companies.show', $company)
             ->with('success', "Role for '{$employee->name}' updated to {$roleTitle} successfully.");

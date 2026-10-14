@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Assessment;
 use App\Models\Company;
 use App\Models\Survey;
 use App\Models\User;
+use App\Services\AssessmentGenerationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -255,5 +257,118 @@ class CompanyManagerRoleTest extends TestCase
         $this->actingAs($manager)
             ->get(route('admin.people.show', $falconEmployee))
             ->assertOk();
+    }
+
+    public function test_user_changed_to_manager_is_removed_from_all_surveys_and_assessments_deleted(): void
+    {
+        $falcon = Company::factory()->create(['name' => 'Falcon Group']);
+        $admin = User::factory()->admin()->create();
+
+        $employee1 = User::factory()->participant()->create([
+            'company_id' => $falcon->id,
+            'name' => 'John Participant',
+        ]);
+        $employee2 = User::factory()->participant()->create([
+            'company_id' => $falcon->id,
+            'name' => 'Jane Colleague',
+        ]);
+
+        $survey = Survey::create([
+            'company_id' => $falcon->id,
+            'title' => 'Falcon Survey',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+
+        $survey->participants()->sync([$employee1->id, $employee2->id]);
+        app(AssessmentGenerationService::class)->generateForSurvey($survey);
+
+        // Initially 2 participants => 4 assessments
+        $this->assertEquals(2, $survey->participants()->count());
+        $this->assertEquals(4, Assessment::where('survey_id', $survey->id)->count());
+
+        // Admin changes employee1 to manager
+        $response = $this->actingAs($admin)->post(
+            route('admin.companies.employees.role', [$falcon, $employee1]),
+            ['role' => 'manager']
+        );
+
+        $response->assertRedirect();
+        $employee1->refresh();
+        $this->assertTrue($employee1->isManager());
+
+        // Manager MUST be completely removed from survey participants
+        $this->assertFalse($survey->participants()->where('users.id', $employee1->id)->exists());
+        $this->assertFalse($employee1->surveys()->where('surveys.id', $survey->id)->exists());
+        $this->assertEquals(1, $survey->participants()->count());
+
+        // Any assessment where manager is assessor or subject MUST be permanently deleted
+        $this->assertDatabaseMissing('assessments', ['survey_id' => $survey->id, 'assessor_id' => $employee1->id]);
+        $this->assertDatabaseMissing('assessments', ['survey_id' => $survey->id, 'subject_id' => $employee1->id]);
+
+        // Remaining cohort only has self-assessment for employee2
+        $this->assertEquals(1, Assessment::where('survey_id', $survey->id)->count());
+    }
+
+    public function test_manager_cannot_take_part_in_survey_or_access_taking_screens(): void
+    {
+        $falcon = Company::factory()->create(['name' => 'Falcon Group']);
+        $manager = User::factory()->manager()->create([
+            'company_id' => $falcon->id,
+        ]);
+
+        $survey = Survey::create([
+            'company_id' => $falcon->id,
+            'title' => 'Falcon Survey',
+            'status' => 'published',
+            'created_by' => $manager->id,
+        ]);
+
+        // Accessing my-assessments redirects to admin dashboard
+        $indexResponse = $this->actingAs($manager)->get(route('participant.assessments.index'));
+        $indexResponse->assertRedirect(route('admin.dashboard'));
+
+        // Accessing survey taking screen is forbidden with 403
+        $takeResponse = $this->actingAs($manager)->get(route('participant.surveys.take', $survey));
+        $takeResponse->assertForbidden();
+
+        // Submitting survey matrix ratings is forbidden with 403
+        $submitResponse = $this->actingAs($manager)->post(route('participant.surveys.submit-matrix', $survey), [
+            'answers' => [1 => [1 => 8]],
+        ]);
+        $submitResponse->assertForbidden();
+    }
+
+    public function test_newly_invited_manager_is_not_enrolled_in_surveys(): void
+    {
+        $falcon = Company::factory()->create(['name' => 'Falcon Group']);
+        $admin = User::factory()->admin()->create();
+
+        $survey = Survey::create([
+            'company_id' => $falcon->id,
+            'title' => 'Falcon Survey',
+            'status' => 'published',
+            'created_by' => $admin->id,
+        ]);
+
+        $response = $this->actingAs($admin)->post(
+            route('admin.companies.invite', $falcon),
+            [
+                'name' => 'Director Dave',
+                'username' => 'directordave',
+                'email' => 'dave@falcon.com',
+                'role' => 'manager',
+            ]
+        );
+
+        $response->assertRedirect();
+        $manager = User::where('username', 'directordave')->first();
+        $this->assertNotNull($manager);
+        $this->assertTrue($manager->isManager());
+
+        // Manager MUST NOT be enrolled in the company survey
+        $this->assertFalse($survey->participants()->where('users.id', $manager->id)->exists());
+        $this->assertDatabaseMissing('assessments', ['survey_id' => $survey->id, 'assessor_id' => $manager->id]);
+        $this->assertDatabaseMissing('assessments', ['survey_id' => $survey->id, 'subject_id' => $manager->id]);
     }
 }
