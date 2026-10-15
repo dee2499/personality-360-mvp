@@ -115,4 +115,73 @@ class AdminSidebarNavigationTest extends TestCase
         $responseAdmin->assertSee(route('admin.survey-assessment'));
         $responseAdmin->assertSee('Survey Assessment');
     }
+
+    public function test_admin_mobile_view_renders_company_switcher(): void
+    {
+        $falcon = Company::factory()->create(['name' => 'Falcon Group']);
+        $acme = Company::factory()->create(['name' => 'Acme Corporation']);
+
+        $admin = User::factory()->create([
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+        $response->assertOk();
+
+        // Mobile top bar company switcher
+        $response->assertSee('mobileTopCompanyOpen');
+        $response->assertSee('switch_company_id='.$acme->id, false);
+
+        // Mobile drawer company switcher
+        $response->assertSee('openDrawerCompanyList');
+        $response->assertSee('Selected Organization');
+    }
+
+    public function test_switching_company_in_team_directory_updates_data_and_redirects_mismatched_person_to_home(): void
+    {
+        $falcon = Company::factory()->create(['name' => 'Falcon Group']);
+        $acme = Company::factory()->create(['name' => 'Acme Corporation']);
+
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $falconEmployee = User::factory()->create([
+            'name' => 'Falcon Worker',
+            'company_id' => $falcon->id,
+            'role' => 'participant',
+        ]);
+
+        $acmeEmployee = User::factory()->create([
+            'name' => 'Acme Specialist',
+            'company_id' => $acme->id,
+            'role' => 'participant',
+        ]);
+
+        // 1. Visit Team Directory switching to Falcon
+        $resFalcon = $this->actingAs($admin)->get(route('admin.people.index', ['switch_company_id' => $falcon->id]));
+        $resFalcon->assertRedirect(route('admin.people.index'));
+
+        $resFalconIndex = $this->actingAs($admin)->get(route('admin.people.index'));
+        $resFalconIndex->assertSee('Falcon Worker');
+        $resFalconIndex->assertDontSee('Acme Specialist');
+
+        // 2. Switch to Acme while on Team Directory
+        $resSwitchAcme = $this->actingAs($admin)->get(route('admin.people.index', ['switch_company_id' => $acme->id]));
+        $resSwitchAcme->assertRedirect(route('admin.people.index'));
+
+        $resAcmeIndex = $this->actingAs($admin)->get(route('admin.people.index'));
+        $resAcmeIndex->assertSee('Acme Specialist');
+        $resAcmeIndex->assertDontSee('Falcon Worker');
+
+        // 3. If viewing a Falcon employee profile but switching company to Acme:
+        // Person does not belong to Acme, so it must redirect to home (admin.dashboard)
+        $resSwitchMismatched = $this->actingAs($admin)->get(route('admin.people.show', [
+            'person' => $falconEmployee,
+            'switch_company_id' => $acme->id,
+        ]));
+        $resSwitchMismatched->assertRedirect(route('admin.dashboard'));
+
+        // 4. If directly accessing a person from another company while active company is Acme:
+        $resDirectMismatched = $this->actingAs($admin)->get(route('admin.people.show', $falconEmployee));
+        $resDirectMismatched->assertRedirect(route('admin.dashboard'));
+    }
 }

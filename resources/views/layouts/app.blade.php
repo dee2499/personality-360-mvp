@@ -102,6 +102,34 @@
 
                     <!-- Navigation Links for Mobile Drawer -->
                     <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+                        @if($isAdmin && isset($allCompanies) && $allCompanies->isNotEmpty())
+                            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200" x-data="{ openDrawerCompanyList: false }">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Selected Organization</span>
+                                        <span class="block text-xs font-black text-slate-900 truncate">{{ $activeCompany?->name ?? 'Select Company' }}</span>
+                                    </div>
+                                    <button type="button" 
+                                            @click="openDrawerCompanyList = !openDrawerCompanyList"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-indigo-600 shadow-2xs hover:bg-indigo-50 transition cursor-pointer shrink-0">
+                                        <span>Change</span>
+                                        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <div x-show="openDrawerCompanyList" x-cloak class="mt-2.5 pt-2 border-t border-slate-200 space-y-1 max-h-48 overflow-y-auto">
+                                    @foreach($allCompanies as $comp)
+                                        <a href="{{ request()->fullUrlWithQuery(['switch_company_id' => $comp->id]) }}" 
+                                           class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition {{ ($activeCompany?->id === $comp->id) ? 'bg-indigo-100 text-indigo-900 font-bold' : 'text-slate-700 hover:bg-white' }}">
+                                            <span class="truncate">{{ $comp->name }}</span>
+                                            @if($activeCompany?->id === $comp->id)
+                                                <i data-lucide="check" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         @if($isStaff)
                             <div>
                                 <div class="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -444,7 +472,37 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    @if($isAdmin && isset($activeCompany))
+                    @if($isAdmin && isset($allCompanies) && $allCompanies->isNotEmpty())
+                        <div class="relative" x-data="{ mobileTopCompanyOpen: false }">
+                            <button type="button" 
+                                    @click="mobileTopCompanyOpen = !mobileTopCompanyOpen"
+                                    class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition cursor-pointer max-w-[150px] truncate shadow-2xs">
+                                <i data-lucide="building-2" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+                                <span class="truncate">{{ $activeCompany?->name ?? 'Select' }}</span>
+                                <i data-lucide="chevron-down" class="w-3 h-3 text-indigo-500 shrink-0 transition" :class="{ 'rotate-180': mobileTopCompanyOpen }"></i>
+                            </button>
+
+                            <div x-show="mobileTopCompanyOpen" 
+                                 @click.outside="mobileTopCompanyOpen = false" 
+                                 x-cloak
+                                 class="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-50 py-1 divide-y divide-slate-100">
+                                <div class="px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/70">
+                                    Switch Active Company
+                                </div>
+                                <div class="max-h-60 overflow-y-auto">
+                                    @foreach($allCompanies as $comp)
+                                        <a href="{{ request()->fullUrlWithQuery(['switch_company_id' => $comp->id]) }}" 
+                                           class="flex items-center justify-between px-3.5 py-2 text-xs hover:bg-indigo-50 transition {{ ($activeCompany?->id === $comp->id) ? 'bg-indigo-50/80 font-bold text-indigo-900' : 'text-slate-700' }}">
+                                            <span class="truncate">{{ $comp->name }}</span>
+                                            @if($activeCompany?->id === $comp->id)
+                                                <i data-lucide="check" class="w-3.5 h-3.5 text-indigo-600 shrink-0"></i>
+                                            @endif
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @elseif(isset($activeCompany))
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 max-w-[120px] truncate">
                             {{ $activeCompany->name }}
                         </span>

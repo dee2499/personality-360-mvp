@@ -32,6 +32,11 @@ class PeopleController extends Controller
             abort(403, 'Your account is designated as manager but has not been assigned to a company yet.');
         }
 
+        // If a survey was selected from another company, reset it to show relative company data
+        if ($selectedSurvey && $managerCompanyId && (int) $selectedSurvey->company_id !== (int) $managerCompanyId) {
+            $selectedSurvey = null;
+        }
+
         $surveys = $managerCompanyId
             ? Survey::where('company_id', $managerCompanyId)->get()
             : Survey::all();
@@ -57,10 +62,19 @@ class PeopleController extends Controller
     /**
      * Display individual person profile with combined score, meter, and subject assessments.
      */
-    public function show(User $person, Request $request): View
+    public function show(User $person, Request $request): View|RedirectResponse
     {
         if ($request->user()->isManager() && $person->company_id !== $request->user()->company_id) {
             abort(403, 'You are not authorized to view employees outside your company.');
+        }
+
+        $activeCompanyId = $request->user()->isManager()
+            ? $request->user()->company_id
+            : session('admin_selected_company_id');
+
+        if ($activeCompanyId && $person->company_id && (int) $person->company_id !== (int) $activeCompanyId) {
+            return redirect()->route('admin.dashboard')
+                ->with('info', "Participant '{$person->name}' does not belong to the selected company. Redirected to home.");
         }
 
         $selectedSurveyId = $request->query('survey_id');
